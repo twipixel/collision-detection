@@ -91,7 +91,7 @@ export default class Polygon extends PIXI.Graphics
             this.lineTo(debug.x, debug.y);
             // this.drawCircle(debug.x, debug.y, 5);
 
-            if (i === 0) {
+            if (i === 3) {
                 this.drawCircle(p1.y - p2.y, -(p1.x - p2.x), 5);
             }
 
@@ -123,14 +123,6 @@ export default class Polygon extends PIXI.Graphics
 
         globalPoints.forEach((point) => {
             var p = axis.dot(point);
-
-            // debug
-            var cloneP = cloneAxis.dot(point);
-            var localX = point.x - this.x;
-            var localY = point.y - this.y;
-            // this.drawCircle(point.x - this.x, point.y - this.y, 5);
-            this.moveTo(localX, localY);
-            this.lineTo(localX + cloneP, localY + cloneP);
 
             if (p < min) {
                 min = p;

@@ -223,7 +223,6 @@ function attachUpdatingMethods(graphics) {
 			console.log('proj1', proj1);
 			console.log('proj2', proj2);
 
-
 			// check overlap
 			if (proj1.min <= proj2.max && proj1.max >= proj2.min) {
 				

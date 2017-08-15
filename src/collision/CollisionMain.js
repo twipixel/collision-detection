@@ -3,6 +3,7 @@ import Calc from './utils/Calculator';
 import Polygon from './shapes/Polygon';
 import Painter from './utils/Painter';
 import PointUtil from './utils/PointUtil';
+import SAT from './utils/SAT';
 
 
 // TEST
@@ -88,30 +89,12 @@ export default class CollisionMain extends PIXI.utils.EventEmitter
         const tri = this.triangle;
         const rec = this.rectangle;
 
-        const axes1 = tri.getAxes();
-        const axes2 = rec.getAxes();
+        var mtv = SAT.collide(tri, rec);
 
+        console.log(mtv);
 
-        for (var i = 0; i < axes1.length; i++) {
-
-            if (i === 2) {
-                var axis = axes1[i];
-                var p1 = tri.project(axis);
-                var p2 = rec.project(axis);
-
-                console.log(p1, p2);
-            }
-        }
-
-
-        for (var i = 0; i < axes2.length; i++) {
-
-            if (i === 3) {
-                // var axis = axes2[i];
-                // var p1 = tri.project(axis);
-                // var p2 = rec.project(axis);
-            }
-        }
+        // tri.x += mtv.x;
+        // tri.y += mtv.y;
     }
 
 
