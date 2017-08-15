@@ -6,13 +6,14 @@ export default class SAT
         const axes2 = shape2.getAxes();
         const axes = axes1.concat(axes2);
 
+        var MTV;
+        var minOverlap = Number.MAX_VALUE; // amount of smallest overlap
+
         for (var i = 0; i < axes.length; i++) {
             var axis = axes[i];
             var proj1 = shape1.project(axis);
             var proj2 = shape2.project(axis);
 
-            var MTV;
-            var minOverlap = Number.MAX_VALUE; // amount of smallest overlap
             // check overlap
             if (proj1.min <= proj2.max && proj1.max >= proj2.min) {
 

@@ -93,8 +93,8 @@ export default class CollisionMain extends PIXI.utils.EventEmitter
 
         console.log(mtv);
 
-        // tri.x += mtv.x;
-        // tri.y += mtv.y;
+        tri.x += mtv.x;
+        tri.y += mtv.y;
     }
 
 

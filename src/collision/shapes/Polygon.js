@@ -109,29 +109,22 @@ export default class Polygon extends PIXI.Graphics
     project(axis)
     {
         console.log('project(', axis, ')');
+
         const globalPoints = this.globalPoints;
         const projection = {min: 0, max: 0, results: []};
 
-        var min = axis.dot(globalPoints[0]);
-        var max = min;
-
-        this.lineStyle(1, 0xff3300);
-
-        const cloneAxis = axis.clone();
-        // cloneAxis.multiplyScalar(100);
-
+        projection.max = axis.dot(globalPoints[0]);
+        projection.min = projection.max;
 
         globalPoints.forEach((point) => {
             var p = axis.dot(point);
 
-            if (p < min) {
-                min = p;
-            } else if (p > max) {
-                max = p;
+            if (p < projection.min) {
+                projection.min = p;
+            } else if (p > projection.max) {
+                projection.max = p;
             }
 
-            projection.min = min;
-            projection.max = max;
             projection.results.push(p);
         });
 
