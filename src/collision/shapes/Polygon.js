@@ -108,8 +108,6 @@ export default class Polygon extends PIXI.Graphics
      */
     project(axis)
     {
-        console.log('project(', axis, ')');
-
         const globalPoints = this.globalPoints;
         const projection = {min: 0, max: 0, results: []};
 

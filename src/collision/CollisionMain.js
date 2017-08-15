@@ -60,7 +60,7 @@ export default class CollisionMain extends PIXI.utils.EventEmitter
 
         this.rectangle = new Polygon(4, 100, 0x333333);
         // this.rectangle.x = 500;
-        this.rectangle.x = 350;
+        this.rectangle.x = 340;
         this.rectangle.y = 200;
         // this.rectangle.rotation = Calc.toRadians(45);
         this.container.addChild(this.rectangle);
@@ -91,10 +91,8 @@ export default class CollisionMain extends PIXI.utils.EventEmitter
 
         var mtv = SAT.collide(tri, rec);
 
-        console.log(mtv);
-
-        tri.x += mtv.x;
-        tri.y += mtv.y;
+        // tri.x += mtv.x;
+        // tri.y += mtv.y;
     }
 
 
