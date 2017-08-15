@@ -9,10 +9,6 @@ document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
 stage.interactive = true;
 
-var textView = new PIXI.Text("Drag polygons");
-textView.x = 30;
-textView.y = 30;
-stage.addChild(textView);
 
 var polygon1 = createPolygon(3, 0x46adc8, true);
 polygon1.x = 100;
@@ -24,10 +20,29 @@ polygon2.x = 300;
 polygon2.y = 200;
 stage.addChild(polygon2);
 
+
+var topRect = createPolygon(4, 0xff3300, true);
+topRect.x = 100;
+topRect.y = 0;
+stage.addChild(topRect);
+
+
 var polygon2_1 = createPolygon(5, 0xE58AD9, false);
 polygon2_1.visible = false;
 polygon2_1.alpha = 0.5;
 stage.addChild(polygon2_1);
+
+
+var textView = new PIXI.Text("Drag polygons");
+textView.x = 30;
+textView.y = 30;
+stage.addChild(textView);
+
+
+// axis draw
+var g = new PIXI.Graphics();
+stage.addChild(g);
+
 
 // run the game loop
 gameLoop();
@@ -133,6 +148,8 @@ function attachUpdatingMethods(graphics) {
 
 	graphics.updateWorldNormals = function() {
 
+		// g.lineStyle(1, 0x8e44ad, 1);
+
 		this.worldNormals = [];
 
 		for (var i = 0; i < this.worldPoints.length; i++) {
@@ -143,12 +160,18 @@ function attachUpdatingMethods(graphics) {
 			var normal = new PIXI.Vector(p1.y - p2.y, -(p1.x - p2.x));
 			normal = normal.normalize();
 			this.worldNormals.push(normal);
+
+			g.moveTo(p2.x, p2.y);
+			g.lineTo(normal.x, normal.y);
 		}
-	}
+	};
 
 	graphics.update = function update(dt) {
 
 		// this.rotation += 0.01;
+
+		//
+		g.clear();
 
 		this.updateWorldPoints();
 		this.updateWorldNormals();
@@ -158,6 +181,9 @@ function attachUpdatingMethods(graphics) {
 
 		if (other.worldPoints === undefined || other.worldNormals === undefined)
 			return false;
+
+
+		g.lineStyle(1, 0xff3300, 0.8);
 
 		var project = function (worldPoints, axisVector) {
 
@@ -169,6 +195,7 @@ function attachUpdatingMethods(graphics) {
 			worldPoints.forEach((point) => {
 
 				var p = axisVector.dot(point);
+
 
 				if (p < projection.min) {
 					projection.min = p;
@@ -192,6 +219,10 @@ function attachUpdatingMethods(graphics) {
 
 			var proj1 = project(this.worldPoints, axis);
 			var proj2 = project(other.worldPoints, axis);
+
+			console.log('proj1', proj1);
+			console.log('proj2', proj2);
+
 
 			// check overlap
 			if (proj1.min <= proj2.max && proj1.max >= proj2.min) {
@@ -247,4 +278,19 @@ function attachMouseDragCallbacks (graphics) {
 	graphics.on('mouseup', onMouseUp);
 
 	return graphics;
+}
+
+
+
+function drawPoints(axes) {
+
+	g.lineStyle(1, 0xff3300, 1);
+
+    for (var i = 0; i < axes.length; i ++) {
+        var p0 = axes[i];
+        var p1 = axes[i + 1 < axes.length ? i + 1 : 0];
+
+        g.moveTo(p0.x, p0.y);
+        g.lineTo(p1.x, p1.y);
+    }
 }

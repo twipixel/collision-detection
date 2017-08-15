@@ -1,10 +1,13 @@
 import Mouse from './utils/Mouse';
+import Calc from './utils/Calculator';
+import Polygon from './shapes/Polygon';
+import Painter from './utils/Painter';
+import PointUtil from './utils/PointUtil';
+
 
 // TEST
 import DatGui from './debug/DatGui';
 import KeyCode from './consts/KeyCode';
-
-
 
 
 export default class CollisionMain extends PIXI.utils.EventEmitter
@@ -19,6 +22,7 @@ export default class CollisionMain extends PIXI.utils.EventEmitter
         this.options = options;
 
         this.initialize(options);
+        this.addEvent();
     }
 
 
@@ -33,12 +37,81 @@ export default class CollisionMain extends PIXI.utils.EventEmitter
     {
         this.options = options;
 
+        this.createPolygon();
+        this.createDebugGraphics();
+        this.drawDebugLine();
+    }
+
+
+    addEvent()
+    {
+        window.addEventListener('keyup', this.onKeyUp.bind(this));
+    }
+
+
+    createPolygon()
+    {
+        this.triangle = new Polygon(3, 100, 0x333333);
+        this.triangle.x = 200;
+        this.triangle.y = 200;
+        // this.triangle.rotation = Calc.toRadians(60);
+        this.container.addChild(this.triangle);
+
+        this.rectangle = new Polygon(4, 100, 0x333333);
+        // this.rectangle.x = 500;
+        this.rectangle.x = 350;
+        this.rectangle.y = 200;
+        // this.rectangle.rotation = Calc.toRadians(45);
+        this.container.addChild(this.rectangle);
+
+
+        this.polygon = new Polygon(5, 100, 0x333333);
+        this.polygon.x = 800;
+        this.polygon.y = 200;
+        this.container.addChild(this.polygon);
+    }
+
+
+    createDebugGraphics()
+    {
         // 디버그용 그래픽스
         window.g = this.g = new PIXI.Graphics();
         this.container.addChild(this.g);
+    }
 
-        // 디버그 키 등록
-        window.addEventListener('keyup', this.onKeyUp.bind(this));
+
+    drawDebugLine()
+    {
+        // const trianglePoints = this.triangle.globalPoints;
+        // Painter.drawPoints(this.g, trianglePoints, true);
+
+        const tri = this.triangle;
+        const rec = this.rectangle;
+
+        const axes1 = tri.getAxes();
+        const axes2 = rec.getAxes();
+
+
+        for (var i = 0; i < axes1.length; i++) {
+
+            if (i === 2) {
+                var axis = axes1[i];
+                var p1 = tri.project(axis);
+                var p2 = rec.project(axis);
+
+                console.log(p1, p2);
+            }
+        }
+
+
+        for (var i = 0; i < axes2.length; i++) {
+
+            if (i === 3) {
+                // var axis = axes2[i];
+                // var p1 = tri.project(axis);
+                // var p2 = rec.project(axis);
+            }
+        }
     }
 
 
