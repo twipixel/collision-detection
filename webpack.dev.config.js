@@ -103,7 +103,7 @@ module.exports = {
                 ignore: [ '*.md']
             }),
 
-        new webpack.optimize.UglifyJsPlugin({
+        /*new webpack.optimize.UglifyJsPlugin({
             minimize: true,
             output: {
                 comments: false
@@ -111,7 +111,7 @@ module.exports = {
             compress: {
                 warnings: false
             }
-        }),
+        }),*/
 
         new BrowserSyncPlugin({
             host: 'localhost',
