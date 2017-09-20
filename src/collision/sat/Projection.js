@@ -11,4 +11,6 @@ export default class Projection
     {
         return this.max > projection.min && projection.max > this.min;
     }
+
+
 }

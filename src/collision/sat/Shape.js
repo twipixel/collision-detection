@@ -1,3 +1,6 @@
+import Painter from './../utils/Painter';
+
+
 export default class Shape
 {
     constructor()
@@ -26,9 +29,6 @@ export default class Shape
             const axis = axes[i];
             const projection1 = otherShape.project(axis);
             const projection2 = this.project(axis);
-
-            //console.log(axis, '|', projection1, '|', projection2);
-
             if (!projection1.overlaps(projection2)) {
                 return true;
             }

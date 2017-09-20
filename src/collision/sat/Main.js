@@ -2,7 +2,8 @@ import Point from './Point';
 import Polygon from './Polygon';
 import Mouse from './../utils/Mouse';
 
-const g = new PIXI.Graphics(),
+const graphics = new PIXI.Graphics(),
+      debugGraphics = new PIXI.Graphics(),
       shapes = [],
       polygonPoints = [
           [new Point(250, 150), new Point(250, 250), new Point(350, 250)],
@@ -28,8 +29,9 @@ export default class Main extends PIXI.Container
 
     initialize()
     {
-        window.g = g;
-        this.addChild(g);
+        window.g = debugGraphics;
+        this.addChild(debugGraphics);
+        this.addChild(graphics);
 
         // 마우스 영역 설정
         this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
@@ -60,7 +62,7 @@ export default class Main extends PIXI.Container
 
             shapes.push(polygon);
 
-            polygon.createPath(g);
+            polygon.createPath(graphics);
         }
     }
 
@@ -85,10 +87,10 @@ export default class Main extends PIXI.Container
 
     updateRender()
     {
-        g.clear();
+        graphics.clear();
 
         shapes.forEach((polygon) => {
-           polygon.createPath(g);
+           polygon.createPath(graphics);
         });
     }
 

@@ -25,13 +25,7 @@ export default class Polygon extends Shape
         this.points.forEach(point => {
             v.x = point.x;
             v.y = point.y;
-
             let scalar = v.dotProduct(axis);
-
-            console.log(v, '|', axis, '|', scalar);
-
-
-            //Painter.drawLine(window.g, v, new PIXI.Point(v.x * scalar, v.y *scalar), 1);
             scalars.push(scalar);
         });
 
