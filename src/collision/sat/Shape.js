@@ -12,6 +12,8 @@ export default class Shape
      */
     collideWidth(otherShape)
     {
+        console.log('드래그 도형 축', this.getAxes());
+        console.log('다른 도형 축', otherShape.getAxes());
         const axes = this.getAxes().concat(otherShape.getAxes());
         return !this.separationOnAxes(axes, otherShape);
     }
@@ -24,6 +26,8 @@ export default class Shape
             const axis = axes[i];
             const projection1 = otherShape.project(axis);
             const projection2 = this.project(axis);
+
+            //console.log(axis, '|', projection1, '|', projection2);
 
             if (!projection1.overlaps(projection2)) {
                 return true;

@@ -2,6 +2,7 @@ import Shape from './Shape';
 import Vector from './Vector';
 import Point from './Point';
 import Projection from './Projection';
+import Painter from './../utils/Painter';
 
 
 export default class Polygon extends Shape
@@ -24,7 +25,14 @@ export default class Polygon extends Shape
         this.points.forEach(point => {
             v.x = point.x;
             v.y = point.y;
-            scalars.push(v.dotProduct(axis));
+
+            let scalar = v.dotProduct(axis);
+
+            console.log(v, '|', axis, '|', scalar);
+
+
+            //Painter.drawLine(window.g, v, new PIXI.Point(v.x * scalar, v.y *scalar), 1);
+            scalars.push(scalar);
         });
 
         return new Projection(
@@ -36,18 +44,25 @@ export default class Polygon extends Shape
 
     getAxes()
     {
-        const v1 = new Vector(),
-              v2 = new Vector(),
-              axes = [];
+        let v1 = new Vector(),
+            v2 = new Vector(),
+            axes = [], axe, p1, p2;
+        //console.log(this.points.length + '.getAxes');
 
         for (var i = 0; i < this.points.length - 1; i++) {
-            v1.x = this.points[i].x;
-            v1.y = this.points[i].y;
 
-            v2.x = this.points[i + 1].x;
-            v2.y = this.points[i + 1].y;
+            p1 = this.points[i];
+            p2 = this.points[i + 1];
 
-            axes.push(v1.edge(v2).normal());
+            v1.x = p1.x;
+            v1.y = p1.y;
+
+            v2.x = p2.x;
+            v2.y = p2.y;
+
+            axe = v1.edge(v2).normal();
+            axes.push(axe);
+            //console.log('p1[', p1.x, p1.y, ']', 'p2[', p2.x, p2.y, ']', 'axe', axe);
         }
 
         v1.x = this.points[this.points.length - 1].x;
@@ -70,17 +85,12 @@ export default class Polygon extends Shape
 
     createPath(graphics)
     {
-        console.log(this.points.length, 'polygon');
-
-        graphics.beginFill(0xFFFFFF, 0);
         graphics.lineStyle(1, 0xFFFFFF);
         graphics.moveTo(this.points[0].x, this.points[0].y);
-
-        for (var i = 0; i < this.points.length; ++i) {
+        for (var i = 0; i < this.points.length; i++) {
             graphics.lineTo(this.points[i].x, this.points[i].y);
         }
-
-        graphics.endFill();
+        graphics.lineTo(this.points[0].x, this.points[0].y);
     }
 
 
@@ -100,15 +110,19 @@ export default class Polygon extends Shape
             return;
         }
 
+        this.context.save();
         this.context.beginPath();
         this.context.moveTo(this.points[0].x, this.points[0].y);
 
-        for (var i = 0; i < this.points.length; ++i) {
+        for (var i = 0; i < this.points.length; i++) {
             this.context.lineTo(this.points[i].x, this.points[i].y);
         }
 
+        this.context.lineTo(this.points[0].x, this.points[0].y);
         this.context.closePath();
 
-        return this.context.isPointInPath(x, y);
+        const isPointInPath = this.context.isPointInPath(x, y);
+        this.context.restore();
+        return isPointInPath;
     }
 }

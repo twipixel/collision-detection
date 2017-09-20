@@ -13,8 +13,7 @@ function initailize() {
     renderer = new PIXI.CanvasRenderer(canvas.width, canvas.height, {
         view: canvas,
         autoResize: true,
-        backgroundColor: 0x3498db
-        //backgroundColor: 0x673AB7
+        backgroundColor: 0x4CAF50
     });
 
 
@@ -22,7 +21,7 @@ function initailize() {
     // 렌더러의 위치를 정수로 연산될 수 있도록 한다.
     //renderer.roundPixels = true;
 
-    stage = new PIXI.Container(0xE6E9EC);
+    stage = new PIXI.Container();
     container = new PIXI.Container();
     stage.addChild(container);
 

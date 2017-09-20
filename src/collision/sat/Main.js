@@ -3,14 +3,12 @@ import Polygon from './Polygon';
 import Mouse from './../utils/Mouse';
 
 const g = new PIXI.Graphics(),
-    shapes = [],
-    polygonPoints = [
-    [new Point(250, 150), new Point(250, 250), new Point(350, 250)],
-    [new Point(100, 100), new Point(100, 150), new Point(150, 150), new Point(150, 100)],
-    [new Point(400, 100), new Point(380, 150), new Point(500, 150), new Point(520, 100)]
-];
-
-
+      shapes = [],
+      polygonPoints = [
+          [new Point(250, 150), new Point(250, 250), new Point(350, 250)],
+          [new Point(100, 100), new Point(100, 150), new Point(150, 150), new Point(150, 100)],
+          //[new Point(400, 100), new Point(380, 150), new Point(500, 150), new Point(520, 100)]
+      ];
 
 
 export default class Main extends PIXI.Container
@@ -30,14 +28,16 @@ export default class Main extends PIXI.Container
 
     initialize()
     {
+        window.g = g;
+        this.addChild(g);
+
+        // 마우스 영역 설정
         this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
 
-        this.mousedown = new PIXI.Point(0, 0);
+        this.mouseDownPoint = new PIXI.Point(0, 0);
         this.lastdrag = new PIXI.Point(0, 0);
         this.shapeBeingDragged = undefined;
 
-
-        this.addChild(g);
         this.createPolygon();
     }
 
@@ -53,6 +53,10 @@ export default class Main extends PIXI.Container
             points.forEach((point) => {
                 polygon.addPoint(point.x, point.y);
             });
+
+            if (i !== polygonPoints.length - 1) {
+                this.rotateShape(polygon, (Math.random() * 45) * Math.PI / 180);
+            }
 
             shapes.push(polygon);
 
@@ -73,15 +77,66 @@ export default class Main extends PIXI.Container
     }
 
 
-    onMouseDown(event)
+    resize()
     {
-        var location = Mouse.global;
+        this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
+    }
 
+
+    updateRender()
+    {
+        g.clear();
+
+        shapes.forEach((polygon) => {
+           polygon.createPath(g);
+        });
+    }
+
+
+    detectCollisions()
+    {
+        let numShapes = shapes.length, shape, i, dragShape = this.shapeBeingDragged;
+
+        if (dragShape) {
+            for (i = 0; i < numShapes; ++i) {
+                shape = shapes[i];
+
+                if (shape !== dragShape) {
+                    if (dragShape.collideWidth(shape)) {
+                        console.log('hit -> ', shape.points.length + ' polygon');
+                    }
+                }
+            }
+        }
+    }
+
+
+    rotateShape(shape, rotate)
+    {
+        console.log(rotate);
+        const cos = Math.cos(rotate);
+        const sin = Math.sin(rotate);
+
+        const points = shape.points;
+
+        for(let i = 0; i < points.length; i++) {
+            let pt = points[i];
+            let x = pt.x;
+            let y = pt.y;
+            pt.x = cos * x - sin * y;
+            pt.y = sin * x + cos * y;
+        }
+    }
+
+
+    onMouseDown()
+    {
+        let location = Mouse.global;
         shapes.forEach((shape) => {
             if (shape.isPointInPath(location.x, location.y)) {
                 this.shapeBeingDragged = shape;
-                this.mousedown.x = location.x;
-                this.mousedown.y = location.y;
+                this.mouseDownPoint.x = location.x;
+                this.mouseDownPoint.y = location.y;
                 this.lastdrag.x = location.x;
                 this.lastdrag.y = location.y;
             }
@@ -89,20 +144,28 @@ export default class Main extends PIXI.Container
     }
 
 
-    onMouseMove(event)
+    onMouseMove()
     {
+        let location, dragVector;
 
+        if (this.shapeBeingDragged) {
+            location = Mouse.global;
+
+            dragVector = new PIXI.Point(location.x - this.lastdrag.x, location.y - this.lastdrag.y);
+
+            this.shapeBeingDragged.move(dragVector.x, dragVector.y);
+
+            this.lastdrag.x = location.x;
+            this.lastdrag.y = location.y;
+
+            this.updateRender();
+            this.detectCollisions();
+        }
     }
 
 
-    onMouseUp(event)
+    onMouseUp()
     {
-
-    }
-
-
-    resize()
-    {
-        this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
+        this.shapeBeingDragged = undefined;
     }
 }

@@ -5,8 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "dev": "webpack --config webpack.dev.config.js",
-    "build": "webpack --config webpack.build.config.js",
-    "electron": "electron electron.js"
+    "build": "webpack --config webpack.build.config.js"
   },
   "repository": {
     "type": "git",
