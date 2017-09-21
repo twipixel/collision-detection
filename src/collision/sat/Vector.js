@@ -77,4 +77,10 @@ export default class Vector
         var p = this.perpendicular();
         return p.normalize();
     }
+
+
+    clone()
+    {
+        return new Vector(this.x, this.y);
+    }
 }

@@ -1,3 +1,4 @@
+import MTV from './MTV';
 import Painter from './../utils/Painter';
 
 
@@ -6,6 +7,90 @@ export default class Shape
     constructor()
     {
         this.interactive = true;
+    }
+
+
+    minimumTranslationVector(axes, shape)
+    {
+        var minimumOverlap = 100000,
+            overlap, axisWithSmallestOverlap,
+            axis, projection1, projection2;
+
+        for (var i = 0; i < axes.length; ++i) {
+            axis = axes[i];
+            projection1 = shape.project(axis);
+            projection2 = this.project(axis);
+            overlap = projection1.getOverlap(projection2);
+
+            //console.log('overlap', overlap);
+
+            if (overlap === 0) { //충돌 없슴.
+                return new MTV(overlap);
+            }
+            else {
+                if (overlap < minimumOverlap) {
+                    minimumOverlap = overlap;
+                    axisWithSmallestOverlap = axis;
+                }
+            }
+        }
+
+        return new MTV(minimumOverlap, axisWithSmallestOverlap);
+    }
+
+
+    /**
+     * 두 다각형 사이에서 충돌
+     * @param p1
+     * @param p2
+     * @returns {*}
+     */
+    polygonCollidesWithPolygon(p1, p2)
+    {
+        var mtv1 = p1.minimumTranslationVector(p1.getAxes(), p2),
+            mtv2 = p1.minimumTranslationVector(p2.getAxes(), p2);
+
+        if (mtv1.overlap === 0 && mtv2.overlap === 0) {
+            return new MTV(0);
+        }
+        else {
+            return mtv1.overlap < mtv2.overlap ? mtv1 : mtv2;
+        }
+    }
+
+
+    /**
+     * 두 원형에 대한 충돌
+     * @param c1
+     * @param c2
+     */
+    circleCollidesWithCircle(c1, c2)
+    {
+        var distance = Math.sqrt(
+            Math.pow(c2.x - c1.x, 2),
+            Math.pow(c2.y - c2.y, 2)
+        );
+
+        var ovrelap = Math.abs(c1.radius + c2.radius) - distance;
+
+        return overlap < 0 ? new MTV(0) : new MTV(overlap);
+    }
+
+
+    /**
+     * 다각형과 원형 충돌 검사
+     * @param polygon
+     * @param circle
+     * @returns {boolean}
+     */
+    polygonCollidesWithCircle(polygon, circle)
+    {
+        var axes = polygon.getAxes(),
+            closestPoint = circle.getPolygonPointClosestToCircle(polygon, circle);
+
+        axes.push(circle.getCircleAxis(circle, closestPoint));
+
+        return !polygon.separationOnAxes(axes, circle);
     }
 
 
@@ -21,6 +106,12 @@ export default class Shape
     }
 
 
+    /**
+     * 분리축이 있는지 여부 (분리축이 있다는 이야기는 충돌하지 않았다는 이야기 입니다.)
+     * @param axes
+     * @param shape
+     * @returns {boolean}
+     */
     separationOnAxes(axes, shape)
     {
         for (var i=0; i < axes.length; ++i) {
@@ -28,7 +119,7 @@ export default class Shape
             var projection1 = shape.project(axis);
             var projection2 = this.project(axis);
 
-            if (! projection1.overlaps(projection2)) {
+            if (!projection1.overlaps(projection2)) {
                 return true; // don't have to test remaining axes
             }
         }

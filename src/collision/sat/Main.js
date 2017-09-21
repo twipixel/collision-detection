@@ -1,4 +1,5 @@
 import Point from './Point';
+import Vector from './Vector';
 import Circle from './Circle';
 import Polygon from './Polygon';
 import Mouse from './../utils/Mouse';
@@ -9,7 +10,8 @@ const graphics = new PIXI.Graphics(),
       shapes = [],
       polygonPoints = [
           [new Point(250, 150), new Point(250, 250), new Point(350, 250)],
-          [new Point(100, 100), new Point(100, 150), new Point(150, 150), new Point(150, 100)],
+          [new Point(158, 20), new Point(195, 130), new Point(100, 200), new Point(5, 130), new Point(42, 20)]
+          //[new Point(100, 100), new Point(100, 150), new Point(150, 150), new Point(150, 100)],
           //[new Point(400, 100), new Point(380, 150), new Point(500, 150), new Point(520, 100)]
       ];
 
@@ -42,7 +44,37 @@ export default class Main extends PIXI.Container
         this.lastdrag = new PIXI.Point(0, 0);
         this.shapeBeingDragged = undefined;
 
+
+        var polygon = this.getPolygonPoints(5);
+        polygonPoints.push(polygon);
+
+        console.log('polygon', polygon);
+
         this.createPolygon();
+    }
+
+
+    getPolygonPoints(angle)
+    {
+        var scale = 100;
+        var points = [];
+
+        // making points, path
+        for (var i = 0; i < angle; i ++) {
+
+            var x = scale * -Math.sin(this.toRadian(360 / angle * i));
+            var y = scale *  Math.cos(this.toRadian(360 / angle * i));
+            var point = new PIXI.Point(x, y);
+            points.push(point);
+        }
+
+        console.log('getPolygonPoints(', angle,')', points.length);
+        return points;
+    }
+
+
+    toRadian(degree) {
+        return degree * Math.PI / 180;
     }
 
 
@@ -80,13 +112,14 @@ export default class Main extends PIXI.Container
         polygon.addPoint(polygonPoints[1][1].x, polygonPoints[1][1].y);
         polygon.addPoint(polygonPoints[1][2].x, polygonPoints[1][2].y);
         polygon.addPoint(polygonPoints[1][3].x, polygonPoints[1][3].y);
+        polygon.addPoint(polygonPoints[1][4].x, polygonPoints[1][4].y);
         this.rotateShape(polygon, (Math.random() * 45) * Math.PI / 180);
         polygon.createPath(graphics);
         shapes.push(polygon);
 
-        let circle = new Circle(context, 150, 75, 30);
-        circle.createPath(graphics);
-        shapes.push(circle);
+        //let circle = new Circle(context, 150, 75, 30);
+        //circle.createPath(graphics);
+        //shapes.push(circle);
     }
 
 
@@ -127,13 +160,56 @@ export default class Main extends PIXI.Container
                 shape = shapes[i];
 
                 if (shape !== dragShape) {
-                    if (dragShape.collidesWith(shape)) {
-                        console.log('HIT');
+
+                    var mtv = dragShape.collidesWith(shape);
+
+                    // 충돌 판정
+                    if (mtv.axis != undefined || mtv.overlap !== 0) {
+                        this.showSeparateGuide(mtv, dragShape, shape);
                     }
                 }
             }
         }
     }
+
+
+    checkMTVAxisDirection(mtv, collider, collidee)
+    {
+        if (mtv.axis === undefined)
+            return;
+
+        var centroid1 = new Vector(collider.centroid()),
+            centroid2 = new Vector(collidee.centroid()),
+            centroidVector = centroid2.subtract(centroid1),
+            centroidUnitVector = (new Vector(centroidVector)).normalize();
+
+        if (centroidUnitVector.dotProduct(mtv.axis) > 0) {
+            mtv.axis.x = -mtv.axis.x;
+            mtv.axis.y = -mtv.axis.y;
+        }
+    };
+
+
+    /**
+     *
+     * @param mtv
+     * @param collider 충돌한 객체
+     * @param collidee 충돌을 당한 객체
+     */
+    showSeparateGuide(mtv, collider, collidee)
+    {
+        //this.checkMTVAxisDirection(mtv, collider, collidee);
+
+        var dx = mtv.axis.x * mtv.overlap,
+            dy = mtv.axis.y * mtv.overlap;
+
+        console.log(mtv.axis.x, mtv.axis.y, mtv.overlap);
+
+        collidee.move(-dx, -dy);
+        //collidee.move(dx, dy);
+    }
+
+
 
 
     rotateShape(shape, rotate)

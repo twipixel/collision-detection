@@ -18,9 +18,31 @@ export default class Circle extends Shape
     }
 
 
+    /**
+     * 중점 좌표 반환
+     * @returns {PIXI.Point|*|svg.Point}
+     */
+    centroid()
+    {
+        return new PIXI.Point(this.x,this.y);
+    }
+
+
     collidesWith(shape)
     {
-        let axes = shape.getAxes(), distance;
+        if (shape.radius === undefined) {
+            return this.polygonCollidesWithCircle(shape, this);
+        }
+        else {
+            return this.circleCollidesWithCircle(this, shape);
+        }
+    }
+
+
+    /*
+    collidesWith(shape)
+    {
+        var axes = shape.getAxes(), distance;
 
         if (axes === undefined) { //원
             distance = Math.sqrt(
@@ -32,12 +54,13 @@ export default class Circle extends Shape
             return this.polygonCollidesWithCircle(shape, this);
         }
     }
+    */
 
 
     getPolygonPointClosestToCircle(polygon, circle)
     {
         var min = 10000,
-            length, testPoint, closetPoint;
+            length, testPoint, closestPoint;
 
         for (var i = 0; i < polygon.points.length; ++i) {
             testPoint = polygon.points[i];
@@ -48,11 +71,11 @@ export default class Circle extends Shape
 
             if (length < min) {
                 min = length;
-                closetPoint = testPoint;
+                closestPoint = testPoint;
             }
         }
 
-        return closetPoint;
+        return closestPoint;
     }
 
 
@@ -62,20 +85,26 @@ export default class Circle extends Shape
      * @param circle
      * @returns {boolean}
      */
-    polygonCollidesWithCircle(polygon, circle)
+    /*polygonCollidesWithCircle(polygon, circle)
     {
-        var min = 10000, v1, v2, p1, p2,
+        var min = 10000,
             axes = polygon.getAxes(),
-            closetPoint = this.getPolygonPointClosestToCircle(polygon, circle);
+            closestPoint = this.getPolygonPointClosestToCircle(polygon, circle);
 
-        p1 = new PIXI.Point(circle.x, circle.y);
-        p2 = new PIXI.Point(closetPoint.x, closetPoint.y);
-        v1 = new Vector(p1.x, p1.y);
-        v2 = new Vector(p2.x, p2.y);
-
-        axes.push(v1.edge(v2).normal());
+        axes.push(this.getCircleAxis(circle, closestPoint));
 
         return !polygon.separationOnAxes(axes, circle);
+    }*/
+
+
+    getCircleAxis(circle, closestPoint)
+    {
+        var p1 = new PIXI.Point(circle.x, circle.y),
+            p2 = new PIXI.Point(closestPoint.x, closestPoint.y),
+            v1 = new Vector(p1.x, p1.y),
+            v2 = new Vector(p2.x, p2.y);
+
+        return v1.edge(v2).normal();
     }
 
 
