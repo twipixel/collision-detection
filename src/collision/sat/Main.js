@@ -2,6 +2,7 @@ import Point from './Point';
 import Vector from './Vector';
 import Circle from './Circle';
 import Polygon from './Polygon';
+import Painter from './../utils/Painter';
 import Mouse from './../utils/Mouse';
 
 
@@ -9,9 +10,8 @@ const graphics = new PIXI.Graphics(),
       debugGraphics = new PIXI.Graphics(),
       shapes = [],
       polygonPoints = [
-          [new Point(250, 150), new Point(250, 250), new Point(350, 250)],
-          [new Point(158, 20), new Point(195, 130), new Point(100, 200), new Point(5, 130), new Point(42, 20)]
-          //[new Point(100, 100), new Point(100, 150), new Point(150, 150), new Point(150, 100)],
+          [new Point(250, 150), new Point(250, 250), new Point(350, 250)]
+          // [new Point(158, 20), new Point(195, 130), new Point(100, 200), new Point(5, 130), new Point(42, 20)]          //[new Point(100, 100), new Point(100, 150), new Point(150, 150), new Point(150, 100)],
           //[new Point(400, 100), new Point(380, 150), new Point(500, 150), new Point(520, 100)]
       ];
 
@@ -203,9 +203,15 @@ export default class Main extends PIXI.Container
         var dx = mtv.axis.x * mtv.overlap,
             dy = mtv.axis.y * mtv.overlap;
 
-        console.log(mtv.axis.x, mtv.axis.y, mtv.overlap);
 
-        collidee.move(-dx, -dy);
+        var c = collidee.centroid();
+        var t = new Vector(dx, dy);
+        var center = new Vector(c.x, c.y);
+        var to = center.subtract(t);
+
+        Painter.drawArrow(window.g, center, to);
+
+        collidee.move(-dx / 0.7, -dy / 0.7);
         //collidee.move(dx, dy);
     }
 

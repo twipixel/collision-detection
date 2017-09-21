@@ -79,6 +79,41 @@ export default class Vector
     }
 
 
+
+    rotate(theta)
+    {
+        var xtemp = this.x;
+        this.x = this.x * Math.cos(theta) - this.y * Math.sin(theta);
+        this.y = xtemp * Math.sin(theta) + this.y * Math.cos(theta);
+        return this;
+    }
+
+
+    multiplyScalar(s)
+    {
+        this.x *= s;
+        this.y *= s;
+        return this;
+    };
+
+
+    setLength(l)
+    {
+        var oldLength = this.length();
+        if(oldLength !== 0 && l !== oldLength) {
+            this.multiplyScalar(l / oldLength);
+        }
+        return this;
+    }
+
+
+    length (v)
+    {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+
+
+
     clone()
     {
         return new Vector(this.x, this.y);

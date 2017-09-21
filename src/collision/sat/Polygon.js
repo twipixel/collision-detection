@@ -14,6 +14,7 @@ export default class Polygon extends Shape
         this.points = [];
         this.context = context;
         this.lineColor = 0xFFFFFF;
+        this.name = this.points.length + ' Polygon';
     }
 
 
@@ -168,6 +169,7 @@ export default class Polygon extends Shape
     addPoint(x, y)
     {
         this.points.push(new Point(x, y));
+        this.name = this.points.length + ' Polygon';
     }
 
 }

@@ -1,3 +1,4 @@
+import Vector from './../sat/Vector';
 import Calc from './../utils/Calculator';
 
 
@@ -86,5 +87,25 @@ export default class Painter
         graphics.lineStyle(thickness, color, alpha);
         graphics.moveTo(p0.x, p0.y);
         graphics.lineTo(p1.x, p1.y);
+    }
+
+
+    static drawArrow(graphics, movePoint, toPoint, isClear = true, thickness = 1, color = 0xFF3300, alpha = 0.7)
+    {
+        if (isClear === true) {
+            graphics.clear();
+        }
+
+        graphics.lineStyle(thickness, color, alpha);
+        graphics.moveTo(movePoint.x, movePoint.y);
+        // graphics.lineTo(toPoint.x, toPoint.y);
+
+        var vector = new Vector(toPoint.x - movePoint.x, toPoint.y - movePoint.y);
+
+        vector.multiplyScalar(20);
+
+        graphics.lineTo(movePoint.x + vector.x, movePoint.y + vector.y);
+
+
     }
 }
