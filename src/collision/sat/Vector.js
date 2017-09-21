@@ -9,13 +9,14 @@ export default class Vector
 
     getMagnitude()
     {
-        return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
+        return Math.sqrt(Math.pow(this.x, 2) +
+            Math.pow(this.y, 2));
     }
 
 
     add(vector)
     {
-        const v = new Vector();
+        var v = new Vector();
         v.x = this.x + vector.x;
         v.y = this.y + vector.y;
         return v;
@@ -24,7 +25,7 @@ export default class Vector
 
     subtract(vector)
     {
-        const v = new Vector();
+        var v = new Vector();
         v.x = this.x - vector.x;
         v.y = this.y - vector.y;
         return v;
@@ -33,7 +34,8 @@ export default class Vector
 
     dotProduct(vector)
     {
-        return this.x * vector.x + this.y * vector.y;
+        return this.x * vector.x +
+            this.y * vector.y;
     }
 
 
@@ -47,25 +49,21 @@ export default class Vector
      * 수직 벡터 생성
      * @returns {Vector}
      */
-    prependicular()
+    perpendicular()
     {
-        const v = new Vector();
+        var v = new Vector();
         v.x = this.y;
-        v.y = 0 - this.x;
+        v.y = 0-this.x;
         return v;
     }
 
 
     normalize()
     {
-        const v = new Vector(0, 0),
+        var v = new Vector(),
             m = this.getMagnitude();
-
-        if (m != 0) {
-            v.x = this.x / m;
-            v.y = this.y / m;
-        }
-
+        v.x = this.x / m;
+        v.y = this.y / m;
         return v;
     }
 
@@ -76,7 +74,7 @@ export default class Vector
      */
     normal()
     {
-        var p = this.prependicular();
+        var p = this.perpendicular();
         return p.normalize();
     }
 }

@@ -1,6 +1,8 @@
 import Point from './Point';
+import Circle from './Circle';
 import Polygon from './Polygon';
 import Mouse from './../utils/Mouse';
+
 
 const graphics = new PIXI.Graphics(),
       debugGraphics = new PIXI.Graphics(),
@@ -48,7 +50,7 @@ export default class Main extends PIXI.Container
     {
         const context = this.canvas.getContext('2d');
 
-        for (var i = 0; i < polygonPoints.length; ++i) {
+        /*for (var i = 0; i < polygonPoints.length; ++i) {
             var polygon = new Polygon(context),
                 points = polygonPoints[i];
 
@@ -63,7 +65,28 @@ export default class Main extends PIXI.Container
             shapes.push(polygon);
 
             polygon.createPath(graphics);
-        }
+        }*/
+
+        let polygon = new Polygon(context);
+        polygon.addPoint(polygonPoints[0][0].x, polygonPoints[0][0].y);
+        polygon.addPoint(polygonPoints[0][1].x, polygonPoints[0][1].y);
+        polygon.addPoint(polygonPoints[0][2].x, polygonPoints[0][2].y);
+        this.rotateShape(polygon, (Math.random() * 45) * Math.PI / 180);
+        polygon.createPath(graphics);
+        shapes.push(polygon);
+
+        polygon = new Polygon(context);
+        polygon.addPoint(polygonPoints[1][0].x, polygonPoints[1][0].y);
+        polygon.addPoint(polygonPoints[1][1].x, polygonPoints[1][1].y);
+        polygon.addPoint(polygonPoints[1][2].x, polygonPoints[1][2].y);
+        polygon.addPoint(polygonPoints[1][3].x, polygonPoints[1][3].y);
+        this.rotateShape(polygon, (Math.random() * 45) * Math.PI / 180);
+        polygon.createPath(graphics);
+        shapes.push(polygon);
+
+        let circle = new Circle(context, 150, 75, 30);
+        circle.createPath(graphics);
+        shapes.push(circle);
     }
 
 
@@ -104,8 +127,8 @@ export default class Main extends PIXI.Container
                 shape = shapes[i];
 
                 if (shape !== dragShape) {
-                    if (dragShape.collideWidth(shape)) {
-                        console.log('hit -> ', shape.points.length + ' polygon');
+                    if (dragShape.collidesWith(shape)) {
+                        console.log('HIT');
                     }
                 }
             }

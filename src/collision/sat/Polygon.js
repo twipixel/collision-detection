@@ -17,50 +17,54 @@ export default class Polygon extends Shape
     }
 
 
+    collidesWith(shape)
+    {
+        var axes = shape.getAxes();
+
+        if (axes === undefined) {
+            return shape.polygonCollidesWithCircle(this, shape);
+        }
+        else {
+            axes.concat(this.getAxes());
+            return !this.separationOnAxes(axes, shape);
+        }
+    }
+
+
     project(axis)
     {
-        const scalars = [],
-              v = new Vector();
+        var scalars = [],
+            v = new Vector();
 
-        this.points.forEach(point => {
+        this.points.forEach( function (point) {
             v.x = point.x;
             v.y = point.y;
-            let scalar = v.dotProduct(axis);
-            scalars.push(scalar);
+            scalars.push(v.dotProduct(axis));
         });
 
-        return new Projection(
-            Math.min.apply(Math, scalars),
-            Math.max.apply(Math, scalars)
-        );
+        return new Projection(Math.min.apply(Math, scalars),
+            Math.max.apply(Math, scalars));
     }
 
 
     getAxes()
     {
-        let v1 = new Vector(),
+        var v1 = new Vector(),
             v2 = new Vector(),
-            axes = [], axe, p1, p2;
-        //console.log(this.points.length + '.getAxes');
+            axes = [];
 
-        for (var i = 0; i < this.points.length - 1; i++) {
+        for (var i=0; i < this.points.length-1; i++) {
+            v1.x = this.points[i].x;
+            v1.y = this.points[i].y;
 
-            p1 = this.points[i];
-            p2 = this.points[i + 1];
+            v2.x = this.points[i+1].x;
+            v2.y = this.points[i+1].y;
 
-            v1.x = p1.x;
-            v1.y = p1.y;
-
-            v2.x = p2.x;
-            v2.y = p2.y;
-
-            axe = v1.edge(v2).normal();
-            axes.push(axe);
-            //console.log('p1[', p1.x, p1.y, ']', 'p2[', p2.x, p2.y, ']', 'axe', axe);
+            axes.push(v1.edge(v2).normal());
         }
 
-        v1.x = this.points[this.points.length - 1].x;
-        v1.y = this.points[this.points.length - 1].y;
+        v1.x = this.points[this.points.length-1].x;
+        v1.y = this.points[this.points.length-1].y;
 
         v2.x = this.points[0].x;
         v2.y = this.points[0].y;
@@ -68,12 +72,6 @@ export default class Polygon extends Shape
         axes.push(v1.edge(v2).normal());
 
         return axes;
-    }
-
-
-    addPoint(x, y)
-    {
-        this.points.push(new Point(x, y));
     }
 
 
@@ -119,4 +117,11 @@ export default class Polygon extends Shape
         this.context.restore();
         return isPointInPath;
     }
+
+
+    addPoint(x, y)
+    {
+        this.points.push(new Point(x, y));
+    }
+
 }
