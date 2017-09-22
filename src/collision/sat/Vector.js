@@ -94,7 +94,14 @@ export default class Vector
         this.x *= s;
         this.y *= s;
         return this;
-    };
+    }
+
+
+    invert(v) {
+        this.x *= -1;
+        this.y *= -1;
+        return this;
+    }
 
 
     setLength(l)
@@ -107,11 +114,16 @@ export default class Vector
     }
 
 
-    length (v)
+    length(v)
     {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
+
+    equals(v)
+    {
+        return this.x === v.x && this.y === v.y;
+    }
 
 
     clone()

@@ -94,6 +94,7 @@ function separate(mtv) {
       point.x = velocity.x / velocityMagnitude;
       point.y = velocity.y / velocityMagnitude;
 
+       console.log(point);
       mtv.axis = new Vector(point);
    }
    

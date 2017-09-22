@@ -10,9 +10,9 @@ const graphics = new PIXI.Graphics(),
       debugGraphics = new PIXI.Graphics(),
       shapes = [],
       polygonPoints = [
-          [new Point(250, 150), new Point(250, 250), new Point(350, 250)]
-          // [new Point(158, 20), new Point(195, 130), new Point(100, 200), new Point(5, 130), new Point(42, 20)]          //[new Point(100, 100), new Point(100, 150), new Point(150, 150), new Point(150, 100)],
-          //[new Point(400, 100), new Point(380, 150), new Point(500, 150), new Point(520, 100)]
+          [new Point(350, 250), new Point(350, 350), new Point(450, 350)],
+          [new Point(500, 200), new Point(480, 250), new Point(600, 250), new Point(620, 200)],
+          [new Point(258, 120), new Point(295, 230), new Point(200, 300), new Point(105, 230), new Point(142, 120)]
       ];
 
 
@@ -25,6 +25,7 @@ export default class Main extends PIXI.Container
         this.interactive = true;
         this.renderer = renderer;
         this.canvas = this.renderer.view;
+        this.context = this.canvas.getContext('2d');
 
         this.initialize();
         this.addEvent();
@@ -44,13 +45,11 @@ export default class Main extends PIXI.Container
         this.lastdrag = new PIXI.Point(0, 0);
         this.shapeBeingDragged = undefined;
 
-
         var polygon = this.getPolygonPoints(5);
         polygonPoints.push(polygon);
 
-        console.log('polygon', polygon);
-
-        this.createPolygon();
+        //this.createPolygon();
+        this.createPolygonManual();
     }
 
 
@@ -80,9 +79,9 @@ export default class Main extends PIXI.Container
 
     createPolygon()
     {
-        const context = this.canvas.getContext('2d');
+        const context = this.context;
 
-        /*for (var i = 0; i < polygonPoints.length; ++i) {
+        for (var i = 0; i < polygonPoints.length; ++i) {
             var polygon = new Polygon(context),
                 points = polygonPoints[i];
 
@@ -97,29 +96,42 @@ export default class Main extends PIXI.Container
             shapes.push(polygon);
 
             polygon.createPath(graphics);
-        }*/
+        }
+    }
 
-        let polygon = new Polygon(context);
-        polygon.addPoint(polygonPoints[0][0].x, polygonPoints[0][0].y);
-        polygon.addPoint(polygonPoints[0][1].x, polygonPoints[0][1].y);
-        polygon.addPoint(polygonPoints[0][2].x, polygonPoints[0][2].y);
-        this.rotateShape(polygon, (Math.random() * 45) * Math.PI / 180);
+
+    createPolygonManual()
+    {
+        this.addPolygon(0);
+        this.addPolygon(2);
+        this.addCircle(300, 300, 100);
+    }
+
+
+    addPolygon(index, useRandomRotate = true)
+    {
+        var polygon = new Polygon(this.context);
+
+        var points = polygonPoints[index];
+
+        points.forEach((point) => {
+            polygon.addPoint(point.x, point.y);
+        });
+
+        if (useRandomRotate) {
+            this.rotateShape(polygon, (Math.random() * 45) * Math.PI / 180);
+        }
+
         polygon.createPath(graphics);
         shapes.push(polygon);
+    }
 
-        polygon = new Polygon(context);
-        polygon.addPoint(polygonPoints[1][0].x, polygonPoints[1][0].y);
-        polygon.addPoint(polygonPoints[1][1].x, polygonPoints[1][1].y);
-        polygon.addPoint(polygonPoints[1][2].x, polygonPoints[1][2].y);
-        polygon.addPoint(polygonPoints[1][3].x, polygonPoints[1][3].y);
-        polygon.addPoint(polygonPoints[1][4].x, polygonPoints[1][4].y);
-        this.rotateShape(polygon, (Math.random() * 45) * Math.PI / 180);
-        polygon.createPath(graphics);
-        shapes.push(polygon);
 
-        //let circle = new Circle(context, 150, 75, 30);
-        //circle.createPath(graphics);
-        //shapes.push(circle);
+    addCircle(x, y, radius)
+    {
+        var circle = new Circle(this.context, x, y, radius);
+        circle.createPath(graphics);
+        shapes.push(circle);
     }
 
 
@@ -153,23 +165,40 @@ export default class Main extends PIXI.Container
 
     detectCollisions()
     {
-        let numShapes = shapes.length, shape, i, dragShape = this.shapeBeingDragged;
+        var dragShape = this.shapeBeingDragged;
 
-        if (dragShape) {
-            for (i = 0; i < numShapes; ++i) {
-                shape = shapes[i];
+        if (!dragShape) {
+            return;
+        }
 
-                if (shape !== dragShape) {
+        shapes.forEach((shape) => {
 
-                    var mtv = dragShape.collidesWith(shape);
+            if (shape !== dragShape) {
+                var mtv = dragShape.collidesWith(shape);
 
-                    // 충돌 판정
-                    if (mtv.axis != undefined || mtv.overlap !== 0) {
-                        this.showSeparateGuide(mtv, dragShape, shape);
-                    }
+                console.log(mtv);
+
+                // 충돌 판정
+                if (this.collisionDetected(mtv)) {
+                    this.moveShapeByMTV(mtv, dragShape, shape);
                 }
             }
+        });
+    }
+
+
+    /**
+     * mtv로 충돌 판정
+     * @param mtv
+     * @returns {boolean}
+     */
+    collisionDetected(mtv)
+    {
+        // 충돌 판정
+        if (mtv.axis != undefined || mtv.overlap !== 0) {
+            return true;
         }
+        return false;
     }
 
 
@@ -178,9 +207,9 @@ export default class Main extends PIXI.Container
         if (mtv.axis === undefined)
             return;
 
-        var centroid1 = new Vector(collider.centroid()),
-            centroid2 = new Vector(collidee.centroid()),
-            centroidVector = centroid2.subtract(centroid1),
+        var colliderCenter = new Vector(collider.centroid()),
+            collideeCenter = new Vector(collidee.centroid()),
+            centroidVector = collideeCenter.subtract(colliderCenter),
             centroidUnitVector = (new Vector(centroidVector)).normalize();
 
         if (centroidUnitVector.dotProduct(mtv.axis) > 0) {
@@ -196,40 +225,56 @@ export default class Main extends PIXI.Container
      * @param collider 충돌한 객체
      * @param collidee 충돌을 당한 객체
      */
-    showSeparateGuide(mtv, collider, collidee)
+    moveShapeByMTV(mtv, collider, collidee)
     {
-        //this.checkMTVAxisDirection(mtv, collider, collidee);
+        if (mtv.axis !== undefined) {
+            // 다각형 충돌 처리
 
-        var dx = mtv.axis.x * mtv.overlap,
-            dy = mtv.axis.y * mtv.overlap;
+            var dx = mtv.axis.x * mtv.overlap,
+                dy = mtv.axis.y * mtv.overlap;
 
+            var dragVector = this.dragVector;
+            var overlapVector = new Vector(dx, dy);
 
-        var c = collidee.centroid();
-        var t = new Vector(dx, dy);
-        var center = new Vector(c.x, c.y);
-        var to = center.subtract(t);
+            /**
+             * 내적이 -1이면 반대 방향을 보는 것
+             * 내적이 0이면 수직
+             * 내적이 1인 경우 같은 방향을 가리키는 것
+             * 내적이 > 0.8 다면 같은 방향을 보고 있는 상태
+             */
+            var dot = dragVector.dotProduct(overlapVector);
 
-        Painter.drawArrow(window.g, center, to);
+            if (dot < 0) {
+                dx = -dx;
+                dy = -dy;
+            }
 
-        collidee.move(-dx / 0.7, -dy / 0.7);
-        //collidee.move(dx, dy);
+            var c = collidee.centroid();
+            var to = new Vector(dx, dy);
+            var center = new Vector(c.x, c.y);
+            to = center.subtract(to);
+
+            Painter.drawArrow(window.g, center, to);
+
+            collidee.move(dx, dy);
+        }
+        else {
+            // 원형 충돌 처리
+            mtv.axis = new Vector(1, 1);
+        }
     }
-
-
 
 
     rotateShape(shape, rotate)
     {
-        console.log(rotate);
         const cos = Math.cos(rotate);
         const sin = Math.sin(rotate);
-
         const points = shape.points;
 
-        for(let i = 0; i < points.length; i++) {
-            let pt = points[i];
-            let x = pt.x;
-            let y = pt.y;
+        for (var  i = 0; i < points.length; i++) {
+            var pt = points[i];
+            var x = pt.x;
+            var y = pt.y;
             pt.x = cos * x - sin * y;
             pt.y = sin * x + cos * y;
         }
@@ -238,7 +283,8 @@ export default class Main extends PIXI.Container
 
     onMouseDown()
     {
-        let location = Mouse.global;
+        var location = Mouse.global;
+
         shapes.forEach((shape) => {
             if (shape.isPointInPath(location.x, location.y)) {
                 this.shapeBeingDragged = shape;
@@ -253,12 +299,12 @@ export default class Main extends PIXI.Container
 
     onMouseMove()
     {
-        let location, dragVector;
+        var location, dragVector;
 
         if (this.shapeBeingDragged) {
             location = Mouse.global;
 
-            dragVector = new PIXI.Point(location.x - this.lastdrag.x, location.y - this.lastdrag.y);
+            this.dragVector = dragVector = new Vector(location.x - this.lastdrag.x, location.y - this.lastdrag.y);
 
             this.shapeBeingDragged.move(dragVector.x, dragVector.y);
 

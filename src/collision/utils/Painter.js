@@ -96,16 +96,37 @@ export default class Painter
             graphics.clear();
         }
 
-        graphics.lineStyle(thickness, color, alpha);
+        /*graphics.lineStyle(thickness, color, alpha);
         graphics.moveTo(movePoint.x, movePoint.y);
-        // graphics.lineTo(toPoint.x, toPoint.y);
 
         var vector = new Vector(toPoint.x - movePoint.x, toPoint.y - movePoint.y);
-
-        vector.multiplyScalar(20);
+        var left = vector.clone().rotate(45).invert();
+        var right = vector.clone().rotate(-45).invert();
+        left.multiplyScalar(5);
+        right.multiplyScalar(5);
+        vector.invert().multiplyScalar(15);
 
         graphics.lineTo(movePoint.x + vector.x, movePoint.y + vector.y);
+        graphics.moveTo(movePoint.x, movePoint.y);
+        graphics.lineTo(movePoint.x + left.x, movePoint.y + left.y);
+        graphics.moveTo(movePoint.x, movePoint.y);
+        graphics.lineTo(movePoint.x + right.x, movePoint.y + right.y);*/
 
 
+        graphics.lineStyle(thickness, color, alpha);
+        graphics.moveTo(movePoint.x, movePoint.y);
+
+        var vector = new Vector(movePoint.x - toPoint.x, movePoint.y - toPoint.y);
+        var left = vector.clone().rotate(45).invert();
+        var right = vector.clone().rotate(-45).invert();
+        left.multiplyScalar(5);
+        right.multiplyScalar(5);
+        vector.invert().multiplyScalar(15);
+
+        graphics.lineTo(movePoint.x + vector.x, movePoint.y + vector.y);
+        graphics.moveTo(movePoint.x, movePoint.y);
+        graphics.lineTo(movePoint.x + left.x, movePoint.y + left.y);
+        graphics.moveTo(movePoint.x, movePoint.y);
+        graphics.lineTo(movePoint.x + right.x, movePoint.y + right.y);
     }
 }
