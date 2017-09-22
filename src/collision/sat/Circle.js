@@ -10,6 +10,7 @@ export default class Circle extends Shape
     {
         super();
 
+        this.name = 'Circle';
         this.context = context;
         this.x = x;
         this.y = y;
@@ -22,7 +23,7 @@ export default class Circle extends Shape
      * 중점 좌표 반환
      * @returns {PIXI.Point|*|svg.Point}
      */
-    centroid()
+    getCenter()
     {
         return new PIXI.Point(this.x,this.y);
     }
@@ -59,16 +60,15 @@ export default class Circle extends Shape
 
     getPolygonPointClosestToCircle(polygon, circle)
     {
-        var min = 10000,
-            length, testPoint, closestPoint;
+        var min = Number.MAX_VALUE,
+            length,
+            testPoint,
+            closestPoint;
 
-        for (var i = 0; i < polygon.points.length; ++i) {
+        for (var i=0; i < polygon.points.length; ++i) {
             testPoint = polygon.points[i];
-            length = Math.sqrt(
-                Math.pow(testPoint.x - circle.x, 2),
-                Math.pow(testPoint.y - circle.y, 2)
-            );
-
+            length = Math.sqrt(Math.pow(testPoint.x - circle.x, 2),
+                Math.pow(testPoint.y - circle.y, 2));
             if (length < min) {
                 min = length;
                 closestPoint = testPoint;
@@ -87,7 +87,7 @@ export default class Circle extends Shape
      */
     /*polygonCollidesWithCircle(polygon, circle)
     {
-        var min = 10000,
+        var min = Number.MAX_VALUE,
             axes = polygon.getAxes(),
             closestPoint = this.getPolygonPointClosestToCircle(polygon, circle);
 
@@ -99,12 +99,11 @@ export default class Circle extends Shape
 
     getCircleAxis(circle, closestPoint)
     {
-        var p1 = new PIXI.Point(circle.x, circle.y),
-            p2 = new PIXI.Point(closestPoint.x, closestPoint.y),
-            v1 = new Vector(p1.x, p1.y),
-            v2 = new Vector(p2.x, p2.y);
+        var v1 = new Vector(circle.x, circle.y),
+            v2 = new Vector(closestPoint.x, closestPoint.y),
+            surfaceVector = v1.subtract(v2);
 
-        return v1.edge(v2).normal();
+        return surfaceVector.normalize();
     }
 
 
@@ -132,9 +131,9 @@ export default class Circle extends Shape
     }
 
 
-    createPath(graphics)
+    createPath(graphics, lineColor = 0xFFFFFF)
     {
-        graphics.lineStyle(1, 0xFFFFFF);
+        graphics.lineStyle(1, lineColor);
         graphics.moveTo(this.x + this.radius, this.y);
         graphics.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
     }

@@ -22,7 +22,7 @@ export default class Polygon extends Shape
      * 중점 좌표
      * @returns {PIXI.Point|*|svg.Point}
      */
-    centroid()
+    getCenter()
     {
         var pointSum = new PIXI.Point();
 
@@ -121,9 +121,9 @@ export default class Polygon extends Shape
     }
 
 
-    createPath(graphics)
+    createPath(graphics, lineColor = 0xFFFFFF)
     {
-        graphics.lineStyle(1, 0xFFFFFF);
+        graphics.lineStyle(1, lineColor);
         graphics.moveTo(this.points[0].x, this.points[0].y);
 
         for (var i = 0; i < this.points.length; ++i) {

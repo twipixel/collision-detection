@@ -13,7 +13,7 @@ function initailize() {
     renderer = new PIXI.CanvasRenderer(canvas.width, canvas.height, {
         view: canvas,
         autoResize: true,
-        backgroundColor: 0x4CAF50
+        backgroundColor: 0x33383D
     });
 
 

@@ -9,12 +9,14 @@ import Mouse from './../utils/Mouse';
 const graphics = new PIXI.Graphics(),
       debugGraphics = new PIXI.Graphics(),
       shapes = [],
-      polygonPoints = [
-          [new Point(350, 250), new Point(350, 350), new Point(450, 350)],
-          [new Point(500, 200), new Point(480, 250), new Point(600, 250), new Point(620, 200)],
-          [new Point(258, 120), new Point(295, 230), new Point(200, 300), new Point(105, 230), new Point(142, 120)]
-      ];
+      lineColor = 0x84D2F6, arrowColor = 0xE57373;
 
+
+var polygonPoints = [
+        [new Point(350, 350), new Point(350, 500), new Point(500, 500)],
+        [new Point(500, 200), new Point(480, 250), new Point(600, 250), new Point(620, 200)],
+        [new Point(258, 120), new Point(295, 230), new Point(200, 300), new Point(105, 230), new Point(142, 120)]
+    ];
 
 export default class Main extends PIXI.Container
 {
@@ -45,39 +47,34 @@ export default class Main extends PIXI.Container
         this.lastdrag = new PIXI.Point(0, 0);
         this.shapeBeingDragged = undefined;
 
-        var polygon = this.getPolygonPoints(5);
-        polygonPoints.push(polygon);
-
         //this.createPolygon();
         this.createPolygonManual();
     }
 
 
-    getPolygonPoints(angle)
+    getPolygonPoints(tx, ty, angle, radius = 100)
     {
-        var scale = 100;
         var points = [];
 
         // making points, path
         for (var i = 0; i < angle; i ++) {
-
-            var x = scale * -Math.sin(this.toRadian(360 / angle * i));
-            var y = scale *  Math.cos(this.toRadian(360 / angle * i));
+            var x = tx + (radius * -Math.sin(this.toRadian(360 / angle * i)));
+            var y = ty + (radius *  Math.cos(this.toRadian(360 / angle * i)));
             var point = new PIXI.Point(x, y);
             points.push(point);
         }
 
-        console.log('getPolygonPoints(', angle,')', points.length);
         return points;
     }
 
 
-    toRadian(degree) {
+    toRadian(degree)
+    {
         return degree * Math.PI / 180;
     }
 
 
-    createPolygon()
+    createPolygon(useRandomRotate = false)
     {
         const context = this.context;
 
@@ -89,22 +86,39 @@ export default class Main extends PIXI.Container
                 polygon.addPoint(point.x, point.y);
             });
 
-            if (i !== polygonPoints.length - 1) {
-                this.rotateShape(polygon, (Math.random() * 45) * Math.PI / 180);
+            if (useRandomRotate) {
+                this.rotateShape(polygon, Math.random() * 45);
             }
 
             shapes.push(polygon);
 
-            polygon.createPath(graphics);
+            polygon.createPath(graphics, lineColor);
         }
     }
 
 
     createPolygonManual()
     {
-        this.addPolygon(0);
-        this.addPolygon(2);
-        this.addCircle(300, 300, 100);
+        var radius = 100,
+            diameter = 200,
+            space = 20,
+            a = radius + space,
+            b = radius + diameter + space * 2,
+            c = radius + diameter * 2 + space * 3;
+
+        polygonPoints = [];
+
+        polygonPoints.push(this.getPolygonPoints(a, a, 3));
+        polygonPoints.push(this.getPolygonPoints(b, a, 4));
+        polygonPoints.push(this.getPolygonPoints(c, a, 5));
+        polygonPoints.push(this.getPolygonPoints(a, b, 6));
+        polygonPoints.push(this.getPolygonPoints(b, b, 7));
+        polygonPoints.push(this.getPolygonPoints(c, b, 8));
+        polygonPoints.push(this.getPolygonPoints(a, c, 9));
+        polygonPoints.push(this.getPolygonPoints(b, c, 10));
+        this.addCircle(c, c, radius);
+
+        this.createPolygon(true);
     }
 
 
@@ -122,7 +136,7 @@ export default class Main extends PIXI.Container
             this.rotateShape(polygon, (Math.random() * 45) * Math.PI / 180);
         }
 
-        polygon.createPath(graphics);
+        polygon.createPath(graphics, lineColor);
         shapes.push(polygon);
     }
 
@@ -130,7 +144,7 @@ export default class Main extends PIXI.Container
     addCircle(x, y, radius)
     {
         var circle = new Circle(this.context, x, y, radius);
-        circle.createPath(graphics);
+        circle.createPath(graphics, lineColor);
         shapes.push(circle);
     }
 
@@ -158,7 +172,7 @@ export default class Main extends PIXI.Container
         graphics.clear();
 
         shapes.forEach((polygon) => {
-           polygon.createPath(graphics);
+           polygon.createPath(graphics, lineColor);
         });
     }
 
@@ -175,8 +189,6 @@ export default class Main extends PIXI.Container
 
             if (shape !== dragShape) {
                 var mtv = dragShape.collidesWith(shape);
-
-                console.log(mtv);
 
                 // 충돌 판정
                 if (this.collisionDetected(mtv)) {
@@ -207,12 +219,12 @@ export default class Main extends PIXI.Container
         if (mtv.axis === undefined)
             return;
 
-        var colliderCenter = new Vector(collider.centroid()),
-            collideeCenter = new Vector(collidee.centroid()),
-            centroidVector = collideeCenter.subtract(colliderCenter),
-            centroidUnitVector = (new Vector(centroidVector)).normalize();
+        var colliderCenter = new Vector(collider.getCenter()),
+            collideeCenter = new Vector(collidee.getCenter()),
+            centerVector = collideeCenter.subtract(colliderCenter),
+            centerUnitVector = (new Vector(centerVector)).normalize();
 
-        if (centroidUnitVector.dotProduct(mtv.axis) > 0) {
+        if (centerUnitVector.dotProduct(mtv.axis) > 0) {
             mtv.axis.x = -mtv.axis.x;
             mtv.axis.y = -mtv.axis.y;
         }
@@ -227,57 +239,73 @@ export default class Main extends PIXI.Container
      */
     moveShapeByMTV(mtv, collider, collidee)
     {
-        if (mtv.axis !== undefined) {
-            // 다각형 충돌 처리
-
-            var dx = mtv.axis.x * mtv.overlap,
-                dy = mtv.axis.y * mtv.overlap;
-
-            var dragVector = this.dragVector;
-            var overlapVector = new Vector(dx, dy);
-
-            /**
-             * 내적이 -1이면 반대 방향을 보는 것
-             * 내적이 0이면 수직
-             * 내적이 1인 경우 같은 방향을 가리키는 것
-             * 내적이 > 0.8 다면 같은 방향을 보고 있는 상태
-             */
-            var dot = dragVector.dotProduct(overlapVector);
-
-            if (dot < 0) {
-                dx = -dx;
-                dy = -dy;
-            }
-
-            var c = collidee.centroid();
-            var to = new Vector(dx, dy);
-            var center = new Vector(c.x, c.y);
-            to = center.subtract(to);
-
-            Painter.drawArrow(window.g, center, to);
-
-            collidee.move(dx, dy);
-        }
-        else {
-            // 원형 충돌 처리
+        if (mtv.axis === undefined) {
             mtv.axis = new Vector(1, 1);
+        }
+
+        var dx = mtv.axis.x * mtv.overlap,
+            dy = mtv.axis.y * mtv.overlap;
+
+        var dragVector = this.dragVector;
+        var overlapVector = new Vector(dx, dy);
+
+        /**
+         * 내적이 -1이면 반대 방향을 보는 것
+         * 내적이 0이면 수직
+         * 내적이 1인 경우 같은 방향을 가리키는 것
+         * 내적이 > 0.8 다면 같은 방향을 보고 있는 상태
+         */
+        var dot = dragVector.dotProduct(overlapVector);
+
+        if (dot < 0) {
+            dx = -dx;
+            dy = -dy;
+        }
+
+        var c = collidee.getCenter();
+        var to = new Vector(dx, dy);
+        var center = new Vector(c.x, c.y);
+        to = center.subtract(to);
+
+        Painter.drawArrow(window.g, center, to, true, 1, arrowColor);
+
+        collidee.move(dx, dy);
+    }
+
+
+    rotateShape(shape, degrees)
+    {
+        //degrees = 90;
+        var points = shape.points;
+
+        if (points) {
+            var center = shape.getCenter();
+
+            for (var  i = 0; i < points.length; i++) {
+                var point = points[i];
+                points[i] = this.rotationPoint(center, point, degrees);
+            }
         }
     }
 
 
-    rotateShape(shape, rotate)
+    /**
+     * 회전하는 좌표 구하기
+     * @param pivot 사각형의 중심점
+     * @param point 계산하고 싶은 포인트
+     * @param degrees 회전각 degrees
+     * @returns {{x: (number|*), y: (number|*)}}
+     */
+    rotationPoint(pivot, point, degrees)
     {
-        const cos = Math.cos(rotate);
-        const sin = Math.sin(rotate);
-        const points = shape.points;
-
-        for (var  i = 0; i < points.length; i++) {
-            var pt = points[i];
-            var x = pt.x;
-            var y = pt.y;
-            pt.x = cos * x - sin * y;
-            pt.y = sin * x + cos * y;
-        }
+        var diffX = point.x - pivot.x;
+        var diffY = point.y - pivot.y;
+        var dist = Math.sqrt(diffX * diffX + diffY * diffY);
+        var ca = Math.atan2(diffY, diffX) * (180 / Math.PI);
+        var na = ((ca + degrees) % 360) * (Math.PI / 180);
+        var x = (pivot.x + dist * Math.cos(na) + 0.5) | 0;
+        var y = (pivot.y + dist * Math.sin(na) + 0.5) | 0;
+        return {x: x, y: y};
     }
 
 
@@ -288,6 +316,7 @@ export default class Main extends PIXI.Container
         shapes.forEach((shape) => {
             if (shape.isPointInPath(location.x, location.y)) {
                 this.shapeBeingDragged = shape;
+                console.log(this.shapeBeingDragged.name);
                 this.mouseDownPoint.x = location.x;
                 this.mouseDownPoint.y = location.y;
                 this.lastdrag.x = location.x;
@@ -311,8 +340,8 @@ export default class Main extends PIXI.Container
             this.lastdrag.x = location.x;
             this.lastdrag.y = location.y;
 
-            this.updateRender();
             this.detectCollisions();
+            this.updateRender();
         }
     }
 

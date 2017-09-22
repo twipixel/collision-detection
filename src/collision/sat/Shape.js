@@ -12,7 +12,7 @@ export default class Shape
 
     minimumTranslationVector(axes, shape)
     {
-        var minimumOverlap = 100000,
+        var minimumOverlap = Number.MAX_VALUE,
             overlap, axisWithSmallestOverlap,
             axis, projection1, projection2;
 
@@ -22,10 +22,8 @@ export default class Shape
             projection2 = this.project(axis);
             overlap = projection1.getOverlap(projection2);
 
-            //console.log('overlap', overlap);
-
             if (overlap === 0) { //충돌 없슴.
-                return new MTV(overlap);
+                return new MTV(0);
             }
             else {
                 if (overlap < minimumOverlap) {
@@ -66,14 +64,13 @@ export default class Shape
      */
     circleCollidesWithCircle(c1, c2)
     {
-        var distance = Math.sqrt(
-            Math.pow(c2.x - c1.x, 2),
-            Math.pow(c2.y - c2.y, 2)
-        );
+        var distance = Math.sqrt( Math.pow(c2.x - c1.x, 2) +
+                Math.pow(c2.y - c1.y, 2)),
+            overlap = Math.abs(c1.radius + c2.radius) - distance;
 
-        var ovrelap = Math.abs(c1.radius + c2.radius) - distance;
-
-        return overlap < 0 ? new MTV(0) : new MTV(overlap);
+        return overlap < 0 ?
+            new MTV(0) :
+            new MTV(overlap);
     }
 
 
@@ -90,7 +87,7 @@ export default class Shape
 
         axes.push(circle.getCircleAxis(circle, closestPoint));
 
-        return !polygon.separationOnAxes(axes, circle);
+        return polygon.minimumTranslationVector(axes, circle);
     }
 
 

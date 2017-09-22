@@ -354,7 +354,7 @@ var Circle = function (x, y, radius) {
 
 Circle.prototype = new Shape();
 
-Circle.prototype.centroid = function () {
+Circle.prototype.getCenter = function () {
    return new Point(this.x,this.y);
 };
 

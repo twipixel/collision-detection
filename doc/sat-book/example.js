@@ -120,8 +120,8 @@ function checkMTVAxisDirection(mtv, collider, collidee) {
    if (mtv.axis === undefined)
       return;
    
-   centroid1 = new Vector(collider.centroid()),
-   centroid2 = new Vector(collidee.centroid()),
+   centroid1 = new Vector(collider.getCenter()),
+   centroid2 = new Vector(collidee.getCenter()),
    centroidVector = centroid2.subtract(centroid1),
    centroidUnitVector = (new Vector(centroidVector)).normalize();
 
