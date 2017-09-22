@@ -1,8 +1,10 @@
-import CollisionMain from './collision/CollisionMain';
+import Mouse from './collision/utils/Mouse';
+import SAT from './collision/sat/SAT';
+import GJK from './collision/gjk/GJK';
 
 
 
-var canvas, renderer, stage, collisionMain, container;
+var canvas, renderer, stage, testMain, container;
 
 window.onload = initailize.bind(this);
 window.onresize = resizeWindow.bind(this);
@@ -17,6 +19,8 @@ function initailize() {
     });
 
 
+    Mouse.renderer = renderer;
+
     // 위치가 정수가 아닐경우 흐릿하게 보이는 문제가 있어
     // 렌더러의 위치를 정수로 연산될 수 있도록 한다.
     //renderer.roundPixels = true;
@@ -25,7 +29,9 @@ function initailize() {
     container = new PIXI.Container();
     stage.addChild(container);
 
-    collisionMain = new CollisionMain(renderer, container);
+    //testMain = new SAT(renderer);
+    testMain = new GJK(renderer);
+    container.addChild(testMain);
 
     updateLoop();
     resizeWindow();
@@ -40,7 +46,6 @@ function updateLoop (ms) {
 
 function update(ms) {
     renderer.render(stage);
-    collisionMain.update(ms);
 }
 
 
@@ -63,7 +68,7 @@ function resizeWindow() {
      */
     renderer.resize(width, height);
 
-    if (collisionMain) {
-        collisionMain.resize();
+    if (testMain) {
+        testMain.resize();
     }
 }

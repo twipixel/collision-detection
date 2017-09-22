@@ -15,7 +15,6 @@ export default class Circle extends Shape
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.lineColor = 0xFFFFFF;
     }
 
 

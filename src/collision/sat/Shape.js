@@ -85,6 +85,8 @@ export default class Shape
         var axes = polygon.getAxes(),
             closestPoint = circle.getPolygonPointClosestToCircle(polygon, circle);
 
+        Painter.drawPoint(window.g, closestPoint, false, 5, 0xE57373);
+
         axes.push(circle.getCircleAxis(circle, closestPoint));
 
         return polygon.minimumTranslationVector(axes, circle);

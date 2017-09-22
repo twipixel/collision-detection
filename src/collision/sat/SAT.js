@@ -4,6 +4,7 @@ import Circle from './Circle';
 import Polygon from './Polygon';
 import Painter from './../utils/Painter';
 import Mouse from './../utils/Mouse';
+import KeyCode from './../consts/KeyCode';
 
 
 const graphics = new PIXI.Graphics(),
@@ -18,7 +19,7 @@ var polygonPoints = [
         [new Point(258, 120), new Point(295, 230), new Point(200, 300), new Point(105, 230), new Point(142, 120)]
     ];
 
-export default class Main extends PIXI.Container
+export default class SAT extends PIXI.Container
 {
     constructor(renderer)
     {
@@ -49,6 +50,26 @@ export default class Main extends PIXI.Container
 
         //this.createPolygon();
         this.createPolygonManual();
+    }
+
+
+    addEvent()
+    {
+        this._mousedownListener = this.onMouseDown.bind(this);
+        this._mousemoveListener = this.onMouseMove.bind(this);
+        this._mouseupListener = this.onMouseUp.bind(this);
+
+        this.on('mousedown', this._mousedownListener);
+        this.on('mousemove', this._mousemoveListener);
+        this.on('mouseup', this._mouseupListener);
+
+        window.addEventListener('keyup', this.onKeyUp.bind(this));
+    }
+
+
+    resize()
+    {
+        this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
     }
 
 
@@ -146,24 +167,6 @@ export default class Main extends PIXI.Container
         var circle = new Circle(this.context, x, y, radius);
         circle.createPath(graphics, lineColor);
         shapes.push(circle);
-    }
-
-
-    addEvent()
-    {
-        this._mousedownListener = this.onMouseDown.bind(this);
-        this._mousemoveListener = this.onMouseMove.bind(this);
-        this._mouseupListener = this.onMouseUp.bind(this);
-
-        this.on('mousedown', this._mousedownListener);
-        this.on('mousemove', this._mousemoveListener);
-        this.on('mouseup', this._mouseupListener);
-    }
-
-
-    resize()
-    {
-        this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
     }
 
 
@@ -311,6 +314,10 @@ export default class Main extends PIXI.Container
 
     onMouseDown()
     {
+        if (window.g) {
+            window.g.clear();
+        }
+
         var location = Mouse.global;
 
         shapes.forEach((shape) => {
@@ -349,5 +356,37 @@ export default class Main extends PIXI.Container
     onMouseUp()
     {
         this.shapeBeingDragged = undefined;
+    }
+
+
+
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    // Test 함수
+    //
+    /////////////////////////////////////////////////////////////////////////////
+
+
+    onKeyUp(e)
+    {
+        switch (e.keyCode) {
+            case KeyCode.ESCAPE:
+                console.clear();
+
+                if (window.g) {
+                    window.g.clear();
+                }
+
+                break;
+            case KeyCode.SPACE:
+                //
+                break;
+            case KeyCode.NUMBER_1:
+                //
+                break;
+            case KeyCode.NUMBER_2:
+                //
+                break;
+        }
     }
 }
