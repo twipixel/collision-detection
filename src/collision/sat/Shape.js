@@ -12,6 +12,8 @@ export default class Shape
 
     minimumTranslationVector(axes, shape)
     {
+        window.g.clear();
+
         var minimumOverlap = Number.MAX_VALUE,
             overlap, axisWithSmallestOverlap,
             axis, projection1, projection2;
@@ -21,6 +23,15 @@ export default class Shape
             projection1 = shape.project(axis);
             projection2 = this.project(axis);
             overlap = projection1.getOverlap(projection2);
+
+            Painter.drawLine(window.g,
+                {x:axis.x * projection1.min, y:axis.y * projection1.min},
+                {x:axis.x * projection2.max, y:axis.y * projection2.max},
+                false
+            );
+
+            console.log('overlap', overlap);
+
 
             if (overlap === 0) { //충돌 없슴.
                 return new MTV(0);
