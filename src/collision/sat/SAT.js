@@ -129,7 +129,7 @@ export default class SAT extends PIXI.Container
 
         polygonPoints = [];
 
-        // polygonPoints.push(this.getPolygonPoints(a, a, 3));
+        polygonPoints.push(this.getPolygonPoints(a, a, 3));
         // polygonPoints.push(this.getPolygonPoints(b, a, 4));
         // polygonPoints.push(this.getPolygonPoints(c, a, 5));
         // polygonPoints.push(this.getPolygonPoints(a, b, 6));
@@ -137,7 +137,7 @@ export default class SAT extends PIXI.Container
         // polygonPoints.push(this.getPolygonPoints(c, b, 8));
         // polygonPoints.push(this.getPolygonPoints(a, c, 9));
         // polygonPoints.push(this.getPolygonPoints(b, c, 10));
-        this.addCircle(c, c, radius);
+        // this.addCircle(c, c, radius);
         this.addCircle(c, c, radius);
 
         this.createPolygon(true);

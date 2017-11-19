@@ -82,8 +82,6 @@ export default class Shape
      */
     polygonCollidesWithCircle(polygon, circle)
     {
-        console.log('polygonCollideWithCircle', polygon, circle, ')');
-
         var axes = polygon.getAxes(),
             closestPoint = circle.getPolygonPointClosestToCircle(polygon, circle);
 

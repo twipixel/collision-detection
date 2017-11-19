@@ -116,6 +116,10 @@ export default class Polygon extends Shape
 
         axes.push(v1.edge(v2).normal());
 
+        axes.forEach(axe => {
+            console.log('axe', axe);
+        });
+
         return axes;
     }
 

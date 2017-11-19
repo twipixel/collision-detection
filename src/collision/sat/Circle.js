@@ -30,6 +30,8 @@ export default class Circle extends Shape
 
     collidesWith(shape)
     {
+        console.log('Circle.collideWith(', shape, ')');
+
         if (shape.radius === undefined) {
             return this.polygonCollidesWithCircle(shape, this);
         }
