@@ -68,6 +68,9 @@ export default class Circle extends Shape
             testPoint = polygon.points[i];
             length = Math.sqrt(Math.pow(testPoint.x - circle.x, 2),
                 Math.pow(testPoint.y - circle.y, 2));
+
+            console.log(i, length, min);
+
             if (length < min) {
                 min = length;
                 closestPoint = testPoint;

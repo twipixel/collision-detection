@@ -29,8 +29,8 @@ function initailize() {
     container = new PIXI.Container();
     stage.addChild(container);
 
-    //testMain = new SAT(renderer);
-    testMain = new GJK(renderer);
+    testMain = new SAT(renderer);
+    // testMain = new GJK(renderer);
     container.addChild(testMain);
 
     updateLoop();

@@ -129,14 +129,15 @@ export default class SAT extends PIXI.Container
 
         polygonPoints = [];
 
-        polygonPoints.push(this.getPolygonPoints(a, a, 3));
-        polygonPoints.push(this.getPolygonPoints(b, a, 4));
-        polygonPoints.push(this.getPolygonPoints(c, a, 5));
-        polygonPoints.push(this.getPolygonPoints(a, b, 6));
-        polygonPoints.push(this.getPolygonPoints(b, b, 7));
-        polygonPoints.push(this.getPolygonPoints(c, b, 8));
-        polygonPoints.push(this.getPolygonPoints(a, c, 9));
-        polygonPoints.push(this.getPolygonPoints(b, c, 10));
+        // polygonPoints.push(this.getPolygonPoints(a, a, 3));
+        // polygonPoints.push(this.getPolygonPoints(b, a, 4));
+        // polygonPoints.push(this.getPolygonPoints(c, a, 5));
+        // polygonPoints.push(this.getPolygonPoints(a, b, 6));
+        // polygonPoints.push(this.getPolygonPoints(b, b, 7));
+        // polygonPoints.push(this.getPolygonPoints(c, b, 8));
+        // polygonPoints.push(this.getPolygonPoints(a, c, 9));
+        // polygonPoints.push(this.getPolygonPoints(b, c, 10));
+        this.addCircle(c, c, radius);
         this.addCircle(c, c, radius);
 
         this.createPolygon(true);
@@ -167,6 +168,7 @@ export default class SAT extends PIXI.Container
         var circle = new Circle(this.context, x, y, radius);
         circle.createPath(graphics, lineColor);
         shapes.push(circle);
+        this.circle = circle;
     }
 
 
@@ -270,7 +272,8 @@ export default class SAT extends PIXI.Container
         var center = new Vector(c.x, c.y);
         to = center.subtract(to);
 
-        Painter.drawArrow(window.g, center, to, true, 1, arrowColor);
+        // Painter.drawArrow(window.g, center, to, false, 1, arrowColor);
+        // Painter.drawPoint(window.g, this.circle.getCenter(), false, 10, 0xff3300, 0.2);
 
         collidee.move(dx, dy);
     }
