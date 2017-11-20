@@ -30,9 +30,15 @@ function initailize() {
     container = new PIXI.Container();
     stage.addChild(container);
 
-    //testMain = new SAT(renderer);
+    // SAT 충돌 검사 테스트
+    testMain = new SAT(renderer);
+
+    // 미구현
     //testMain = new GJK(renderer);
-    testMain = new Distance(renderer);
+
+    // distance 테스트
+    //testMain = new Distance(renderer);
+
     container.addChild(testMain);
 
     updateLoop();

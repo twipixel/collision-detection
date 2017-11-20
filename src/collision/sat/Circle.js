@@ -1,5 +1,5 @@
 import Shape from './Shape';
-import Vector from './Vector';
+import Vector from './../geom/Vector';
 import Projection from './Projection';
 import Painter from './../utils/Painter';
 
@@ -59,36 +59,22 @@ export default class Circle extends Shape
 
     getPolygonPointClosestToCircle(polygon, circle)
     {
-        var min = Number.MAX_VALUE,
-            length,
-            testPoint,
-            closestPoint;
+        let min = Number.MAX_VALUE,
+            circleVector = Vector.fromObject(circle),
+            length, testPointVector, closestPoint;
 
         for (var i=0; i < polygon.points.length; i++) {
-            testPoint = polygon.points[i];
-            testPoint.index = i;
-
-            //Painter.drawPoint(window.g, testPoint, false, 1, Math.random() * 0xFFFFFF, 0.3);
-
-            length = Math.sqrt(
-                //Math.pow(testPoint.x - circle.x, 2),
-                //Math.pow(testPoint.y - circle.y, 2)
-
-                Math.pow(circle.x - testPoint.x , 2),
-                Math.pow(circle.y - testPoint.y, 2)
-            );
-
-            console.log(i, 'length:', length, 'p[', parseInt(testPoint.x), parseInt(testPoint.y), ']', 'c[', parseInt(circle.x), parseInt(circle.y), ']');
+            testPointVector = Vector.fromObject(polygon.points[i]);
+            testPointVector.index = i;
+            length = testPointVector.clone().distance(circle);
 
             if (length < min) {
                 min = length;
-                closestPoint = testPoint;
+                closestPoint = testPointVector;
             }
         }
 
-        console.log('closetPoint index', closestPoint.index);
-
-        return {x:closestPoint.x, y:closestPoint.y};
+        return closestPoint.clone();
     }
 
 
@@ -116,9 +102,8 @@ export default class Circle extends Shape
             v2 = new Vector(closestPoint.x, closestPoint.y),
             surfaceVector = v1.subtract(v2);
 
-        Painter.drawPoint(window.g, closestPoint, false, 1, 0xff3300, 0.3);
-
-        //Painter.drawLine(window.g, v1, v2, false, 1, 0xff3300, 0.3);
+        Painter.drawPoint(window.g, closestPoint, false, 5, 0xff3300, 0.3);
+        //Painter.drawLine(window.g, Vector.fromObject(circle), Vector.fromObject(closestPoint), false, 1, 0xff3300, 0.3);
 
         return surfaceVector.normalize();
     }

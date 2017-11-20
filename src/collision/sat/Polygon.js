@@ -1,6 +1,6 @@
 import Shape from './Shape';
-import Vector from './Vector';
 import Point from './Point';
+import Vector from './../geom/Vector';
 import Projection from './Projection';
 import Painter from './../utils/Painter';
 

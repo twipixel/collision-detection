@@ -1,4 +1,4 @@
-import Vector from './../sat/Vector';
+import Vector from './../geom/Vector';
 import Calc from './../utils/Calculator';
 
 

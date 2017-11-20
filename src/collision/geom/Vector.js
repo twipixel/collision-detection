@@ -283,6 +283,12 @@ export default class Vector
     }
 
 
+    edge(vec)
+    {
+        return this.subtract(vec);
+    }
+
+
     /**
      * Subtracts the given scalar from both axis
      *
@@ -657,6 +663,19 @@ export default class Vector
 
 
     /**
+     * 수직 벡터 생성
+     * @returns {Vector}
+     */
+    perpendicular()
+    {
+        var v = new Vector();
+        v.x = this.y;
+        v.y = 0-this.x;
+        return v;
+    }
+
+
+    /**
      * Normalize
      *
      * @return {Vector} `this` for chaining capabilities
@@ -670,7 +689,7 @@ export default class Vector
             this.x = 1;
             this.y = 0;
         } else {
-            this.divide(Vector(length, length));
+            this.divide(new Vector(length, length));
         }
         return this;
     }
@@ -679,6 +698,17 @@ export default class Vector
     norm()
     {
         return this.normalize();
+    }
+
+
+    /**
+     * 정규화된 수직 벡터 생성
+     * @returns {*|string|void|XMLList|XML|Victor}
+     */
+    normal()
+    {
+        var p = this.perpendicular();
+        return p.normalize();
     }
 
 
@@ -1020,6 +1050,13 @@ export default class Vector
         return this.x * vec2.x + this.y * vec2.y;
     }
 
+
+    dotProduct(vec)
+    {
+        return this.dot(vec);
+    }
+
+
     cross(vec2)
     {
         return (this.x * vec2.y ) - (this.y * vec2.x );
@@ -1236,6 +1273,12 @@ export default class Vector
     distance(vec)
     {
         return Math.sqrt(this.distanceSq(vec));
+    }
+
+
+    getMagnitude()
+    {
+        return this.direction();
     }
 
 

@@ -22,11 +22,11 @@ export default class Shape
             projection2 = this.project(axis);
             overlap = projection1.getOverlap(projection2);
 
-            Painter.drawLine(window.g,
+            /*Painter.drawLine(window.g,
                 {x:axis.x * projection1.min, y:axis.y * projection1.min},
                 {x:axis.x * projection2.max, y:axis.y * projection2.max},
                 false
-            );
+            );*/
 
             if (overlap === 0) { //충돌 없슴.
                 return new MTV(0);

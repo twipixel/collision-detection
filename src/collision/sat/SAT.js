@@ -1,7 +1,7 @@
 import Point from './Point';
-import Vector from './Vector';
 import Circle from './Circle';
 import Polygon from './Polygon';
+import Vector from './../geom/Vector';
 import Painter from './../utils/Painter';
 import Mouse from './../utils/Mouse';
 import KeyCode from './../consts/KeyCode';
@@ -134,16 +134,15 @@ export default class SAT extends PIXI.Container
             c = radius + diameter * 2 + space * 3;
 
         polygonPoints = [];
-
-        //polygonPoints.push(this.getPolygonPoints(a, a, 3));
-         polygonPoints.push(this.getPolygonPoints(b, a, 4));
-        // polygonPoints.push(this.getPolygonPoints(c, a, 5));
-        // polygonPoints.push(this.getPolygonPoints(a, b, 6));
-        // polygonPoints.push(this.getPolygonPoints(b, b, 7));
-        // polygonPoints.push(this.getPolygonPoints(c, b, 8));
-        // polygonPoints.push(this.getPolygonPoints(a, c, 9));
-        // polygonPoints.push(this.getPolygonPoints(b, c, 10));
-         this.addCircle(c, c, radius);
+        polygonPoints.push(this.getPolygonPoints(a, a, 3));
+        polygonPoints.push(this.getPolygonPoints(b, a, 4));
+        polygonPoints.push(this.getPolygonPoints(c, a, 5));
+        polygonPoints.push(this.getPolygonPoints(a, b, 6));
+        polygonPoints.push(this.getPolygonPoints(b, b, 7));
+        polygonPoints.push(this.getPolygonPoints(c, b, 8));
+        polygonPoints.push(this.getPolygonPoints(a, c, 9));
+        polygonPoints.push(this.getPolygonPoints(b, c, 10));
+        this.addCircle(c, c, radius);
         //this.addCircle(c, c, radius);
 
         this.createPolygon(true);
@@ -230,10 +229,10 @@ export default class SAT extends PIXI.Container
         if (mtv.axis === undefined)
             return;
 
-        var colliderCenter = new Vector(collider.getCenter()),
-            collideeCenter = new Vector(collidee.getCenter()),
+        var colliderCenter = Vector.fromObject(collider.getCenter()),
+            collideeCenter = Vector.fromObject(collidee.getCenter()),
             centerVector = collideeCenter.subtract(colliderCenter),
-            centerUnitVector = (new Vector(centerVector)).normalize();
+            centerUnitVector = Vector.fromObject(centerVector).normalize();
 
         if (centerUnitVector.dotProduct(mtv.axis) > 0) {
             mtv.axis.x = -mtv.axis.x;
@@ -276,10 +275,10 @@ export default class SAT extends PIXI.Container
         var c = collidee.getCenter();
         var to = new Vector(dx, dy);
         var center = new Vector(c.x, c.y);
-        to = center.subtract(to);
+        to = center.clone().subtract(to);
 
-        // Painter.drawArrow(window.g, center, to, false, 1, arrowColor);
-        // Painter.drawPoint(window.g, this.circle.getCenter(), false, 10, 0xff3300, 0.2);
+         Painter.drawArrow(window.g, center, to, false, 1, arrowColor);
+         //Painter.drawPoint(window.g, this.circle.getCenter(), false, 10, 0xff3300, 0.2);
 
         collidee.move(dx, dy);
     }
@@ -323,19 +322,17 @@ export default class SAT extends PIXI.Container
 
     onMouseDown()
     {
-        if (window.g) {
-            window.g.clear();
-        }
+        debugGraphics.clear();
 
-        var location = Mouse.global;
+        var currentPoint = Vector.fromObject(Mouse.global);
 
         shapes.forEach((shape) => {
-            if (shape.isPointInPath(location.x, location.y)) {
+            if (shape.isPointInPath(currentPoint.x, currentPoint.y)) {
                 this.shapeBeingDragged = shape;
-                this.mouseDownPoint.x = location.x;
-                this.mouseDownPoint.y = location.y;
-                this.lastdrag.x = location.x;
-                this.lastdrag.y = location.y;
+                this.mouseDownPoint.x = currentPoint.x;
+                this.mouseDownPoint.y = currentPoint.y;
+                this.lastdrag.x = currentPoint.x;
+                this.lastdrag.y = currentPoint.y;
             }
         });
     }
@@ -343,17 +340,19 @@ export default class SAT extends PIXI.Container
 
     onMouseMove()
     {
-        var location, dragVector;
+        debugGraphics.clear();
+
+        var currentPoint, dragVector;
 
         if (this.shapeBeingDragged) {
-            location = Mouse.global;
+            currentPoint = Vector.fromObject(Mouse.global);
 
-            this.dragVector = dragVector = new Vector(location.x - this.lastdrag.x, location.y - this.lastdrag.y);
+            this.dragVector = dragVector = currentPoint.clone().subtract(this.lastdrag);
 
             this.shapeBeingDragged.move(dragVector.x, dragVector.y);
 
-            this.lastdrag.x = location.x;
-            this.lastdrag.y = location.y;
+            this.lastdrag.x = currentPoint.x;
+            this.lastdrag.y = currentPoint.y;
 
             this.detectCollisions();
             this.updateRender();
@@ -363,6 +362,7 @@ export default class SAT extends PIXI.Container
 
     onMouseUp()
     {
+        debugGraphics.clear();
         this.shapeBeingDragged = undefined;
     }
 
