@@ -12,8 +12,6 @@ export default class Shape
 
     minimumTranslationVector(axes, shape)
     {
-        window.g.clear();
-
         var minimumOverlap = Number.MAX_VALUE,
             overlap, axisWithSmallestOverlap,
             axis, projection1, projection2;
@@ -29,9 +27,6 @@ export default class Shape
                 {x:axis.x * projection2.max, y:axis.y * projection2.max},
                 false
             );
-
-            console.log('overlap', overlap);
-
 
             if (overlap === 0) { //충돌 없슴.
                 return new MTV(0);

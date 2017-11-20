@@ -44,6 +44,12 @@ export default class Main extends PIXI.Container
     }
 
 
+    update()
+    {
+
+    }
+
+
     resize()
     {
         this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);

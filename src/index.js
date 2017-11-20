@@ -1,6 +1,7 @@
 import Mouse from './collision/utils/Mouse';
 import SAT from './collision/sat/SAT';
 import GJK from './collision/gjk/GJK';
+import Distance from './collision/distance/Distance';
 
 
 
@@ -29,8 +30,9 @@ function initailize() {
     container = new PIXI.Container();
     stage.addChild(container);
 
-    testMain = new SAT(renderer);
-    // testMain = new GJK(renderer);
+    //testMain = new SAT(renderer);
+    //testMain = new GJK(renderer);
+    testMain = new Distance(renderer);
     container.addChild(testMain);
 
     updateLoop();
@@ -45,6 +47,7 @@ function updateLoop (ms) {
 
 
 function update(ms) {
+    testMain.update();
     renderer.render(stage);
 }
 

@@ -55,15 +55,21 @@ export default class SAT extends PIXI.Container
 
     addEvent()
     {
-        this._mousedownListener = this.onMouseDown.bind(this);
-        this._mousemoveListener = this.onMouseMove.bind(this);
-        this._mouseupListener = this.onMouseUp.bind(this);
+        this.onMouseDown = this.onMouseDown.bind(this);
+        this.onMouseMove = this.onMouseMove.bind(this);
+        this.onMouseUp = this.onMouseUp.bind(this);
 
-        this.on('mousedown', this._mousedownListener);
-        this.on('mousemove', this._mousemoveListener);
-        this.on('mouseup', this._mouseupListener);
+        this.on('mousedown', this.onMouseDown);
+        this.on('mousemove', this.onMouseMove);
+        this.on('mouseup', this.onMouseUp);
 
         window.addEventListener('keyup', this.onKeyUp.bind(this));
+    }
+
+
+    update()
+    {
+
     }
 
 
@@ -129,16 +135,16 @@ export default class SAT extends PIXI.Container
 
         polygonPoints = [];
 
-        polygonPoints.push(this.getPolygonPoints(a, a, 3));
-        // polygonPoints.push(this.getPolygonPoints(b, a, 4));
+        //polygonPoints.push(this.getPolygonPoints(a, a, 3));
+         polygonPoints.push(this.getPolygonPoints(b, a, 4));
         // polygonPoints.push(this.getPolygonPoints(c, a, 5));
         // polygonPoints.push(this.getPolygonPoints(a, b, 6));
         // polygonPoints.push(this.getPolygonPoints(b, b, 7));
         // polygonPoints.push(this.getPolygonPoints(c, b, 8));
         // polygonPoints.push(this.getPolygonPoints(a, c, 9));
         // polygonPoints.push(this.getPolygonPoints(b, c, 10));
-        // this.addCircle(c, c, radius);
-        this.addCircle(c, c, radius);
+         this.addCircle(c, c, radius);
+        //this.addCircle(c, c, radius);
 
         this.createPolygon(true);
     }
@@ -326,7 +332,6 @@ export default class SAT extends PIXI.Container
         shapes.forEach((shape) => {
             if (shape.isPointInPath(location.x, location.y)) {
                 this.shapeBeingDragged = shape;
-                console.log(this.shapeBeingDragged.name);
                 this.mouseDownPoint.x = location.x;
                 this.mouseDownPoint.y = location.y;
                 this.lastdrag.x = location.x;

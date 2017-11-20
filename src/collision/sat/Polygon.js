@@ -116,10 +116,6 @@ export default class Polygon extends Shape
 
         axes.push(v1.edge(v2).normal());
 
-        axes.forEach(axe => {
-            console.log('axe', axe);
-        });
-
         return axes;
     }
 
@@ -129,7 +125,7 @@ export default class Polygon extends Shape
         graphics.lineStyle(1, lineColor);
         graphics.moveTo(this.points[0].x, this.points[0].y);
 
-        for (var i = 0; i < this.points.length; ++i) {
+        for (var i = 0; i < this.points.length; i++) {
             graphics.lineTo(this.points[i].x, this.points[i].y);
         }
         graphics.lineTo(this.points[0].x, this.points[0].y);

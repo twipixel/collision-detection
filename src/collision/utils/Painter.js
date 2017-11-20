@@ -82,8 +82,6 @@ export default class Painter
             graphics.clear();
         }
 
-        console.log('drawLine(', p0, p1, ')');
-
         graphics.lineStyle(thickness, color, alpha);
         graphics.moveTo(p0.x, p0.y);
         graphics.lineTo(p1.x, p1.y);

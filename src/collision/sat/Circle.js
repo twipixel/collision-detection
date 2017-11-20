@@ -30,8 +30,6 @@ export default class Circle extends Shape
 
     collidesWith(shape)
     {
-        console.log('Circle.collideWith(', shape, ')');
-
         if (shape.radius === undefined) {
             return this.polygonCollidesWithCircle(shape, this);
         }
@@ -66,12 +64,21 @@ export default class Circle extends Shape
             testPoint,
             closestPoint;
 
-        for (var i=0; i < polygon.points.length; ++i) {
+        for (var i=0; i < polygon.points.length; i++) {
             testPoint = polygon.points[i];
-            length = Math.sqrt(Math.pow(testPoint.x - circle.x, 2),
-                Math.pow(testPoint.y - circle.y, 2));
+            testPoint.index = i;
 
-            console.log(i, length, min);
+            //Painter.drawPoint(window.g, testPoint, false, 1, Math.random() * 0xFFFFFF, 0.3);
+
+            length = Math.sqrt(
+                //Math.pow(testPoint.x - circle.x, 2),
+                //Math.pow(testPoint.y - circle.y, 2)
+
+                Math.pow(circle.x - testPoint.x , 2),
+                Math.pow(circle.y - testPoint.y, 2)
+            );
+
+            console.log(i, 'length:', length, 'p[', parseInt(testPoint.x), parseInt(testPoint.y), ']', 'c[', parseInt(circle.x), parseInt(circle.y), ']');
 
             if (length < min) {
                 min = length;
@@ -79,7 +86,9 @@ export default class Circle extends Shape
             }
         }
 
-        return closestPoint;
+        console.log('closetPoint index', closestPoint.index);
+
+        return {x:closestPoint.x, y:closestPoint.y};
     }
 
 
@@ -106,6 +115,10 @@ export default class Circle extends Shape
         var v1 = new Vector(circle.x, circle.y),
             v2 = new Vector(closestPoint.x, closestPoint.y),
             surfaceVector = v1.subtract(v2);
+
+        Painter.drawPoint(window.g, closestPoint, false, 1, 0xff3300, 0.3);
+
+        //Painter.drawLine(window.g, v1, v2, false, 1, 0xff3300, 0.3);
 
         return surfaceVector.normalize();
     }
