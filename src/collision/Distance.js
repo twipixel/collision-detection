@@ -1,6 +1,6 @@
-import Point from './../geom/Point';
-import Vector from './../geom/Vector';
-import Mouse from './../utils/Mouse';
+import Point from './geom/Point';
+import Vector from './geom/Vector';
+import Mouse from './utils/Mouse';
 
 
 const graphics = new PIXI.Graphics()
@@ -19,50 +19,39 @@ export default class Distance extends PIXI.Container
     {
         super();
 
+        window.g = debugGraphics;
+
         this.interactive = true;
         this.renderer = renderer;
         this.canvas = this.renderer.view;
         this.context = this.canvas.getContext('2d');
-
-        this.bindListener();
-        setTimeout(() => {this.initialize();}, 10);
-    }
-
-
-    bindListener()
-    {
-        this.onTargetDown = this.onTargetDown.bind(this);
-        this.onTargetMove = this.onTargetMove.bind(this);
-        this.onTargetUp = this.onTargetUp.bind(this);
-        //this.onPointDown = this.onPointDown.bind(this);
-        //this.onPointMove = this.onPointMove.bind(this);
-        //this.onPointUp = this.onPointUp.bind(this);
-        //this.onStageDown = this.onStageDown.bind(this);
-        //this.onStageMove = this.onStageMove.bind(this);
-        //this.onStageUp = this.onStageUp.bind(this);
     }
 
 
     initialize()
     {
-        window.g = debugGraphics;
-        this.addChild(graphics);
-        this.addChild(debugGraphics);
+        if (!this.isInit) {
+            this.bindListener();
 
+            this.addChild(graphics);
+            this.addChild(debugGraphics);
 
-        this.target = new Point(30, 30, 10, 0x3498db, 0.5);
-        this.target.on('mousedown', this.onTargetDown);
-        this.addChild(this.target);
+            this.target = new Point(30, 30, 10, 0x3498db, 0.5);
+            this.target.on('mousedown', this.onTargetDown);
+            this.addChild(this.target);
 
-        for (let i = 0; i < 5; i++) {
-            let point = new Point();
-            point.randomize(new Vector(0, 0), new Vector(this.canvas.width, this.canvas.height));
-            point.on('mousedown', this.onPointDown);
-            this.addChild(point);
-            pointArray.push(point);
+            for (let i = 0; i < 5; i++) {
+                let point = new Point();
+                point.randomize(new Vector(0, 0), new Vector(this.canvas.width, this.canvas.height));
+                point.on('mousedown', this.onPointDown);
+                this.addChild(point);
+                pointArray.push(point);
+            }
+
+            this.addEvent();
+
+            this.isInit = true;
         }
-
-        this.addEvent();
     }
 
 
@@ -120,6 +109,21 @@ export default class Distance extends PIXI.Container
     resize()
     {
         this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
+        this.initialize();
+    }
+
+
+    bindListener()
+    {
+        this.onTargetDown = this.onTargetDown.bind(this);
+        this.onTargetMove = this.onTargetMove.bind(this);
+        this.onTargetUp = this.onTargetUp.bind(this);
+        //this.onPointDown = this.onPointDown.bind(this);
+        //this.onPointMove = this.onPointMove.bind(this);
+        //this.onPointUp = this.onPointUp.bind(this);
+        //this.onStageDown = this.onStageDown.bind(this);
+        //this.onStageMove = this.onStageMove.bind(this);
+        //this.onStageUp = this.onStageUp.bind(this);
     }
 
 

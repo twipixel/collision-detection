@@ -1,23 +1,25 @@
-import Point from './Point';
-import Circle from './Circle';
-import Polygon from './Polygon';
-import Vector from './../geom/Vector';
-import Painter from './../utils/Painter';
-import Mouse from './../utils/Mouse';
-import KeyCode from './../consts/KeyCode';
+import Point from './sat/Point';
+import Circle from './sat/Circle';
+import Polygon from './sat/Polygon';
+import Vector from './geom/Vector';
+import Painter from './utils/Painter';
+import Mouse from './utils/Mouse';
+import KeyCode from './consts/KeyCode';
 
 
-const graphics = new PIXI.Graphics(),
-      debugGraphics = new PIXI.Graphics(),
-      shapes = [],
-      lineColor = 0x84D2F6, arrowColor = 0xE57373;
+const graphics = new PIXI.Graphics()
+    , debugGraphics = new PIXI.Graphics()
+    , shapes = []
+    , LINE_COLOR = 0x84D2F6
+    , ARROW_COLOR = 0xE57373;
 
 
-var polygonPoints = [
+let polygonPoints = [
         [new Point(350, 350), new Point(350, 500), new Point(500, 500)],
         [new Point(500, 200), new Point(480, 250), new Point(600, 250), new Point(620, 200)],
         [new Point(258, 120), new Point(295, 230), new Point(200, 300), new Point(105, 230), new Point(142, 120)]
     ];
+
 
 export default class SAT extends PIXI.Container
 {
@@ -25,31 +27,32 @@ export default class SAT extends PIXI.Container
     {
         super();
 
+        window.g = debugGraphics;
+
         this.interactive = true;
         this.renderer = renderer;
         this.canvas = this.renderer.view;
         this.context = this.canvas.getContext('2d');
-
-        this.initialize();
-        this.addEvent();
     }
 
 
     initialize()
     {
-        window.g = debugGraphics;
-        this.addChild(debugGraphics);
-        this.addChild(graphics);
+        if (!this.isInit) {
+            this.addChild(graphics);
+            this.addChild(debugGraphics);
 
-        // 마우스 영역 설정
-        this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
+            this.mouseDownPoint = new PIXI.Point(0, 0);
+            this.lastdrag = new PIXI.Point(0, 0);
+            this.shapeBeingDragged = undefined;
 
-        this.mouseDownPoint = new PIXI.Point(0, 0);
-        this.lastdrag = new PIXI.Point(0, 0);
-        this.shapeBeingDragged = undefined;
+            //this.createPolygon();
+            this.createPolygonManual();
 
-        //this.createPolygon();
-        this.createPolygonManual();
+            this.addEvent();
+
+            this.isInit = true;
+        }
     }
 
 
@@ -67,27 +70,25 @@ export default class SAT extends PIXI.Container
     }
 
 
-    update()
-    {
-
-    }
+    update() {}
 
 
     resize()
     {
         this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
+        this.initialize();
     }
 
 
     getPolygonPoints(tx, ty, angle, radius = 100)
     {
-        var points = [];
+        const points = [];
 
         // making points, path
-        for (var i = 0; i < angle; i ++) {
-            var x = tx + (radius * -Math.sin(this.toRadian(360 / angle * i)));
-            var y = ty + (radius *  Math.cos(this.toRadian(360 / angle * i)));
-            var point = new PIXI.Point(x, y);
+        for (let i = 0; i < angle; i ++) {
+            let x = tx + (radius * -Math.sin(this.toRadian(360 / angle * i)));
+            let y = ty + (radius *  Math.cos(this.toRadian(360 / angle * i)));
+            let point = new PIXI.Point(x, y);
             points.push(point);
         }
 
@@ -105,8 +106,8 @@ export default class SAT extends PIXI.Container
     {
         const context = this.context;
 
-        for (var i = 0; i < polygonPoints.length; ++i) {
-            var polygon = new Polygon(context),
+        for (let i = 0; i < polygonPoints.length; ++i) {
+            let polygon = new Polygon(context),
                 points = polygonPoints[i];
 
             points.forEach((point) => {
@@ -119,14 +120,14 @@ export default class SAT extends PIXI.Container
 
             shapes.push(polygon);
 
-            polygon.createPath(graphics, lineColor);
+            polygon.createPath(graphics, LINE_COLOR);
         }
     }
 
 
     createPolygonManual()
     {
-        var radius = 100,
+        let radius = 100,
             diameter = 200,
             space = 20,
             a = radius + space,
@@ -151,9 +152,9 @@ export default class SAT extends PIXI.Container
 
     addPolygon(index, useRandomRotate = true)
     {
-        var polygon = new Polygon(this.context);
+        let polygon = new Polygon(this.context);
 
-        var points = polygonPoints[index];
+        let points = polygonPoints[index];
 
         points.forEach((point) => {
             polygon.addPoint(point.x, point.y);
@@ -163,15 +164,15 @@ export default class SAT extends PIXI.Container
             this.rotateShape(polygon, (Math.random() * 45) * Math.PI / 180);
         }
 
-        polygon.createPath(graphics, lineColor);
+        polygon.createPath(graphics, LINE_COLOR);
         shapes.push(polygon);
     }
 
 
     addCircle(x, y, radius)
     {
-        var circle = new Circle(this.context, x, y, radius);
-        circle.createPath(graphics, lineColor);
+        let circle = new Circle(this.context, x, y, radius);
+        circle.createPath(graphics, LINE_COLOR);
         shapes.push(circle);
         this.circle = circle;
     }
@@ -182,14 +183,14 @@ export default class SAT extends PIXI.Container
         graphics.clear();
 
         shapes.forEach((polygon) => {
-           polygon.createPath(graphics, lineColor);
+           polygon.createPath(graphics, LINE_COLOR);
         });
     }
 
 
     detectCollisions()
     {
-        var dragShape = this.shapeBeingDragged;
+        let dragShape = this.shapeBeingDragged;
 
         if (!dragShape) {
             return;
@@ -198,7 +199,7 @@ export default class SAT extends PIXI.Container
         shapes.forEach((shape) => {
 
             if (shape !== dragShape) {
-                var mtv = dragShape.collidesWith(shape);
+                let mtv = dragShape.collidesWith(shape);
 
                 // 충돌 판정
                 if (this.collisionDetected(mtv)) {
@@ -229,7 +230,7 @@ export default class SAT extends PIXI.Container
         if (mtv.axis === undefined)
             return;
 
-        var colliderCenter = Vector.fromObject(collider.getCenter()),
+        let colliderCenter = Vector.fromObject(collider.getCenter()),
             collideeCenter = Vector.fromObject(collidee.getCenter()),
             centerVector = collideeCenter.subtract(colliderCenter),
             centerUnitVector = Vector.fromObject(centerVector).normalize();
@@ -253,11 +254,11 @@ export default class SAT extends PIXI.Container
             mtv.axis = new Vector(1, 1);
         }
 
-        var dx = mtv.axis.x * mtv.overlap,
+        let dx = mtv.axis.x * mtv.overlap,
             dy = mtv.axis.y * mtv.overlap;
 
-        var dragVector = this.dragVector;
-        var overlapVector = new Vector(dx, dy);
+        let dragVector = this.dragVector,
+            overlapVector = new Vector(dx, dy);
 
         /**
          * 내적이 -1이면 반대 방향을 보는 것
@@ -265,19 +266,19 @@ export default class SAT extends PIXI.Container
          * 내적이 1인 경우 같은 방향을 가리키는 것
          * 내적이 > 0.8 다면 같은 방향을 보고 있는 상태
          */
-        var dot = dragVector.dotProduct(overlapVector);
+        let dot = dragVector.dotProduct(overlapVector);
 
         if (dot < 0) {
             dx = -dx;
             dy = -dy;
         }
 
-        var c = collidee.getCenter();
-        var to = new Vector(dx, dy);
-        var center = new Vector(c.x, c.y);
+        let c = collidee.getCenter();
+        let to = new Vector(dx, dy);
+        let center = new Vector(c.x, c.y);
         to = center.clone().subtract(to);
 
-         Painter.drawArrow(window.g, center, to, false, 1, arrowColor);
+         Painter.drawArrow(window.g, center, to, false, 1, ARROW_COLOR);
          //Painter.drawPoint(window.g, this.circle.getCenter(), false, 10, 0xff3300, 0.2);
 
         collidee.move(dx, dy);
@@ -287,13 +288,13 @@ export default class SAT extends PIXI.Container
     rotateShape(shape, degrees)
     {
         //degrees = 90;
-        var points = shape.points;
+        let points = shape.points;
 
         if (points) {
-            var center = shape.getCenter();
+            let center = shape.getCenter();
 
-            for (var  i = 0; i < points.length; i++) {
-                var point = points[i];
+            for (let  i = 0; i < points.length; i++) {
+                let point = points[i];
                 points[i] = this.rotationPoint(center, point, degrees);
             }
         }
@@ -309,13 +310,13 @@ export default class SAT extends PIXI.Container
      */
     rotationPoint(pivot, point, degrees)
     {
-        var diffX = point.x - pivot.x;
-        var diffY = point.y - pivot.y;
-        var dist = Math.sqrt(diffX * diffX + diffY * diffY);
-        var ca = Math.atan2(diffY, diffX) * (180 / Math.PI);
-        var na = ((ca + degrees) % 360) * (Math.PI / 180);
-        var x = (pivot.x + dist * Math.cos(na) + 0.5) | 0;
-        var y = (pivot.y + dist * Math.sin(na) + 0.5) | 0;
+        let diffX = point.x - pivot.x;
+        let diffY = point.y - pivot.y;
+        let dist = Math.sqrt(diffX * diffX + diffY * diffY);
+        let ca = Math.atan2(diffY, diffX) * (180 / Math.PI);
+        let na = ((ca + degrees) % 360) * (Math.PI / 180);
+        let x = (pivot.x + dist * Math.cos(na) + 0.5) | 0;
+        let y = (pivot.y + dist * Math.sin(na) + 0.5) | 0;
         return {x: x, y: y};
     }
 
@@ -324,7 +325,7 @@ export default class SAT extends PIXI.Container
     {
         debugGraphics.clear();
 
-        var currentPoint = Vector.fromObject(Mouse.global);
+        let currentPoint = Vector.fromObject(Mouse.global);
 
         shapes.forEach((shape) => {
             if (shape.isPointInPath(currentPoint.x, currentPoint.y)) {
@@ -342,7 +343,7 @@ export default class SAT extends PIXI.Container
     {
         debugGraphics.clear();
 
-        var currentPoint, dragVector;
+        let currentPoint, dragVector;
 
         if (this.shapeBeingDragged) {
             currentPoint = Vector.fromObject(Mouse.global);

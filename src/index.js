@@ -1,14 +1,15 @@
 import Mouse from './collision/utils/Mouse';
-import SAT from './collision/sat/SAT';
-import GJK from './collision/gjk/GJK';
-import Distance from './collision/distance/Distance';
+import SAT from './collision/SAT';
+import GJK from './collision/GJK';
+import Distance from './collision/Distance';
 
 
 
-var canvas, renderer, stage, testMain, container;
+let canvas, renderer, stage, testMain, container;
 
 window.onload = initailize.bind(this);
 window.onresize = resizeWindow.bind(this);
+
 
 function initailize() {
     canvas = document.getElementById('canvas');
@@ -30,14 +31,14 @@ function initailize() {
     container = new PIXI.Container();
     stage.addChild(container);
 
+    // distance 테스트
+    testMain = new Distance(renderer);
+
     // SAT 충돌 검사 테스트
-    testMain = new SAT(renderer);
+    //testMain = new SAT(renderer);
 
     // 미구현
-    //testMain = new GJK(renderer);
-
-    // distance 테스트
-    //testMain = new Distance(renderer);
+    testMain = new GJK(renderer);
 
     container.addChild(testMain);
 
