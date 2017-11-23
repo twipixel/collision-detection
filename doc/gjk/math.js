@@ -285,6 +285,10 @@ Transform.prototype.setPosition = function(p) {
 	return this;
 }
 
+/**
+ * 초기화
+ * @returns {Transform}
+ */
 Transform.prototype.identity = function() {
 	this.t.set(0, 0);
 	this.c = 1;
@@ -292,18 +296,44 @@ Transform.prototype.identity = function() {
 	return this;
 }
 
+/**
+ * 회전변환 공식
+ *
+ * | x' | | cos(q) -sin(q) | | x |
+ * | y' | | sin(q)  cos(q) | | y |
+ *
+ * x' = x * cos(q) - y * sin(q)
+ * y' = x * sin(q) + y * cos(q)
+ *
+ * @param v
+ * @returns {vec2}
+ */
 Transform.prototype.rotate = function(v) {
 	return new vec2(v.x * this.c - v.y * this.s, v.x * this.s + v.y * this.c);
 }
 
+/**
+ * 반대로 회전
+ * @param v
+ * @returns {vec2}
+ */
 Transform.prototype.unrotate = function(v) {
 	return new vec2(v.x * this.c + v.y * this.s, -v.x * this.s + v.y * this.c);
 }
 
+/**
+ * 주어진 벡터를 현재 변환 상태 적용
+ * 회전 + 이동
+ */
 Transform.prototype.transform = function(v) {
 	return new vec2(v.x * this.c - v.y * this.s + this.t.x, v.x * this.s + v.y * this.c + this.t.y);
 }
 
+/**
+ * 로컬좌표 구하기
+ * @param v
+ * @returns {vec2}
+ */
 Transform.prototype.untransform = function(v) {
 	var px = v.x - this.t.x;
 	var py = v.y - this.t.y;

@@ -159,6 +159,37 @@ App = function() {
 
 	function drawPolygon(v, xf, lineWidth, strokeColor, fillColor) {
 		ctx.save();
+
+		/**
+		 * context matrix
+		 *
+		 * | a c e |
+		 * | b d f |
+		 * | 0 0 1 |
+		 *
+		 * transform(a, b, c, d, e, f)
+		 *
+		 * 평행 이동
+		 * | 1 0 tx |
+		 * | 0 1 ty |
+		 * | 0 0 1  |
+		 *
+		 * 크기 조절
+		 * | Sx 0  0 |
+		 * | 0  Sy 0 |
+		 * | 0  0  1 |
+		 *
+		 * 회전
+		 * | cos(q) -sin(q) 0 |
+		 * | sin(q)  cos(q) 0 |
+		 * | 0       0      1 |
+		 */
+
+		if (xf === xfA) {
+			console.log('xf[', xf.c, xf.s, xf.t.x, xf.t.y, ']');
+		}
+
+
 		ctx.transform(xf.c, xf.s, -xf.s, xf.c, xf.t.x, xf.t.y);
 
 		ctx.beginPath();			
@@ -168,6 +199,7 @@ App = function() {
 			ctx.lineTo(v[i].x, v[i].y);
 		}
 
+		// 도형이면 closePath
 		if (v.length > 2) {
 			ctx.closePath();
 		}
@@ -245,17 +277,19 @@ App = function() {
 	function updateScreen() {
 		domInfo.innerHTML = getModeName();
 
+		// context 초기화
 		ctx.save();
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, domCanvas.width, domCanvas.height);
 		ctx.restore();
 
+		// 여기서 전체 좌표를 가운데로 옮기고, 나머지는 기존의 transform 대로 그림을 그립니다.
 		ctx.setTransform(1, 0, 0, -1, domCanvas.width * 0.5, domCanvas.height * 0.5);
 
-		// Draw origin
+		// 원점 좌표 그리기 (가운데 점)
 		drawPoint(vec2.zero, 2, "#000");
 
-		// Draw two polygons
+		// 2개의 폴리곤을 그립니다.
 		drawPolygon(polygonA.verts, xfA, 1, "#888");
 		drawPolygon(polygonB.verts, xfB, 1, "#888");
 
@@ -270,6 +304,7 @@ App = function() {
 			drawText(vec2.add(v, new vec2(-3, 3)), "" + i, "#888");
 		}
 
+		// 충돌검사
 		var simplexHistory = doGJK(polygonA, xfA, polygonB, xfB);
 		var lastIndex = simplexHistory.length - 1;
 		var lastSimplex = simplexHistory[lastIndex];
@@ -390,6 +425,11 @@ App = function() {
 			domCanvas.height * 0.5 - p.y);
 	}
 
+	/**
+	 * 캔버스를 가운데 중점을 0,0 으로 만들어 줍니다.
+	 * @param p
+	 * @returns {vec2}
+     */
 	function canvasToWorld(p) {
 		return new vec2(
 			p.x - domCanvas.width * 0.5,
@@ -409,9 +449,14 @@ App = function() {
 	}
 
 	function onMouseMove(ev) {
+
+		// canvas 좌표를
 		mousePos = getMousePosition(ev);
 
+		// world 좌표로 변환 (가운데 0, 0인 좌표)
 		xfA.setPosition(canvasToWorld(mousePos));
+
+		//console.log('xfA', xfA, 'canvasToWorld(mousePos)', canvasToWorld(mousePos));
 	}
 
 	function touchHandler(ev) {

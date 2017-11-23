@@ -264,6 +264,14 @@ function supportPoint(polygon, d) {
 	return bestIndex;
 }
 
+/**
+ * 충돌검사
+ * @param polygon1
+ * @param xf1
+ * @param polygon2
+ * @param xf2
+ * @returns {Array}
+ */
 function doGJK(polygon1, xf1, polygon2, xf2) {
 	var simplexHistory = [];
 
@@ -643,6 +651,15 @@ function clipLineSegment(v1, v2, n, o) {
 	return cp;
 }
 
+/**
+ * 근접 포인트 계산
+ * @param polygon1
+ * @param xf1
+ * @param polygon2
+ * @param xf2
+ * @param n
+ * @returns {*}
+ */
 function computeContactPoints(polygon1, xf1, polygon2, xf2, n) {
 	var e1 = findSeparationEdge(polygon1, xf1, n);
 	var e2 = findSeparationEdge(polygon2, xf2, vec2.neg(n));
