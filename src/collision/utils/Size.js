@@ -19,12 +19,20 @@ export default class Size
 
     static get windowWidth()
     {
-        return window.innerWidth * window.devicePixelRatio;
+        if (!this.canvas) {
+            this.canvas = document.getElementById('canvas');
+        }
+
+        return this.canvas.width;
     }
 
     static get windowHeight()
     {
-        return window.innerHeight * window.devicePixelRatio;
+        if (!this.canvas) {
+            this.canvas = document.getElementById('canvas');
+        }
+
+        return this.canvas.height;
     }
 
     static get windowSize()

@@ -105,7 +105,8 @@ export default class Polygon extends Shape
             v2.x = this.points[i+1].x;
             v2.y = this.points[i+1].y;
 
-            axes.push(v1.edge(v2).normal());
+            //axes.push(v1.edge(v2).normal());
+            axes.push(v1.edge(v2).perpendicular().normalize());
         }
 
         v1.x = this.points[this.points.length-1].x;
@@ -114,8 +115,8 @@ export default class Polygon extends Shape
         v2.x = this.points[0].x;
         v2.y = this.points[0].y;
 
-        axes.push(v1.edge(v2).normal());
-
+        //axes.push(v1.edge(v2).normal());
+        axes.push(v1.edge(v2).perpendicular().normalize());
         return axes;
     }
 

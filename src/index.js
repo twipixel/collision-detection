@@ -32,13 +32,13 @@ function initailize() {
     stage.addChild(container);
 
     // distance 테스트
-    testMain = new Distance(renderer);
+    // testMain = new Distance(renderer);
 
     // SAT 충돌 검사 테스트
-    //testMain = new SAT(renderer);
+    testMain = new SAT(renderer);
 
     // 미구현
-    testMain = new GJK(renderer);
+    // testMain = new GJK(renderer);
 
     container.addChild(testMain);
 

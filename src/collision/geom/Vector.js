@@ -668,9 +668,9 @@ export default class Vector
      */
     perpendicular()
     {
-        var v = new Vector();
+        const v = new Vector();
         v.x = this.y;
-        v.y = 0-this.x;
+        v.y = 0 - this.x;
         return v;
     }
 
@@ -683,7 +683,7 @@ export default class Vector
      */
     normalize()
     {
-        var length = this.length();
+        const length = this.length();
 
         if (length === 0) {
             this.x = 1;
@@ -698,17 +698,6 @@ export default class Vector
     norm()
     {
         return this.normalize();
-    }
-
-
-    /**
-     * 정규화된 수직 벡터 생성
-     * @returns {*|string|void|XMLList|XML|Victor}
-     */
-    normal()
-    {
-        var p = this.perpendicular();
-        return p.normalize();
     }
 
 

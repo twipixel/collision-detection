@@ -189,7 +189,6 @@ App = function() {
 			console.log('xf[', xf.c, xf.s, xf.t.x, xf.t.y, ']');
 		}
 
-
 		ctx.transform(xf.c, xf.s, -xf.s, xf.c, xf.t.x, xf.t.y);
 
 		ctx.beginPath();			
