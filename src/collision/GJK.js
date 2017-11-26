@@ -1,7 +1,8 @@
 import World from './gjk/World';
 import Size from './utils/Size';
-import Vec2 from './gjk/Vec2';
+import Cal from './gjk/Calculator';
 import Painter from './utils/Painter';
+import Vector from './geom/Vector';
 
 
 const graphics = new PIXI.Graphics();
@@ -77,25 +78,25 @@ export default class Main extends PIXI.Container
     test()
     {
         const vertices1 = [
-            new Vec2(0, 0),
-            new Vec2(5, 5),
-            new Vec2(3, 6)
+            new Vector(0, 0),
+            new Vector(5, 5),
+            new Vector(3, 6)
         ];
 
         // const vertices2 = [
-        //     new Vec2(4, 1),
-        //     new Vec2(6, 5),
-        //     new Vec2(8, 2)
+        //     new Vector(4, 1),
+        //     new Vector(6, 5),
+        //     new Vector(8, 2)
         // ];
 
         const vertices2 = [
-            new Vec2(2, 1),
-            new Vec2(3, 4),
-            new Vec2(7, 0)
+            new Vector(2, 1),
+            new Vector(3, 4),
+            new Vector(7, 0)
         ];
 
 
-        //Painter.drawLine(window.g, new Vec2(0, Size.windowCenterY), new Vec2(Size.windowWidth, Size.windowCenterY), false);
+        //Painter.drawLine(window.g, new Vector(0, Size.windowCenterY), new Vector(Size.windowWidth, Size.windowCenterY), false);
 
         const g = window.g
             , w = Size.windowWidth
@@ -114,8 +115,8 @@ export default class Main extends PIXI.Container
         Painter.drawMinkowskiSum(vertices1, vertices2);
 
 
-        const vec = new Vec2();
-        const collisionDetected = vec.gjk(vertices1, vertices1.length, vertices2, vertices2.length);
+        const vec = new Vector();
+        const collisionDetected = Cal.gjk(vertices1, vertices1.length, vertices2, vertices2.length);
 
         console.log('collisionDetected', collisionDetected);
     }

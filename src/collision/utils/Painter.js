@@ -1,6 +1,5 @@
 import Vector from './../geom/Vector';
-import Vec2 from './../gjk/Vec2';
-import Calc from './../utils/Calculator';
+import Calc from './../gjk/Calculator';
 
 
 export default class Painter
@@ -18,69 +17,8 @@ export default class Painter
             }
         }
 
-        Painter.drawPolygon(Painter.createConvexHull(path), 2, 0x9C27B0, 0.7);
+        Painter.drawPolygon(Calc.createConvexHull(path), 2, 0x9C27B0, 0.7);
     }
-
-
-    static createConvexHull(points)
-    {
-        // Find the right most point on the hull
-        var i0 = 0;
-        var x0 = points[0].x;
-        for (var i = 1; i < points.length; i++) {
-            var x = points[i].x;
-            if (x > x0 || (x == x0 && points[i].y < points[i0].y)) {
-                i0 = i;
-                x0 = x;
-            }
-        }
-
-        var n = points.length;
-        var hull = [];
-        var m = 0;
-        var ih = i0;
-
-        while (1) {
-            hull[m] = ih;
-
-            var ie = 0;
-            for (var j = 1; j < n; j++) {
-                if (ie == ih) {
-                    ie = j;
-                    continue;
-                }
-
-                var r = Vec2.sub(points[ie], points[hull[m]]);
-                var v = Vec2.sub(points[j], points[hull[m]]);
-                var c = Vec2.cross(r, v);
-                if (c < 0) {
-                    ie = j;
-                }
-
-                // Collinearity check
-                if (c == 0 && v.lengthsq() > r.lengthsq()) {
-                    ie = j;
-                }
-            }
-
-            m++;
-            ih = ie;
-
-            if (ie == i0) {
-                break;
-            }
-        }
-
-        // Copy vertices
-        var newPoints = [];
-        for (var i = 0; i < m; ++i) {
-            let point = points[hull[i]];
-            newPoints.push(new Vec2(point.x, point.y));
-        }
-
-        return newPoints;
-    }
-
 
 
     static drawPolygon(vertices, lineWidth = 1, color = 0xff3300, alpha = 0.5)

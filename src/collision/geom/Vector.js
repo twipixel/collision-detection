@@ -152,6 +152,11 @@ export default class Vector
     }
 
 
+    static add(a, b)
+    {
+        return new Vector(a.x + b.x, a.y + b.y);
+    }
+
     /**
      * Adds the given scalar to both vector axis
      *
@@ -283,9 +288,21 @@ export default class Vector
     }
 
 
+    static subtract(a, b)
+    {
+        return new Vector(a.x - b.x, a.y - b.y);
+    }
+
+
     edge(vec)
     {
         return this.subtract(vec);
+    }
+
+
+    static edge(a, b)
+    {
+        return Vector.subtract(a, b);
     }
 
 
@@ -417,6 +434,12 @@ export default class Vector
         this.x /= vector.x;
         this.y /= vector.y;
         return this;
+    }
+
+
+    static divide(a, b)
+    {
+        return new Vector(a.x / b.x, a.y / b.y);
     }
 
 
@@ -559,6 +582,15 @@ export default class Vector
     }
 
 
+    static negate(vec)
+    {
+        vec.x = -vec.x;
+        vec.y = -vec.y;
+        return vec;
+    }
+
+
+
     /**
      * Multiplies the X axis by X component of given vector
      *
@@ -672,6 +704,15 @@ export default class Vector
         v.x = this.y;
         v.y = 0 - this.x;
         return v;
+    }
+
+
+    static perpendicular(vec)
+    {
+        const clone = vec.clone();
+        clone.x = vec.y;
+        clone.y = -vec.x;
+        return clone;
     }
 
 
@@ -1046,9 +1087,38 @@ export default class Vector
     }
 
 
+    static dotProduct(a, b)
+    {
+        return a.x * b.x + a.y * b.y;
+    }
+
+
     cross(vec2)
     {
-        return (this.x * vec2.y ) - (this.y * vec2.x );
+        return (this.x * vec2.y) - (this.y * vec2.x);
+    }
+
+
+    static cross(a, b)
+    {
+        return a.x * b.y - a.y * b.x;
+    }
+
+
+    static tripleProduct(a, b, c)
+    {
+        const r = new Vector();
+
+        // perform a.dot(c)
+        // perform b.dot(c)
+        const ac = a.x * c.x + a.y * c.y
+            , bc = b.x * c.x + b.y * c.y;
+
+        // perform b * a.dot(c) - a * b.dot(c)
+        r.x = b.x * ac - a.x * bc;
+        r.y = b.y * ac - a.y * bc;
+
+        return r;
     }
 
 
@@ -1327,6 +1397,12 @@ export default class Vector
     lengthSq()
     {
         return this.x * this.x + this.y * this.y;
+    }
+
+
+    static lengthSq(vec)
+    {
+        return vec.x * vec.x + vec.y * vec.y;
     }
 
 

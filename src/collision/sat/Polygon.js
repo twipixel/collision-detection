@@ -105,7 +105,7 @@ export default class Polygon extends Shape
             v2.x = this.points[i+1].x;
             v2.y = this.points[i+1].y;
 
-            //axes.push(v1.edge(v2).normal());
+            // 모서리에서 수직인 노말(법선) 벡터를 만듭니다. (축 생성)
             axes.push(v1.edge(v2).perpendicular().normalize());
         }
 
@@ -115,7 +115,7 @@ export default class Polygon extends Shape
         v2.x = this.points[0].x;
         v2.y = this.points[0].y;
 
-        //axes.push(v1.edge(v2).normal());
+        // 모서리에서 수직인 노말(법선) 벡터를 만듭니다. (축 생성)
         axes.push(v1.edge(v2).perpendicular().normalize());
         return axes;
     }

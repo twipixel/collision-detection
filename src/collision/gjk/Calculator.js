@@ -1,86 +1,10 @@
+import Vector from './../geom/Vector';
 import Painter from './../utils/Painter';
 
 
-export default class Vec2 {
-    constructor(x = 0, y = 0)
-    {
-        this.x = x;
-        this.y = y;
-    }
 
-
-    subtract(a, b)
-    {
-        a.x -= b.x;
-        a.y -= b.y;
-        return a;
-    }
-
-
-    lengthsq()
-    {
-        return this.x * this.x + this.y * this.y;
-    }
-
-
-    static sub(a, b)
-    {
-        return new Vec2(a.x - b.x, a.y - b.y);
-    }
-
-
-    // Z-component of 3d cross product (ax, ay, 0) x (bx, by, 0)
-    static cross(v1, v2) {
-        return v1.x * v2.y - v1.y * v2.x;
-    }
-
-
-    negate(v)
-    {
-        v.x = -v.x;
-        v.y = -v.y;
-        return v;
-    }
-
-
-    perpendicular(v)
-    {
-        const p = v.clone();
-        p.x = v.y;
-        p.y = -v.x;
-        return p;
-    }
-
-
-    dotProduct(a, b)
-    {
-        return a.x * b.x + a.y * b.y;
-    }
-
-
-    lengthSquared(v)
-    {
-        return v.x * v.x + v.y * v.y;
-    }
-
-
-    tripleProduct(a, b, c)
-    {
-        const r = new Vec2();
-
-        // perform a.dot(c)
-        // perform b.dot(c)
-        const ac = a.x * c.x + a.y * c.y
-            , bc = b.x * c.x + b.y * c.y;
-
-        // perform b * a.dot(c) - a * b.dot(c)
-        r.x = b.x * ac - a.x * bc;
-        r.y = b.y * ac - a.y * bc;
-
-        return r;
-    }
-
-
+export default class Calculator
+{
     /**
      *
      * This is to compute average center (roughly). It might be different from
@@ -90,9 +14,9 @@ export default class Vec2 {
      * @param count
      * @param direction
      */
-    averagePoint(vertices, count)
+    static averagePoint(vertices, count)
     {
-        const avg = new Vec2();
+        const avg = new Vector();
 
         for (let i = 0; i < count; i++) {
             avg.x += vertices[i].x;
@@ -101,6 +25,7 @@ export default class Vec2 {
 
         avg.x /= count;
         avg.y /= count;
+
         return avg;
     }
 
@@ -111,13 +36,13 @@ export default class Vec2 {
      * @param count
      * @param direction
      */
-    indexOfFurthestPoint(vertices, count, direction)
+    static indexOfFurthestPoint(vertices, count, direction)
     {
         let index = 0;
-        let maxProduct = this.dotProduct(direction, vertices[0]);
+        let maxProduct = Vector.dotProduct(direction, vertices[0]);
 
         for (let i = 0; i < count; i++) {
-            let product = this.dotProduct(direction, vertices[i]);
+            let product = Vector.dotProduct(direction, vertices[i]);
 
             if (product > maxProduct) {
                 maxProduct = product;
@@ -137,7 +62,7 @@ export default class Vec2 {
      * @param count2
      * @param direction
      */
-    support(vertices1, count1, vertices2, count2, direction)
+    static support(vertices1, count1, vertices2, count2, direction)
     {
         // get furthest point of first body along an arbitrary direction
         const i = this.indexOfFurthestPoint(vertices1, count1, direction);
@@ -150,12 +75,14 @@ export default class Vec2 {
 
 
         // subtract (Minkowski sum) the two points to see if bodies 'overlap'
-        return this.subtract(vertices1[i], vertices2[j]);
+        return Vector.subtract(vertices1[i], vertices2[j]);
     }
 
 
-    gjk(vertices1, count1, vertices2, count2)
+    static gjk(vertices1, count1, vertices2, count2)
     {
+        return;
+
         console.log('gjk(', vertices1, count1, vertices2, count2, ')');
 
         // index of current vertex of simplex
@@ -171,7 +98,7 @@ export default class Vec2 {
         Painter.drawLine(window.g, c1, c2, false, 1, 0x00BCD4);
 
         // initial direction from the center of 1st body to the center of 2nd body
-        d = Vec2.sub(position1, position2);
+        d = Vector.subtract(position1, position2);
 
         // if initial direction is zero – set it to any arbitrary axis (we choose X)
         if ((d.x == 0) && (d.y == 0)) {
@@ -248,29 +175,69 @@ export default class Vec2 {
     }
 
 
-    midpoint(a, b)
+    static createConvexHull(points)
     {
-        return new Vec2((a.x + b.x) / 2, (a.y + b.y) / 2);
+        // Find the right most point on the hull
+        var i0 = 0;
+        var x0 = points[0].x;
+        for (var i = 1; i < points.length; i++) {
+            var x = points[i].x;
+            if (x > x0 || (x == x0 && points[i].y < points[i0].y)) {
+                i0 = i;
+                x0 = x;
+            }
+        }
+
+        var n = points.length;
+        var hull = [];
+        var m = 0;
+        var ih = i0;
+
+        while (1) {
+            hull[m] = ih;
+
+            var ie = 0;
+            for (var j = 1; j < n; j++) {
+                if (ie == ih) {
+                    ie = j;
+                    continue;
+                }
+
+                var r = Vector.subtract(points[ie], points[hull[m]]);
+                var v = Vector.subtract(points[j], points[hull[m]]);
+                var c = Vector.cross(r, v);
+                if (c < 0) {
+                    ie = j;
+                }
+
+                // Collinearity check
+                if (c == 0 && v.lengthSq() > r.lengthSq()) {
+                    ie = j;
+                }
+            }
+
+            m++;
+            ih = ie;
+
+            if (ie == i0) {
+                break;
+            }
+        }
+
+        // Copy vertices
+        var newPoints = [];
+        for (var i = 0; i < m; ++i) {
+            let point = points[hull[i]];
+            newPoints.push(new Vector(point.x, point.y));
+        }
+
+        return newPoints;
     }
 
 
-    multiplyScalar(scalar)
+
+    static midpoint(a, b)
     {
-        this.x *= scalar;
-        this.y *= scalar;
-        return this;
+        return new Vector((a.x + b.x) / 2, (a.y + b.y) / 2);
     }
-
-
-    clone()
-    {
-        return new Vec2(this.x, this.y);
-    }
-
-
-    toString()
-    {
-        return `Vec2 ${this.x}, ${this.y}`;
-    }
-
 }
