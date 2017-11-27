@@ -584,9 +584,10 @@ export default class Vector
 
     static negate(vec)
     {
-        vec.x = -vec.x;
-        vec.y = -vec.y;
-        return vec;
+        const v = vec.clone();
+        v.x = -vec.x;
+        v.y = -vec.y;
+        return v;
     }
 
 

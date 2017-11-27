@@ -6,7 +6,6 @@ import Painter from './../utils/Painter';
 export default class Calculator
 {
     /**
-     *
      * This is to compute average center (roughly). It might be different from
      * Center of Gravity, especially for bodies with nonuniform density,
      * but this is ok as initial direction of simplex search in GJK
@@ -68,26 +67,49 @@ export default class Calculator
         const i = this.indexOfFurthestPoint(vertices1, count1, direction);
 
         // get furthest point of second body along the opposite direction
-        const j = this.indexOfFurthestPoint(vertices2, count2, this.negate(direction));
+        const j = this.indexOfFurthestPoint(vertices2, count2, Vector.negate(direction));
 
         const v1 = vertices1[i]
             , v2 = vertices2[j];
 
+        const diff = Vector.subtract(v1, v2);
+
+        const d = direction.clone().normalize();
+        console.log('support', `Minkowski sum[${diff.x}, ${diff.y}]`, `v1[${v1.x}, ${v1.y}]`, `v2[${v2.x}, ${v2.y}]`, `d[${d.x.toFixed(2)}, ${d.y.toFixed(2)}]`);
+
+        Painter.drawPoint(window.g, diff.clone().multiplyScalar(10), false, 2);
 
         // subtract (Minkowski sum) the two points to see if bodies 'overlap'
-        return Vector.subtract(vertices1[i], vertices2[j]);
+        return diff;
     }
 
 
     static gjk(vertices1, count1, vertices2, count2)
     {
-        return;
-
+        console.log('-------------------------------------------------');
         console.log('gjk(', vertices1, count1, vertices2, count2, ')');
+        console.log('-------------------------------------------------');
+
+        // const vertices = [...vertices1, ...vertices2];
+
+        console.log('vertices1');
+        console.log('-------------------------------------------------');
+        vertices1.forEach((vec, index) => {
+            console.log(index, `vec[${vec.x}, ${vec.y}]`);
+        });
+
+        console.log('-------------------------------------------------');
+        console.log('vertices2');
+        console.log('-------------------------------------------------');
+        vertices2.forEach((vec, index) => {
+            console.log(index, `vec[${vec.x}, ${vec.y}]`);
+        });
+        console.log('-------------------------------------------------');
+
 
         // index of current vertex of simplex
         let iter_count = 0, index = 0;
-        let a, b, c, d, ao, ab, ac, abperp, acperp, simplex = [];
+        let a, b, c, d, dn, ao, ab, ac, abperp, acperp, simplex = [];
 
         const position1 = this.averagePoint(vertices1, count1); // not a CoG but
         const position2 = this.averagePoint(vertices2, count2); // it's ok for GJK )
@@ -100,68 +122,107 @@ export default class Calculator
         // initial direction from the center of 1st body to the center of 2nd body
         d = Vector.subtract(position1, position2);
 
+        console.log(`c1[${position1.x.toFixed(2)}, ${position1.y.toFixed(2)}]`, `c2[${position2.x.toFixed(2)}, ${position2.y.toFixed(2)}]`, `d[${d.x.toFixed(2)}, ${d.y.toFixed(2)}]`);
+        console.log('-------------------------------------------------');
+
         // if initial direction is zero – set it to any arbitrary axis (we choose X)
         if ((d.x == 0) && (d.y == 0)) {
             d.x = 1.0;
+
+            console.log('** direction is zero **');
         }
-
-        console.log('d', d);
-
 
         // set the first support as initial point of the new simplex
         a = simplex[0] = this.support(vertices1, count1, vertices2, count2, d);
 
+        dn = d.clone().normalize();
+        console.log('-------------------------------------------------');
+        console.log(`Simplex[${index}]`, `a[${a.x.toFixed()}, ${a.y.toFixed()}][0]`, `d[${dn.x.toFixed(2)}, ${dn.y.toFixed(2)}]`, Vector.dotProduct(a, d));
+        console.log('-------------------------------------------------');
+        console.log(`Vector.dotProduct((${a.x.toFixed()}, ${a.y.toFixed()}),(${dn.x.toFixed(2)}, ${dn.y.toFixed(2)})) <= 0`, Vector.dotProduct(a, d));
 
-        // const simplex0 = a.clone().multiplyScalar(10);
-        // Painter.drawPoint(window.g, simplex0, false, 5);
-
-
-        if (this.dotProduct(a, d) <= 0) {
-            console.log('no collision 1');
+        if (Vector.dotProduct(a, d) <= 0) {
+            console.log('1. no collision');
             return 0; // no collision
         }
 
-        d = this.negate(a); // The next search direction is always towards the origin, so the next search direction is negate(a)
+        d = Vector.negate(a); // The next search direction is always towards the origin, so the next search direction is negate(a)
+
+        console.log(`Vector.negate(${a}) = ${d}`);
 
         while (1) {
             iter_count++;
 
             a = simplex[++index] = this.support(vertices1, count1, vertices2, count2, d);
 
-            if (this.dotProduct(a, d) <= 0) {
+            dn = d.clone().normalize();
+            console.log('-------------------------------------------------');
+            console.log(`Simplex[${index}]`, `a[${a.x.toFixed()}, ${a.y.toFixed()}][1]`, `d[${dn.x.toFixed(2)}, ${dn.y.toFixed(2)}]`, Vector.dotProduct(a, d).toFixed(2));
+            console.log('-------------------------------------------------');
+            console.log(`Vector.dotProduct((${a.x.toFixed()}, ${a.y.toFixed()}),(${dn.x.toFixed(2)}, ${dn.y.toFixed(2)})) <= 0`, Vector.dotProduct(a, d));
+
+            if (Vector.dotProduct(a, d) <= 0) {
+                console.log('2. no collision');
                 return 0; // no collision
             }
 
-            ao = this.negate(a); // from point A to Origin is just negative A
+            ao = Vector.negate(a); // from point A to Origin is just negative A
+
+            console.log(`ao[${ao.x.toFixed(2)}, ${ao.y.toFixed(2)}]`);
+            console.log('-------------------------------------------------');
 
             // simplex has 2 points (a line segment, not a triangle yet)
             if (index < 2) {
                 b = simplex[0];
-                ab = this.subtract(b, a); // from point A to B
-                d = this.tripleProduct(ab, ao, ab); // normal to AB towards Origin
-                if (this.lengthSquared(d) == 0) {
-                    d = this.perpendicular(ab);
+                ab = Vector.subtract(b, a); // from point A to B
+                d = Vector.tripleProduct(ab, ao, ab); // normal to AB towards Origin
+                if (Vector.lengthSq(d) == 0) {
+                    d = Vector.perpendicular(ab);
                 }
+
+                // console.log('Simplex 2개 로직, 첫 루프만 여길 실행');
+                dn = d.clone().normalize();
+                console.log(`Simplex[${index}]`, `a[${a.x.toFixed()}, ${a.y.toFixed()}][1]`, `b[${b.x.toFixed()}, ${b.y.toFixed()}][0]`, `d[${dn.x.toFixed(2)}, ${dn.y.toFixed(2)}]`);
+                console.log('-------------------------------------------------');
+                // Painter.drawLine(window.g, this.midpoint(a, b).multiplyScalar(10), d.clone(), false);
+                // Painter.drawLine(window.g, a.clone().multiplyScalar(10), d.clone(), false);
+                // Painter.drawLine(window.g, b.clone().multiplyScalar(10), d.clone(), false);
                 continue; // skip to next iteration
             }
 
             b = simplex[1];
             c = simplex[0];
-            ab = this.subtract(b, a); // from point A to B
-            ac = this.subtract(c, a); // from point A to C
+            ab = Vector.subtract(b, a); // from point A to B
+            ac = Vector.subtract(c, a); // from point A to C
 
-            acperp = this.tripleProduct(ab, ac, ac);
+            //ac와 수직
+            acperp = Vector.tripleProduct(ab, ac, ac);
+            // console.log('Simplex 3개 로직, 두 번째 루프부터 여기 계속 실행');
+            dn = d.clone().normalize();
+            console.log(`Simplex[${index}]`, `a[${a.x.toFixed()}, ${a.y.toFixed()}][2]`, `b[${b.x.toFixed()}, ${b.y.toFixed()}][1]`, `c[${c.x.toFixed()}, ${c.y.toFixed()}][0]`, `d[${dn.x.toFixed(2)}, ${dn.y.toFixed(2)}]`, `acperp[${acperp.clone().normalize().x.toFixed(2)}, ${acperp.clone().normalize().y.toFixed(2)}]`, Vector.dotProduct(acperp, ao), Vector.dotProduct(acperp, ao) >= 0);
+            console.log('-------------------------------------------------');
 
-            if (this.dotProduct(acperp, ao) >= 0) {
+            Painter.drawLine(window.g, this.midpoint(a, c).clone().multiplyScalar(10), acperp.clone(), false, 1);
+
+            // ac 수직 선분이 이 안을 원점 으로 바라보고 있으면 새로운 방향 설정
+            if (Vector.dotProduct(acperp, ao) >= 0) {
                 d = acperp; // new direction is normal to AC towards Origin
+                dn = d.clone().normalize();
+                console.log('>>>', `d[${dn.x}, ${dn.y}]`);
             }
             else {
-                abperp = this.tripleProduct(ac, ab, ab);
+                abperp = Vector.tripleProduct(ac, ab, ab);
 
-                if (this.dotProduct(abperp, ao) < 0) {
+                dn = abperp.clone().normalize();
+                console.log(`abperp[${dn.x.toFixed(2)}, ${dn.y.toFixed(2)}]`);
+
+                Painter.drawLine(window.g, this.midpoint(a, b).clone().multiplyScalar(10), abperp.clone(), false, 1);
+
+                // ab 수직 선분이 원점 반대 방향을 향하고 있으면 즉, 원점이 삼각형 안에 있으면
+                if (Vector.dotProduct(abperp, ao) < 0) {
+                    console.log('>>> collision');
                     return 1; // collision
                 }
-
 
                 simplex[0] = simplex[1]; // swap first element (point C)
                 d = abperp; // new direction is normal to AB towards Origin
@@ -171,6 +232,7 @@ export default class Calculator
             --index;
         }
 
+        console.log('3. no collision');
         return 0;
     }
 

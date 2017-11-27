@@ -15,6 +15,7 @@ export default class Main extends PIXI.Container
         super();
 
         window.g = graphics;
+        window.stage = this;
 
         this.interactive = true;
         this.renderer = renderer;
@@ -77,26 +78,81 @@ export default class Main extends PIXI.Container
 
     test()
     {
-        const vertices1 = [
-            new Vector(0, 0),
-            new Vector(5, 5),
-            new Vector(3, 6)
+        const polygons = [
+            [
+                new Vector(0, 0),
+                new Vector(5, 5),
+                new Vector(3, 6)
+            ],
+            [
+                new Vector(2, 1),
+                new Vector(7, 0),
+                new Vector(3, 4)
+            ],
+            [
+                new Vector(4, 11),
+                new Vector(9, 9),
+                new Vector(4, 5)
+            ],
+            [
+                new Vector(5, 7),
+                new Vector(12, 7),
+                new Vector(10, 2),
+                new Vector(7, 3)
+            ],
+            [
+                new Vector(0, -2),
+                new Vector(-2, 2),
+                new Vector(2, 2)
+            ],
+            [
+                new Vector(4, 1),
+                new Vector(6, 5),
+                new Vector(8, 2)
+            ],
+            [
+                new Vector(-3, 2),
+                new Vector(2, -5),
+                new Vector(4, 2)
+            ],
+            [
+                new Vector(2, 1),
+                new Vector(7, -4),
+                new Vector(5, 4)
+            ],
+            [
+                new Vector(0, 1),
+                new Vector(5, -4),
+                new Vector(3, 4)
+            ],
+            [
+                new Vector(2, 1),
+                new Vector(8, 0),
+                new Vector(10, 6),
+                new Vector(3, 5)
+            ],
+            [
+                new Vector(2, -8),
+                new Vector(4, -2),
+                new Vector(10, -4),
+                new Vector(9, -7)
+            ],
+            [
+                new Vector(-1, -1),
+                new Vector(9, -1),
+                new Vector(9, 7),
+                new Vector(-1, 7)
+            ]
         ];
 
-        // const vertices2 = [
-        //     new Vector(4, 1),
-        //     new Vector(6, 5),
-        //     new Vector(8, 2)
-        // ];
+        // const vertices1 = polygons[0]
+        //     , vertices2 = polygons[1];
 
-        const vertices2 = [
-            new Vector(2, 1),
-            new Vector(3, 4),
-            new Vector(7, 0)
-        ];
+        // const vertices1 = polygons[2]
+        //     , vertices2 = polygons[3];
 
-
-        //Painter.drawLine(window.g, new Vector(0, Size.windowCenterY), new Vector(Size.windowWidth, Size.windowCenterY), false);
+        const vertices1 = polygons[8]
+            , vertices2 = polygons[5];
 
         const g = window.g
             , w = Size.windowWidth
@@ -104,18 +160,17 @@ export default class Main extends PIXI.Container
             , cx = Size.windowCenterX
             , cy = Size.windowCenterY;
 
-        g.lineStyle(1, 0xff3300, 0.5);
+        g.lineStyle(1, 0x03A9F4, 1);
         g.moveTo(0, -cy);
         g.lineTo(0, h);
         g.moveTo(-cx, 0);
         g.lineTo(w, 0);
 
-        Painter.drawPolygon(vertices1);
-        Painter.drawPolygon(vertices2);
+        Painter.drawPolygon(vertices1, 1, 0xdddddd);
+        Painter.drawPolygon(vertices2, 1, 0xdddddd);
         Painter.drawMinkowskiSum(vertices1, vertices2);
 
 
-        const vec = new Vector();
         const collisionDetected = Cal.gjk(vertices1, vertices1.length, vertices2, vertices2.length);
 
         console.log('collisionDetected', collisionDetected);

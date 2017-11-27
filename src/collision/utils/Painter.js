@@ -6,49 +6,63 @@ export default class Painter
 {
     static drawMinkowskiSum(vertices1, vertices2)
     {
+        console.log('-------------------------------------------------');
+        console.log('drawMinkowskiSum(', vertices1.length * vertices2.length, ')');
+        console.log('-------------------------------------------------');
+
         const path = [];
         for (let i = 0; i < vertices1.length; i++) {
             for (let j = 0; j < vertices2.length; j++) {
 
                 let v1 = vertices1[i].clone();
                 let v2 = vertices2[j].clone();
-                console.log('v1', v1.toString(), 'v2', v2.toString());
-                path.push(v1.subtract(v1, v2));
+                let diff = Vector.subtract(v1, v2);
+                path.push(diff);
+                console.log(i, j, `vec[${diff.x}, ${diff.y}]`);
             }
         }
 
-        Painter.drawPolygon(Calc.createConvexHull(path), 2, 0x9C27B0, 0.7);
+        const convexHullPath = Calc.createConvexHull(path);
+        Painter.drawPolygon(convexHullPath, 2, 0x9C27B0, 0.7);
     }
 
 
     static drawPolygon(vertices, lineWidth = 1, color = 0xff3300, alpha = 0.5)
     {
         const graphics = window.g;
-        // graphics.lineStyle(0xFF3300, 0.5);
-        // graphics.drawPolygon(vertices);
-        // graphics.endFill();
-
-        // graphics.beginFill(0xFF3300, 0.5);
-        // graphics.drawRect(0, 0, 300, 300);
-        // graphics.endFill();
-
         graphics.lineStyle(lineWidth, color, alpha);
 
         const vec0 = vertices[0].clone();
         vec0.multiplyScalar(10);
 
-
         graphics.moveTo(vec0.x, vec0.y);
+
+        // this.drawText(window.stage, '(' + vec0.x.toFixed(0) + ',' + vec0.y.toFixed(0) + ')', vec0);
 
         for (let i = 1; i < vertices.length; i++) {
             let vec = vertices[i].clone();
             vec.multiplyScalar(10);
             graphics.lineTo(vec.x, vec.y);
-
-            console.log(i, `vec[${vec.x}, ${vec.y}]`);
         }
 
         graphics.lineTo(vec0.x, vec0.y);
+    }
+
+
+    static drawText(stage, string, point, color = '#ff3300')
+    {
+        const text = new PIXI.Text(string, {
+            // fontFamily: 'Arial',
+            // fontSize: 4,
+            // fontWeight: 'bold',
+            fill: color,
+            // stroke: '#4a1850',
+        });
+
+        text.x = point.x;
+        text.y = point.y;
+
+        stage.addChild(text);
     }
 
 
