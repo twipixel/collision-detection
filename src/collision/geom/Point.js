@@ -33,7 +33,6 @@ export default class Point extends PIXI.Graphics
     }
 
 
-
     get vector()
     {
         return Vector.fromObject(this);

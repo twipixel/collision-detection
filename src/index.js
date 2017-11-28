@@ -37,7 +37,7 @@ function initailize() {
     // SAT 충돌 검사 테스트
     // testMain = new SAT(renderer);
 
-    // 미구현
+    // GJK 구현
     testMain = new GJK(renderer);
 
     container.addChild(testMain);
