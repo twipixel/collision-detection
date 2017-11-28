@@ -16,6 +16,7 @@ export default class Main extends PIXI.Container
 
         window.g = graphics;
         window.stage = this;
+        window.magnification = 20;
 
         this.interactive = true;
         this.renderer = renderer;
@@ -152,28 +153,30 @@ export default class Main extends PIXI.Container
         //     , vertices2 = polygons[3];
 
         const vertices1 = polygons[8]
-            , vertices2 = polygons[5];
+            , vertices2 = polygons[7];
 
         const g = window.g
             , w = Size.windowWidth
             , h = Size.windowHeight
             , cx = Size.windowCenterX
-            , cy = Size.windowCenterY;
+            , cy = Size.windowCenterY
+            // , color = 0xdddddd;
+            , color = 0xffffff;
 
-        g.lineStyle(1, 0x03A9F4, 1);
+        // g.lineStyle(1, 0x03A9F4, 1);
+        g.lineStyle(1, 0xffffff, 0.3);
         g.moveTo(0, -cy);
         g.lineTo(0, h);
         g.moveTo(-cx, 0);
         g.lineTo(w, 0);
 
-        Painter.drawPolygon(vertices1, 1, 0xdddddd);
-        Painter.drawPolygon(vertices2, 1, 0xdddddd);
+
+        Painter.drawPolygon(vertices1, 1, color, 1);
+        Painter.drawPolygon(vertices2, 1, color, 1);
         Painter.drawMinkowskiSum(vertices1, vertices2);
 
-
         const collisionDetected = Cal.gjk(vertices1, vertices1.length, vertices2, vertices2.length);
-
-        console.log('collisionDetected', collisionDetected);
+        console.log(`collisionDetected = ${collisionDetected}`, `, isCollision = ${collisionDetected === 0 ? false : true}`);
     }
 
 

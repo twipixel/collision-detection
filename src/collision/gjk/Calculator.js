@@ -77,7 +77,7 @@ export default class Calculator
         const d = direction.clone().normalize();
         console.log('support', `Minkowski sum[${diff.x}, ${diff.y}]`, `v1[${v1.x}, ${v1.y}]`, `v2[${v2.x}, ${v2.y}]`, `d[${d.x.toFixed(2)}, ${d.y.toFixed(2)}]`);
 
-        Painter.drawPoint(window.g, diff.clone().multiplyScalar(10), false, 2);
+        Painter.drawPoint(window.g, diff.clone().multiplyScalar(window.magnification), false, 2, 0xdddddd);
 
         // subtract (Minkowski sum) the two points to see if bodies 'overlap'
         return diff;
@@ -107,6 +107,13 @@ export default class Calculator
         console.log('-------------------------------------------------');
 
 
+        // 디버그용
+        const lineAlpha = 0.5
+            // 블루
+            , abBlue = 0x00BCD4
+            // 당금색
+            , acCarrot = 0xe67e22;
+
         // index of current vertex of simplex
         let iter_count = 0, index = 0;
         let a, b, c, d, dn, ao, ab, ac, abperp, acperp, simplex = [];
@@ -114,10 +121,10 @@ export default class Calculator
         const position1 = this.averagePoint(vertices1, count1); // not a CoG but
         const position2 = this.averagePoint(vertices2, count2); // it's ok for GJK )
 
-        const c1 = position1.clone().multiplyScalar(10)
-            , c2 = position2.clone().multiplyScalar(10);
+        const c1 = position1.clone().multiplyScalar(window.magnification)
+            , c2 = position2.clone().multiplyScalar(window.magnification);
 
-        Painter.drawLine(window.g, c1, c2, false, 1, 0x00BCD4);
+        Painter.drawLine(window.g, c1, c2, false, 1, 0xdddddd, 0.3);
 
         // initial direction from the center of 1st body to the center of 2nd body
         d = Vector.subtract(position1, position2);
@@ -176,17 +183,21 @@ export default class Calculator
                 b = simplex[0];
                 ab = Vector.subtract(b, a); // from point A to B
                 d = Vector.tripleProduct(ab, ao, ab); // normal to AB towards Origin
+
                 if (Vector.lengthSq(d) == 0) {
                     d = Vector.perpendicular(ab);
                 }
+
+                // a -> b
+                Painter.drawLine(window.g, a.clone().multiplyScalar(window.magnification), b.clone().multiplyScalar(window.magnification), false, 1, abBlue, lineAlpha);
+
+                // ab -> ao
+                Painter.drawLine(window.g, this.midpoint(a, b).multiplyScalar(window.magnification), d, false, 1, abBlue, lineAlpha);
 
                 // console.log('Simplex 2개 로직, 첫 루프만 여길 실행');
                 dn = d.clone().normalize();
                 console.log(`Simplex[${index}]`, `a[${a.x.toFixed()}, ${a.y.toFixed()}][1]`, `b[${b.x.toFixed()}, ${b.y.toFixed()}][0]`, `d[${dn.x.toFixed(2)}, ${dn.y.toFixed(2)}]`);
                 console.log('-------------------------------------------------');
-                // Painter.drawLine(window.g, this.midpoint(a, b).multiplyScalar(10), d.clone(), false);
-                // Painter.drawLine(window.g, a.clone().multiplyScalar(10), d.clone(), false);
-                // Painter.drawLine(window.g, b.clone().multiplyScalar(10), d.clone(), false);
                 continue; // skip to next iteration
             }
 
@@ -197,14 +208,23 @@ export default class Calculator
 
             //ac와 수직
             acperp = Vector.tripleProduct(ab, ac, ac);
+
+            // a -> b
+            Painter.drawLine(window.g, a.clone().multiplyScalar(window.magnification), b.clone().multiplyScalar(window.magnification), false, 1, abBlue, lineAlpha);
+
+            // a -> c
+            Painter.drawLine(window.g, a.clone().multiplyScalar(window.magnification), c.clone().multiplyScalar(window.magnification), false, 1, acCarrot, lineAlpha);
+
+            // ac -> acperp
+            Painter.drawLine(window.g, this.midpoint(a, c).clone().multiplyScalar(window.magnification), acperp, false, 1, acCarrot, lineAlpha);
+            // Painter.drawLine(window.g, this.averagePoint([a, b, c], 3).multiplyScalar(window.magnification), acperp, false, 1, acBlue, lineAlpha);
+
             // console.log('Simplex 3개 로직, 두 번째 루프부터 여기 계속 실행');
             dn = d.clone().normalize();
             console.log(`Simplex[${index}]`, `a[${a.x.toFixed()}, ${a.y.toFixed()}][2]`, `b[${b.x.toFixed()}, ${b.y.toFixed()}][1]`, `c[${c.x.toFixed()}, ${c.y.toFixed()}][0]`, `d[${dn.x.toFixed(2)}, ${dn.y.toFixed(2)}]`, `acperp[${acperp.clone().normalize().x.toFixed(2)}, ${acperp.clone().normalize().y.toFixed(2)}]`, Vector.dotProduct(acperp, ao), Vector.dotProduct(acperp, ao) >= 0);
             console.log('-------------------------------------------------');
 
-            Painter.drawLine(window.g, this.midpoint(a, c).clone().multiplyScalar(10), acperp.clone(), false, 1);
-
-            // ac 수직 선분이 이 안을 원점 으로 바라보고 있으면 새로운 방향 설정
+            // ac 수직 선분이 원점을 보도록 방향 설정
             if (Vector.dotProduct(acperp, ao) >= 0) {
                 d = acperp; // new direction is normal to AC towards Origin
                 dn = d.clone().normalize();
@@ -212,11 +232,17 @@ export default class Calculator
             }
             else {
                 abperp = Vector.tripleProduct(ac, ab, ab);
+                // abperp = Vector.tripleProduct(ac, Vector.negate(ab), ab);
 
                 dn = abperp.clone().normalize();
+
                 console.log(`abperp[${dn.x.toFixed(2)}, ${dn.y.toFixed(2)}]`);
 
-                Painter.drawLine(window.g, this.midpoint(a, b).clone().multiplyScalar(10), abperp.clone(), false, 1);
+                // a -> b
+                Painter.drawLine(window.g, a.clone().multiplyScalar(window.magnification), b.clone().multiplyScalar(window.magnification), false, 1, abBlue, lineAlpha);
+
+                // ab -> abperp
+                Painter.drawLine(window.g, this.midpoint(a, b).clone().multiplyScalar(window.magnification), abperp, false, 1, abBlue, lineAlpha);
 
                 // ab 수직 선분이 원점 반대 방향을 향하고 있으면 즉, 원점이 삼각형 안에 있으면
                 if (Vector.dotProduct(abperp, ao) < 0) {

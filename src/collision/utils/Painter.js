@@ -23,17 +23,17 @@ export default class Painter
         }
 
         const convexHullPath = Calc.createConvexHull(path);
-        Painter.drawPolygon(convexHullPath, 2, 0x9C27B0, 0.7);
+        Painter.drawPolygon(convexHullPath, 1, 0xDDDDDD, 1);
     }
 
 
-    static drawPolygon(vertices, lineWidth = 1, color = 0xff3300, alpha = 0.5)
+    static drawPolygon(vertices, lineWidth = 1, color = 0x607D8B, alpha = 0.5)
     {
         const graphics = window.g;
         graphics.lineStyle(lineWidth, color, alpha);
 
         const vec0 = vertices[0].clone();
-        vec0.multiplyScalar(10);
+        vec0.multiplyScalar(window.magnification);
 
         graphics.moveTo(vec0.x, vec0.y);
 
@@ -41,7 +41,7 @@ export default class Painter
 
         for (let i = 1; i < vertices.length; i++) {
             let vec = vertices[i].clone();
-            vec.multiplyScalar(10);
+            vec.multiplyScalar(window.magnification);
             graphics.lineTo(vec.x, vec.y);
         }
 
@@ -72,6 +72,7 @@ export default class Painter
             graphics.clear();
         }
 
+        graphics.lineStyle(1, color);
         graphics.beginFill(color, alpha);
         graphics.drawCircle(point.x, point.y, radius);
         graphics.endFill();
