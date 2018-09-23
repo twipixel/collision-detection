@@ -2,16 +2,13 @@ import MTV from './MTV';
 import Painter from './../utils/Painter';
 
 
-export default class Shape
-{
-    constructor()
-    {
+export default class Shape {
+    constructor() {
         this.interactive = true;
     }
 
 
-    minimumTranslationVector(axes, shape)
-    {
+    minimumTranslationVector(axes, shape) {
         var minimumOverlap = Number.MAX_VALUE,
             overlap, axisWithSmallestOverlap,
             axis, projection1, projection2;
@@ -49,8 +46,7 @@ export default class Shape
      * @param p2
      * @returns {*}
      */
-    polygonCollidesWithPolygon(p1, p2)
-    {
+    polygonCollidesWithPolygon(p1, p2) {
         var mtv1 = p1.minimumTranslationVector(p1.getAxes(), p2),
             mtv2 = p1.minimumTranslationVector(p2.getAxes(), p2);
 
@@ -68,10 +64,9 @@ export default class Shape
      * @param c1
      * @param c2
      */
-    circleCollidesWithCircle(c1, c2)
-    {
-        var distance = Math.sqrt( Math.pow(c2.x - c1.x, 2) +
-                Math.pow(c2.y - c1.y, 2)),
+    circleCollidesWithCircle(c1, c2) {
+        var distance = Math.sqrt(Math.pow(c2.x - c1.x, 2) +
+            Math.pow(c2.y - c1.y, 2)),
             overlap = Math.abs(c1.radius + c2.radius) - distance;
 
         return overlap < 0 ?
@@ -86,8 +81,7 @@ export default class Shape
      * @param circle
      * @returns {boolean}
      */
-    polygonCollidesWithCircle(polygon, circle)
-    {
+    polygonCollidesWithCircle(polygon, circle) {
         var axes = polygon.getAxes(),
             closestPoint = circle.getPolygonPointClosestToCircle(polygon, circle);
 
@@ -104,8 +98,7 @@ export default class Shape
      * @param otherShape
      * @returns {boolean}
      */
-    collidesWith(shape)
-    {
+    collidesWith(shape) {
         var axes = this.getAxes().concat(shape.getAxes());
         return !this.separationOnAxes(axes, shape);
     }
@@ -117,9 +110,8 @@ export default class Shape
      * @param shape
      * @returns {boolean}
      */
-    separationOnAxes(axes, shape)
-    {
-        for (var i=0; i < axes.length; ++i) {
+    separationOnAxes(axes, shape) {
+        for (var i = 0; i < axes.length; ++i) {
             var axis = axes[i];
             var projection1 = shape.project(axis);
             var projection2 = this.project(axis);

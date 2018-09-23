@@ -258,6 +258,10 @@ export default class SAT extends PIXI.Container
             dy = mtv.axis.y * mtv.overlap;
 
         let dragVector = this.dragVector,
+            centerCollider = collider.getCenter(),
+            centerCollidee = collidee.getCenter(),
+            direction = new Vector(centerCollidee.x - centerCollider.x, centerCollidee.y - centerCollider.y),
+            directionNorm = direction.norm(),
             overlapVector = new Vector(dx, dy);
 
         /**
@@ -273,15 +277,19 @@ export default class SAT extends PIXI.Container
             dy = -dy;
         }
 
-        let c = collidee.getCenter();
-        let to = new Vector(dx, dy);
-        let center = new Vector(c.x, c.y);
+        let c = collidee.getCenter(),
+            to = new Vector(dx, dy),
+            toNormalize = to.clone().norm(),
+            dotTo = directionNorm.dotProduct(toNormalize),
+            center = new Vector(c.x, c.y);
         to = center.clone().subtract(to);
 
-         Painter.drawArrow(window.g, center, to, false, 1, ARROW_COLOR);
-         //Painter.drawPoint(window.g, this.circle.getCenter(), false, 10, 0xff3300, 0.2);
-
-        collidee.move(dx, dy);
+        // 두 객체의 방향 벡터와 밀어내는 백터(to)의 내적이 0보다 클 경우, 즉 밀어 내는 방향이 밀어내는 방향일 때만 적용
+        if (dotTo >= 0) {
+            Painter.drawArrow(window.g, center, to, false, 1, ARROW_COLOR);
+            //Painter.drawPoint(window.g, this.circle.getCenter(), false, 10, 0xff3300, 0.2);
+            collidee.move(dx, dy);
+        }
     }
 
 
