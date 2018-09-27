@@ -11,8 +11,8 @@ const BrowserWindow = electron.BrowserWindow;
  * { "presets": ["es2015"] }
  */
 app.on('ready', function () {
-    const mainWindow = new BrowserWindow({width: 1200, height: 800});
-    mainWindow.loadURL('file://' + __dirname + '/src/index.html');
+    const mainWindow = new BrowserWindow({width: 800, height: 600});
+    mainWindow.loadURL('file://' + __dirname + '/test/index.html');
     mainWindow.webContents.openDevTools();
     mainWindow.on('closed', function () {
         app.quit();

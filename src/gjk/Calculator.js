@@ -1,5 +1,5 @@
-import Vector from './../geom/Vector';
-import Painter from './../utils/Painter';
+import Vector from '../geom/Vector';
+import Painter from '../utils/Painter';
 
 
 

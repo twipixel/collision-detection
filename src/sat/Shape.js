@@ -1,5 +1,5 @@
 import MTV from './MTV';
-import Painter from './../utils/Painter';
+import Painter from '../utils/Painter';
 
 
 export default class Shape {

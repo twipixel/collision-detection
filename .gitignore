@@ -164,7 +164,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Project Setting
-dist
-build
+# IDE
 package-lock.json
+
+
+

@@ -1,4 +1,4 @@
-import Size from './../utils/Size';
+import Size from '../utils/Size';
 
 
 export default class World extends PIXI.Container

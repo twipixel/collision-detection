@@ -1,6 +1,6 @@
-import Point from './geom/Point';
-import Vector from './geom/Vector';
-import Mouse from './utils/Mouse';
+import Point from '../geom/Point';
+import Vector from '../geom/Vector';
+import Mouse from '../utils/Mouse';
 
 
 const graphics = new PIXI.Graphics()

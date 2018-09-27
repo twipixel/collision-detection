@@ -1,5 +1,5 @@
-import Vector from './../geom/Vector';
-import Calc from './../gjk/Calculator';
+import Vector from '../geom/Vector';
+import Calc from '../gjk/Calculator';
 
 
 export default class Painter

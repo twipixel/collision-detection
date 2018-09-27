@@ -1,11 +1,10 @@
-import Point from '../sat/Point';
-import Circle from '../sat/Circle';
-import Polygon from '../sat/Polygon';
-import Vector from '../geom/Vector';
-import Painter from '../utils/Painter';
-import Mouse from '../utils/Mouse';
-import KeyCode from '../consts/KeyCode';
-
+import Point from '../../src/sat/Point';
+import Circle from '../../src/sat/Circle';
+import Polygon from '../../src/sat/Polygon';
+import Vector from '../../src/geom/Vector';
+import Painter from '../../src/utils/Painter';
+import Mouse from '../../src/utils/Mouse';
+import KeyCode from '../../src/consts/KeyCode';
 
 const graphics = new PIXI.Graphics()
     , debugGraphics = new PIXI.Graphics()
@@ -13,21 +12,19 @@ const graphics = new PIXI.Graphics()
     , LINE_COLOR = 0x84D2F6
     , ARROW_COLOR = 0xE57373;
 
-
 let polygonPoints = [
-        [new Point(350, 350), new Point(350, 500), new Point(500, 500)],
-        [new Point(500, 200), new Point(480, 250), new Point(600, 250), new Point(620, 200)],
-        [new Point(258, 120), new Point(295, 230), new Point(200, 300), new Point(105, 230), new Point(142, 120)]
-    ];
+    [new Point(350, 350), new Point(350, 500), new Point(500, 500)],
+    [new Point(500, 200), new Point(480, 250), new Point(600, 250), new Point(620, 200)],
+    [new Point(258, 120), new Point(295, 230), new Point(200, 300), new Point(105, 230), new Point(142, 120)]
+];
 
-
-export default class SAT extends PIXI.Container
+export default class Test extends PIXI.Container
 {
     constructor(renderer)
     {
         super();
 
-        window.g = debugGraphics;
+        window['g'] = debugGraphics;
 
         this.interactive = true;
         this.renderer = renderer;
@@ -183,7 +180,7 @@ export default class SAT extends PIXI.Container
         graphics.clear();
 
         shapes.forEach((polygon) => {
-           polygon.createPath(graphics, LINE_COLOR);
+            polygon.createPath(graphics, LINE_COLOR);
         });
     }
 

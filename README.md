@@ -12,9 +12,7 @@
 ### 실행
 
 
-    npm run dev (개발 환경 실행)
-    npm run build (배포)
-    npm run test (ESLint 실행)
+    npm run start 
 
 <br>
 

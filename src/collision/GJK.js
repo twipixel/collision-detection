@@ -1,8 +1,8 @@
-import World from './gjk/World';
-import Size from './utils/Size';
-import Cal from './gjk/Calculator';
-import Painter from './utils/Painter';
-import Vector from './geom/Vector';
+import World from '../gjk/World';
+import Size from '../utils/Size';
+import Cal from '../gjk/Calculator';
+import Painter from '../utils/Painter';
+import Vector from '../geom/Vector';
 
 
 const graphics = new PIXI.Graphics();
@@ -36,7 +36,7 @@ export default class Main extends PIXI.Container
             // graphics.scale.y = 10;
 
             this.test();
-            // this.createWorld();
+            this.createWorld();
             this.isInit = true;
         }
     }
