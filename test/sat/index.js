@@ -2,7 +2,6 @@ import 'babel-polyfill';
 import Test from './Test';
 import KeyCode from '../../src/consts/KeyCode';
 import Mouse from "../../src/utils/Mouse";
-import { requestAnimFrame } from '../../external/lib/animation';
 
 (function () {
     window.onload = function () {
