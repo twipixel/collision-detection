@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 import Test from './Test';
-import KeyCode from './../../src/es6/consts/KeyCode';
+import KeyCode from './../../src/consts/KeyCode';
 
 (function () {
     window.onload = function () {

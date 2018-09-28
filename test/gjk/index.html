@@ -4,16 +4,33 @@
     <meta charset="UTF-8">
     <title>GJK</title>
     <style type="text/css">
+        :root {
+            --bg-color: #33383D;
+        }
+
         body {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: #FFFFFF;
+            background-color: var(--bg-color);
+        }
+
+        #datGuiHolder {
+            position: absolute;
+        }
+
+        #canvas {
+            margin: 0px;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
         }
     </style>
 </head>
 
 <body>
+<div id="datGuiHolder" class="datGuiHolder"></div>
+<canvas id="canvas"></canvas>
 
 <script type="text/javascript" src="./../../external/lib/test.common.js"></script>
 <script>
