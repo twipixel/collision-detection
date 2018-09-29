@@ -26,30 +26,35 @@ export default class Test extends PIXI.Container
 
         window['g'] = debugGraphics;
 
+        this.isInit = false;
         this.interactive = true;
         this.renderer = renderer;
         this.canvas = this.renderer.view;
         this.context = this.canvas.getContext('2d');
+
+        this.initialize();
     }
 
 
     initialize()
     {
-        if (!this.isInit) {
-            this.addChild(graphics);
-            this.addChild(debugGraphics);
-
-            this.mouseDownPoint = new PIXI.Point(0, 0);
-            this.lastdrag = new PIXI.Point(0, 0);
-            this.shapeBeingDragged = undefined;
-
-            //this.createPolygon();
-            this.createPolygonManual();
-
-            this.addEvent();
-
-            this.isInit = true;
+        if (this.isInit) {
+            return;
         }
+
+        this.addChild(graphics);
+        this.addChild(debugGraphics);
+
+        this.mouseDownPoint = new PIXI.Point(0, 0);
+        this.lastdrag = new PIXI.Point(0, 0);
+        this.shapeBeingDragged = undefined;
+
+        //this.createPolygon();
+        this.createPolygonManual();
+
+        this.addEvent();
+
+        this.isInit = true;
     }
 
 
@@ -73,7 +78,6 @@ export default class Test extends PIXI.Container
     resize()
     {
         this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
-        this.initialize();
     }
 
 

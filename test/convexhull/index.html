@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SAT</title>
+    <title>Convex Hull</title>
     <style type="text/css">
         :root {
             --bg-color: #33383D;
@@ -33,6 +33,7 @@
 <script type="text/javascript" src="./../../external/lib/test.common.js"></script>
 <script>
     (function(){
+
         addScriptToBodySync('../../external/vendor/pixi.js');
         addScriptToBodySync('../../external/vendor/animation.js');
         addScriptToBodySync('../../external/vendor/dat.gui.js');
@@ -44,7 +45,7 @@
         } else {
             // commons 은 build 할 때 생성합니다.
             addScriptToHeadSync('./../bundle/commons.js');
-            addScriptToBodySync('./../bundle/sat.js');
+            addScriptToBodySync('./../bundle/convexhull.js');
         }
     })();
 </script>

@@ -4,17 +4,30 @@
     <meta charset="UTF-8">
     <title>EPA</title>
     <style type="text/css">
+        :root {
+            --bg-color: #33383D;
+        }
+
         body {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: #FFFFFF;
+            background-color: var(--bg-color);
+        }
+
+        #datGuiHolder {
+            position: absolute;
+        }
+
+        #canvas {
+            margin: 0px;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
         }
     </style>
 </head>
-
 <body>
-
 <script type="text/javascript" src="./../../external/lib/test.common.js"></script>
 <script>
     (function(){
@@ -30,11 +43,7 @@
             addScriptToHeadSync('./../bundle/commons.js');
             addScriptToBodySync('./../bundle/epa.js');
         }
-
-
     })();
-
 </script>
-
 </body>
 </html>

@@ -136,4 +136,12 @@ export default class PointUtil {
         return { x: lt.x, y: lt.y, width: rt.x - lt.x, height: rb.y - rt.y };
     }
 
+
+    static ccw(pointA, pointB, pointC) {
+        const triangleArea = (pointB.x - pointA.x) * (pointC.y - pointA.y) - (pointC.x - pointA.x) * (pointB.y - pointA.y);
+        if (triangleArea > 0) {
+            return true;
+        }
+        return false;
+    }
 }

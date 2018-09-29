@@ -658,7 +658,6 @@ export default class Vector
         return this;
     }
 
-
     /**
      * Multiplies both vector axis by the given scalar value
      *
@@ -680,6 +679,11 @@ export default class Vector
         return this;
     }
 
+    static multiplyScalar(vector, scalar)
+    {
+        return new Vector(vector.x * scalar, vector.y * scalar);
+    }
+
 
     multiplyScalarX(scalar)
     {
@@ -696,24 +700,55 @@ export default class Vector
 
 
     /**
-     * 수직 벡터 생성
+     * 수직 벡터 생성 (90 도 회전)
      * @returns {Vector}
      */
     perpendicular()
     {
-        const v = new Vector();
-        v.x = this.y;
-        v.y = 0 - this.x;
-        return v;
+        return new Vector(-this.y, -this.x);
     }
 
 
     static perpendicular(vec)
     {
         const clone = vec.clone();
+        clone.x = -vec.y;
+        clone.y = vec.x;
+        return clone;
+    }
+
+
+    /**
+     * 수직 벡터 생성 (-90 도 회전)
+     */
+    returnPerpendicular()
+    {
+        return new Vector(this.y, -this.x);
+    }
+
+
+    static returnPerpendicular(vec)
+    {
+        const clone = vec.clone();
         clone.x = vec.y;
         clone.y = -vec.x;
         return clone;
+    }
+
+
+    /**
+     * 버림
+     * @param vector
+     * @param length
+     */
+    static truncate(vec, length)
+    {
+        const ret = vec.clone();
+        const lengthSq = vec.x * vec.x + vec.y * vec.y;
+        if (lengthSq > length * length) {
+            ret.multiplyScalar(length / Math.sqrt(lengthSq));
+        }
+        return ret;
     }
 
 
@@ -790,6 +825,12 @@ export default class Vector
     }
 
 
+    static randomize(topLeft, bottomRight)
+    {
+        return new Vector(this.randomizeX(topLeft, bottomRight), this.randomizeY(topLeft, bottomRight));
+    }
+
+
     randomizeX(topLeft, bottomRight)
     {
         var min = Math.min(topLeft.x, bottomRight.x);
@@ -799,12 +840,28 @@ export default class Vector
     }
 
 
+    static randomizeX(topLeft, bottomRight)
+    {
+        const min = Math.min(topLeft.x, bottomRight.x);
+        const max = Math.max(topLeft.x, bottomRight.x);
+        return random(min, max);
+    }
+
+
     randomizeY(topLeft, bottomRight)
     {
         var min = Math.min(topLeft.y, bottomRight.y);
         var max = Math.max(topLeft.y, bottomRight.y);
         this.y = random(min, max);
         return this;
+    }
+
+
+    static randomizeY(topLeft, bottomRight)
+    {
+        const min = Math.min(topLeft.y, bottomRight.y);
+        const max = Math.max(topLeft.y, bottomRight.y);
+        return random(min, max);
     }
 
 
@@ -1144,6 +1201,28 @@ export default class Vector
         this.x = coeff * vec2.x;
         this.y = coeff * vec2.y;
         return this;
+    }
+
+
+    /**
+     * 선형 보간
+     * http://developug.blogspot.com/2014/09/unity-vector-lerp.html
+     * @param vec1
+     * @param vec2
+     * @param to
+     * @returns {Vector}
+     */
+    static lerp(vec1, vec2, to) {
+        return Vector.add(Vector.multiplyScalar(vec1, 1 - to), Vector.multiplyScalar(vec2, to));
+    }
+
+    /**
+     * 역수
+     * @param vector
+     * @returns {Vector}
+     */
+    static rcp(vector) {
+        return new Vector(1 / vector.x, 1 / vector.y);
     }
 
 
