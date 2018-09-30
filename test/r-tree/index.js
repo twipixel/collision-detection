@@ -4,7 +4,7 @@ import KeyCode from './../../src/consts/KeyCode';
 
 (function () {
     window.onload = function () {
-        var main = new Main();
+        const main = new Main();
     }
 }());
 

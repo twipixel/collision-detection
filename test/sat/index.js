@@ -5,7 +5,7 @@ import Mouse from "../../src/utils/Mouse";
 
 (function () {
     window.onload = function () {
-        var main = new Main();
+        const main = new Main();
     }
 }());
 

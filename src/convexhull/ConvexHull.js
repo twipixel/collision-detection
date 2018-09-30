@@ -1,7 +1,7 @@
 /**
  * https://www.crocus.co.kr/1288
  */
-import Vector from "../geom/Vector";
+import Vector from "../Vector";
 
 export default class ConvexHull {
     static generate(points) {
@@ -88,8 +88,11 @@ export default class ConvexHull {
             return 1;
         }
 
-        if (pointA.relativePosition.y * pointB.relativePosition.x !== pointA.relativePosition.x * pointB.relativePosition.y) {
-            return pointA.relativePosition.y * pointB.relativePosition.x - pointA.relativePosition.x * pointB.relativePosition.y;
+        const a = pointA.relativePosition.y * pointB.relativePosition.x;
+        const b = pointA.relativePosition.x * pointB.relativePosition.y;
+
+        if (a !== b) {
+            return b - a;
         }
 
         return ConvexHull.sortLowerYX(pointA, pointB);
@@ -103,7 +106,8 @@ export default class ConvexHull {
      * @returns {boolean}
      */
     static isCcw(pointA, pointB, pointC) {
-        const triangleArea = (pointB.x - pointA.x) * (pointC.y - pointA.y) - (pointC.x - pointA.x) * (pointB.y - pointA.y);
+        // const triangleArea = (pointB.x - pointA.x) * (pointC.y - pointA.y) - (pointC.x - pointA.x) * (pointB.y - pointA.y);
+        const triangleArea =  (pointC.x - pointA.x) * (pointB.y - pointA.y) - (pointB.x - pointA.x) * (pointC.y - pointA.y);
         if (triangleArea > 0) {
             return true;
         }

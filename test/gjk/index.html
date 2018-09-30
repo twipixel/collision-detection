@@ -34,7 +34,9 @@
 <script>
     (function(){
 
-        addScriptToBodySync('./../../external/vendor/dat.gui.js');
+        addScriptToBodySync('../../external/vendor/pixi.js');
+        addScriptToBodySync('../../external/vendor/animation.js');
+        addScriptToBodySync('../../external/vendor/dat.gui.js');
 
         if (navigator.userAgent.indexOf('Electron') >= 0) {
             // Install babel hooks to the browser process

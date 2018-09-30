@@ -614,7 +614,7 @@
 				}
 			}
 
-			this.Type.scale = function(s) {
+			this.Type.multiply = function(s) {
 				this.p = svg.CreatePoint(s);
 				this.apply = function(ctx) {
 					ctx.scale(this.p.x || 1.0, this.p.y || this.p.x || 1.0);

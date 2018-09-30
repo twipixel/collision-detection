@@ -12,7 +12,8 @@ export default class PastelColor {
         return {
             hsl: color, // hsl(0, 100%, 85%);
             rgb: `rgb(${r}, ${g}, ${b})`, // rgb(255, 128, 128);
-            hex: `${this.RGBtoHex(r, g, b)}`, // 0xff8080 or #ff8080
+            hex: `${this.RGBtoHex(r, g, b)}`, // 0xff8080
+            hexShap:`${this.RGBtoHex(r, g, b, '#')}`, // #ff8080
         };
     }
 

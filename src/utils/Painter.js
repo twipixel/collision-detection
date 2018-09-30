@@ -1,5 +1,5 @@
-import Vector from '../geom/Vector';
-import Calc from '../gjk/Calculator';
+import Vector from '../Vector';
+import GJK from '../gjk/GJK';
 
 
 export default class Painter
@@ -22,7 +22,7 @@ export default class Painter
             }
         }
 
-        const convexHullPath = Calc.createConvexHull(path);
+        const convexHullPath = GJK.createConvexHull(path);
         Painter.drawPolygon(convexHullPath, 1, 0xDDDDDD, 1);
     }
 

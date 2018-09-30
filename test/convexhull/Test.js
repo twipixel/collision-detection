@@ -1,4 +1,4 @@
-import Vector from '../../src/geom/Vector';
+import Vector from '../../src/Vector';
 import PastelColor from '../../src/utils/PastelColor';
 import Point from '../../src/convexhull/Point';
 import ConvexHull from '../../src/convexhull/ConvexHull';
@@ -88,6 +88,4 @@ export default class Test extends PIXI.Container {
     resize() {
         this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
     }
-
-
 }

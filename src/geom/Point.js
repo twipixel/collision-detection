@@ -1,4 +1,4 @@
-import Vector from './Vector';
+import Vector from '../Vector';
 
 
 export default class Point extends PIXI.Graphics
