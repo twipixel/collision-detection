@@ -1,25 +1,28 @@
 import Vector from '../../src/Vector';
 import Shape from '../../src/gjk/Shape';
+import Consts from '../../src/gjk/Consts';
 import Vertices from '../../src/gjk/Vertices';
 import GJK from '../../src/gjk/GJK';
 import ConvexHull from '../../src/convexhull/ConvexHull';
+import MinkowskiDifference from '../../src/gjk/MinkowskiDifference';
 import KeyCode from "../../src/consts/KeyCode";
 
-const SCALE = 20;
-const TOTAL = 30;
-const INTERVAL = 600000;
-const TOP_LEFT = {x: 2, y: 2};
-const TOP_RIGHT = {x: 30, y: 30};
+const TOTAL = 30
+    , INTERVAL = 600000
+    , SCALE = Consts.SCALE
+    , STAGE = Consts.STAGE
+    , TOP_LEFT = {x: 2, y: 2}
+    , TOP_RIGHT = {x: 17, y: 17};
 
-// const triangles = createPolygons(3, TOTAL);
-// const rectangles = createPolygons(4, TOTAL);
+const triangles = createPolygons(3, TOTAL);
+const rectangles = createPolygons(4, TOTAL);
 
-const triangles = [
+/*const triangles = [
     [new Vector(3, 1), new Vector(3, 5), new Vector(6, 4)]
 ];
 const rectangles = [
     [new Vector(8, 1), new Vector(8, 5), new Vector(11, 5), new Vector(11, 1)]
-];
+];*/
 
 export default class Test extends PIXI.Container {
     constructor(renderer) {
@@ -60,6 +63,12 @@ export default class Test extends PIXI.Container {
 
         this.shapes.length = 0;
         this.shapes = [];
+
+        if (!this.minkowski) {
+            return;
+        }
+        this.removeChild(this.minkowski);
+        this.minkowski.destroy();
     }
 
     checkCollision() {
@@ -73,8 +82,13 @@ export default class Test extends PIXI.Container {
 
         const shape1 = new Shape(vertices1.vertices, SCALE)
             , shape2 = new Shape(vertices2.vertices, SCALE);
+        this.minkowski = new MinkowskiDifference(vertices1.vertices, vertices2.vertices);
+        this.minkowski.x = (STAGE.width / 3) * 2;
+        this.minkowski.y = (STAGE.height / 3) * 2;
+
         this.addChild(shape1);
         this.addChild(shape2);
+        this.addChild(this.minkowski);
 
         this.shapes.push(shape1);
         this.shapes.push(shape2);
@@ -82,10 +96,12 @@ export default class Test extends PIXI.Container {
         vertices1.divide(SCALE);
         vertices2.divide(SCALE);
 
-        console.log('isCollision: ', GJK.checkCollision(vertices1.vertices, vertices2.vertices));
+        console.log('COLLISION[', GJK.checkCollision(vertices1.vertices, vertices2.vertices), ']');
     }
 
     next() {
+        console.clear();
+
         if (this.intervalId) {
             clearInterval(this.intervalId);
         }

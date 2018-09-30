@@ -679,9 +679,16 @@ export default class Vector
         return this;
     }
 
+
     static multiplyScalar(vector, scalar)
     {
         return new Vector(vector.x * scalar, vector.y * scalar);
+    }
+
+
+    static divideScalar(vector, scalar)
+    {
+        return new Vector(vector.x / scalar, vector.y / scalar);
     }
 
 

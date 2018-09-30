@@ -73,6 +73,9 @@ export default class GJK
         // get furthest point of second body along the opposite direction
         const j = this.indexOfFurthestPoint(vertices2, Vector.negate(direction));
 
+        console.log('d:' + str(direction, true), 'i:' + str(vertices1[i]));
+        console.log('d:' + str(Vector.negate(direction), true), 'j:' + str(vertices2[j]));
+        console.log('support(' + str(Vector.subtract(vertices1[i], vertices2[j])) + ')');
         // subtract (Minkowski sum) the two points to see if bodies 'overlap'
         return Vector.subtract(vertices1[i], vertices2[j]);
     }
@@ -106,10 +109,14 @@ export default class GJK
 
         // set the first support as initial point of the new simplex
         a = simplex[0] = this.support(vertices1, vertices2, d);
-        console.log('a', a.x, a.y, 'd', d.x, d.y, Vector.dotProduct(a, d));
+        console.log(str(a), str(d, true), Vector.dotProduct(a, d).toFixed(2));
 
-        // 의미 파악
+        // support 점과 방향이 같은 방향이 아닐 경우
         if (Vector.dotProduct(a, d) <= 0) {
+            // 마지막에 추가 된 점이 d의 방향으로 원점을 지나치지 않은 경우
+            // 그 다음 Minkowski 합은 원점을 포함 할 수 없습니다.
+            // 추가 된 마지막 점은 Minkowski Difference의 가장자리에 있습니다.
+            console.log('CASE1[', 'NO', ']');
             return false; // no collision
         }
 
@@ -121,6 +128,8 @@ export default class GJK
             a = simplex[++index] = this.support(vertices1, vertices2, d);
 
             if (Vector.dotProduct(a, d) <= 0) {
+                console.log(str(a), str(d, true), Vector.dotProduct(a, d).toFixed(2));
+                console.log('CASE2[', 'NO', ']');
                 return false; // no collision
             }
 
@@ -253,4 +262,11 @@ function consoleVertices(vertices1, vertices2) {
     console.log('-------------------------------------------------');
     debugVertices(vertices2);
     console.log('-------------------------------------------------');
+}
+
+function str(vertex, isFixed = false) {
+    if (isFixed === false) {
+        return `(${vertex.x},${vertex.y})`;
+    }
+    return `(${vertex.x.toFixed(2)},${vertex.y.toFixed(2)})`;
 }

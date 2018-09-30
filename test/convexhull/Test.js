@@ -1,6 +1,6 @@
 import Vector from '../../src/Vector';
+import Point from '../../src/geom/Point';
 import PastelColor from '../../src/utils/PastelColor';
-import Point from '../../src/convexhull/Point';
 import ConvexHull from '../../src/convexhull/ConvexHull';
 
 const INTERVAL = 3000;

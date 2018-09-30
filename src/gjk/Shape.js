@@ -1,6 +1,9 @@
+import Vector from '../Vector';
+import Consts from '../gjk/Consts';
 import PastelColor from '../../src/utils/PastelColor';
 
-const FONT_SIZE = '9px';
+const FONT_SIZE = '9px'
+    , SCALE = Consts.SCALE;
 
 export default class Shape extends PIXI.Container {
     constructor(vertices = []) {
@@ -42,14 +45,12 @@ export default class Shape extends PIXI.Container {
         vertices.forEach((vertex, index) => {
             g.lineTo(vertex.x, vertex.y);
             const label = this.labels[index]
-                , w = label.width
-                , h = label.height;
+                , vec = Vector.divideScalar(vertex, SCALE);
 
-            // label.x = vertex.x - w / 2;
-            // label.y = vertex.y - h / 2;
             label.x = vertex.x;
             label.y = vertex.y;
-            label.text = vertex.x + ',' + vertex.y;
+
+            label.text = `(${vec.x},${vec.y})`;
             label.visible = true;
         });
         g.lineTo(origin.x, origin.y);
