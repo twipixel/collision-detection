@@ -1,6 +1,6 @@
 import PastelColor from '../../src/utils/PastelColor';
 
-const FONT_SIZE = '9';
+const FONT_SIZE = '9px';
 
 export default class Shape extends PIXI.Container {
     constructor(vertices = []) {
@@ -21,7 +21,7 @@ export default class Shape extends PIXI.Container {
         for (let i = 0; i < n; i++) {
             const text = new PIXI.Text(i, {
                 align: 'center',
-                fontSize: FONT_SIZE,
+                font: FONT_SIZE,
                 fill: this.textColor,
             });
             text.visible = false;
@@ -49,6 +49,7 @@ export default class Shape extends PIXI.Container {
             // label.y = vertex.y - h / 2;
             label.x = vertex.x;
             label.y = vertex.y;
+            label.text = vertex.x + ',' + vertex.y;
             label.visible = true;
         });
         g.lineTo(origin.x, origin.y);

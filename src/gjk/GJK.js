@@ -86,17 +86,8 @@ export default class GJK
      */
     static checkCollision(vertices1, vertices2)
     {
-        console.log('-------------------------------------------------');
-        console.log('vertices1');
-        console.log('-------------------------------------------------');
-        debugVertices(vertices1);
-        console.log('-------------------------------------------------');
-        console.log('vertices2');
-        console.log('-------------------------------------------------');
-        debugVertices(vertices2);
-        console.log('-------------------------------------------------');
+        // consoleVertices(vertices1, vertices2);
 
-        const all = [...vertices1, ...vertices2];
         let iterCount = 0, index = 0;   // index of current vertex of simplex
         let a, b, c, d, ao, ab, ac, abperp, acperp, simplex = new Array(3);
 
@@ -117,6 +108,7 @@ export default class GJK
         a = simplex[0] = this.support(vertices1, vertices2, d);
         console.log('a', a.x, a.y, 'd', d.x, d.y, Vector.dotProduct(a, d));
 
+        // 의미 파악
         if (Vector.dotProduct(a, d) <= 0) {
             return false; // no collision
         }
@@ -249,4 +241,16 @@ function debugVertices(vertices) {
     vertices.forEach((vertex, index) => {
        console.log(index, vertex.x, vertex.y);
     });
+}
+
+function consoleVertices(vertices1, vertices2) {
+    console.log('-------------------------------------------------');
+    console.log('vertices1');
+    console.log('-------------------------------------------------');
+    debugVertices(vertices1);
+    console.log('-------------------------------------------------');
+    console.log('vertices2');
+    console.log('-------------------------------------------------');
+    debugVertices(vertices2);
+    console.log('-------------------------------------------------');
 }
