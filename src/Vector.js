@@ -1170,14 +1170,16 @@ export default class Vector
     }
 
 
+    /**
+     * https://github.com/kroitor/gjk.c
+     * https://en.wikipedia.org/wiki/Triple_product#Vector_triple_product
+     * 세그먼트에서 원점으로 향하는 방향을 찾을 때 사용
+     */
     static tripleProduct(a, b, c)
     {
         const r = new Vector();
-
-        // perform a.dot(c)
-        // perform b.dot(c)
-        const ac = a.x * c.x + a.y * c.y
-            , bc = b.x * c.x + b.y * c.y;
+        const ac = a.x * c.x + a.y * c.y    // perform a.dot(c)
+            , bc = b.x * c.x + b.y * c.y;   // perform b.dot(c)
 
         // perform b * a.dot(c) - a * b.dot(c)
         r.x = b.x * ac - a.x * bc;

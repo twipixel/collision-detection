@@ -4,6 +4,7 @@ import Painter from '../utils/Painter';
 
 /**
  * GJK Algorithm (Gilbert-Johnson-Keerthi)
+ * https://github.com/kroitor/gjk.c
  * http://www.dyn4j.org/2010/04/gjk-gilbert-johnson-keerthi/#gjk-top
  * https://www.haroldserrano.com/blog/visualizing-the-gjk-collision-algorithm
  * https://github.com/juhl/collision-detection-2d
@@ -125,6 +126,9 @@ export default class GJK
         while (true) {
             iterCount++;
 
+            console.log('');
+            console.log(iterCount);
+
             a = simplex[++index] = this.support(vertices1, vertices2, d);
 
             if (Vector.dotProduct(a, d) <= 0) {
@@ -133,10 +137,12 @@ export default class GJK
                 return false; // no collision
             }
 
+            // a가 원점으로 향하는 벡터는 -a 를 하면 됩니다.
             ao = Vector.negate(a); // from point A to Origin is just negative A
 
             // simplex has 2 points (a line segment, not a triangle yet)
             if (index < 2) {
+
                 b = simplex[0];
                 ab = Vector.subtract(b, a); // from point A to B
                 d = Vector.tripleProduct(ab, ao, ab); // normal to AB towards Origin
@@ -155,14 +161,25 @@ export default class GJK
             //ac와 수직
             acperp = Vector.tripleProduct(ab, ac, ac);
 
-            // ac 수직 선분이 원점을 보도록 방향 설정
+            console.log('a', a, 'b', b, 'c', c);
+            console.log('ao', ao, 'ab', ab, 'ac', ac);
+            console.log('acperp', acperp, acperp.clone().norm());
+            console.log('dotProduct(acperp, ao)', Vector.dotProduct(acperp, ao));
+
+            // ac 수직 선분이 a가 원점을 향하는 방향 반대편에 있고
+            // 즉, ac 수직 선분 안쪽에 원점이 있으면
             if (Vector.dotProduct(acperp, ao) >= 0) {
                 d = acperp; // new direction is normal to AC towards Origin
+                console.log('new direction is normal to AC towards Origin', d);
             }
             else {
+                // ab 수직 선분
                 abperp = Vector.tripleProduct(ac, ab, ab);
+                console.log('abperp', abperp, abperp.clone().norm());
+                console.log('dotProduct(abperp, ao)', Vector.dotProduct(abperp, ao));
 
-                // ab 수직 선분이 원점 반대 방향을 향하고 있으면 즉, 원점이 삼각형 안에 있으면
+                // ab 수직 선분이 원점 반대 방향을 향하고 있으면
+                // 즉, 원점이 삼각형 안에 있으면
                 if (Vector.dotProduct(abperp, ao) < 0) {
                     return true; // collision
                 }
