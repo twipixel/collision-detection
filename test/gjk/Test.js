@@ -12,17 +12,18 @@ const TOTAL = 30
     , SCALE = Consts.SCALE
     , STAGE = Consts.STAGE
     , TOP_LEFT = {x: 2, y: 2}
-    , TOP_RIGHT = {x: 17, y: 17};
+    , TOP_RIGHT = {x: 17, y: 17}
+    , RAD_TO_DEG = 180 / Math.PI;
 
-const triangles = createPolygons(3, TOTAL);
-const rectangles = createPolygons(4, TOTAL);
+// const triangles = createPolygons(3, TOTAL);
+// const rectangles = createPolygons(4, TOTAL);
 
-/*const triangles = [
+const triangles = [
     [new Vector(3, 1), new Vector(3, 5), new Vector(6, 4)]
 ];
 const rectangles = [
     [new Vector(8, 1), new Vector(8, 5), new Vector(11, 5), new Vector(11, 1)]
-];*/
+];
 
 export default class Test extends PIXI.Container {
     constructor(renderer) {
@@ -128,6 +129,20 @@ export default class Test extends PIXI.Container {
                 break;
         }
     }
+}
+
+
+/**
+ * 두벡터 사이각 구하기
+ * @param a
+ * @param b
+ * @returns {number}
+ */
+function getAngle(a, b) {
+    a = new Vector(a.x, a.y).norm();
+    b = new Vector(b.x, b.y).norm();
+    const radian = Math.acos(Vector.dotProduct(a, b));
+    return radian * RAD_TO_DEG;
 }
 
 
