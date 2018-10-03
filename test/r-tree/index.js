@@ -24,7 +24,9 @@ class Main {
         window.addEventListener('keyup', this.onKeyUp.bind(this));
     }
 
-    onResize() {}
+    onResize() {
+        this.resizeWindow();
+    }
 
     onKeyUp (e) {
         switch (e.keyCode) {

@@ -5,18 +5,18 @@ import KeyCode from '../../src/consts/KeyCode';
 import Stage from '../../src/distance/Stage';
 
 const TOTAL = 30
-    , INTERVAL = 600000
+    , INTERVAL = 3000
     , SCALE = Consts.SCALE
     , STAGE = Consts.STAGE
     , W = STAGE.width
     , H = STAGE.height
     , HW = W / 2
     , HH = H / 2
-    , TOP_LEFT = {x: 2, y: 2}
-    , TOP_RIGHT = {x: 17, y: 17}
+    , TOP_LEFT = {x: 3, y: 3}
+    , TOP_RIGHT = {x: 10, y: 10}
     , RAD_TO_DEG = 180 / Math.PI;
 
-const LINE = [
+/*const LINE = [
     [new Vector(-4, -1), new Vector(1, 3)],
     [new Vector(1, 0), new Vector(0, 1)],
     [new Vector(-1, 0), new Vector(0, 1)],
@@ -24,8 +24,9 @@ const LINE = [
     [new Vector(-6, 0), new Vector(0, -7)],
     [new Vector(7, 0), new Vector(0, 4)],
     [new Vector(-6, 0), new Vector(0, 1)]
-];
+];*/
 
+const LINE = createRandomLine();
 
 export default class Test extends PIXI.Container {
     constructor(renderer) {
@@ -102,8 +103,8 @@ export default class Test extends PIXI.Container {
 
         this.initProperties();
         this.draw();
-        this.draw = this.draw.bind(this);
-        this.intervalId = setInterval(this.draw, INTERVAL);
+        this.next = this.next.bind(this);
+        this.intervalId = setInterval(this.next, INTERVAL);
     }
 
     update() {
@@ -111,6 +112,7 @@ export default class Test extends PIXI.Container {
 
     resize() {
         this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
+        this.draw();
     }
 
     onMouseDown() {
@@ -128,23 +130,62 @@ export default class Test extends PIXI.Container {
 
 
 // 라인과 점 사이의 최소 거리 구하기
+// http://blog.daum.net/gamza-net/12
 // http://www.dyn4j.org/2010/04/gjk-distance-closest-points/
 function distance(lineA, lineB, point) {
     // create the line
     const ab = new Vector(lineB.x - lineA.x, lineB.y - lineA.y);
     const ap = new Vector(point.x - lineA.x, point.y - lineA.y);
     // project AO onto AB
-    const projAp = ap.dot(ab);
-    // get the length squared
-    const lengthSq = ab.dot(ab);
-    // calculate the distance along AB
-    const t = projAp / lengthSq;
-    const distVec = ab.multiplyScalar(t).add(lineA);
-    const distance = distVec.magnitude();
+    const projApToAb = ap.dot(ab);
+    const projAbToAb = ab.dot(ab);
+
+    let distVec, distance;
+
+    if (projApToAb < 0) {
+        distVec = new Vector(lineA.x - point.x , lineA.y - point.y);
+    } else if (projApToAb > projAbToAb) {
+        distVec = new Vector(lineB.x - point.x, lineB.y - point.y);
+    } else {
+        // get the length squared
+        const lengthSq = ab.dot(ab);
+        // calculate the distance along AB
+        const t = projApToAb / lengthSq;
+        distVec = ab.multiplyScalar(t).add(lineA);
+    }
+
+    distance = distVec.magnitude();
+
     return {
         distVec,
         distance,
     };
+}
+
+function createRandomLine() {
+    const list = []
+        , random = 100 + Math.floor(Math.random() * 100);
+
+    for (let i = 0; i < random; i++) {
+        list.push([
+            new Vector(ranSign() * ranX(), ranSign() * ranY()),
+            new Vector(ranSign() * ranX(), ranSign() * ranY())]
+        );
+    }
+
+    return list;
+}
+
+function ranX() {
+    return Vector.randomizeX(TOP_LEFT, TOP_RIGHT);
+}
+
+function ranY() {
+    return Vector.randomizeY(TOP_LEFT, TOP_RIGHT);
+}
+
+function ranSign() {
+    return Math.random() < 0.5 ? -1 : 1;
 }
 
 /**

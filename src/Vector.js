@@ -712,7 +712,7 @@ export default class Vector
      */
     perpendicular()
     {
-        return new Vector(-this.y, -this.x);
+        return new Vector(-this.y, this.x);
     }
 
 

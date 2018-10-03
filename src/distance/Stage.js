@@ -1,4 +1,5 @@
 import Consts from "../distance/Consts";
+import PastelColor from '../utils/PastelColor';
 
 const STAGE = Consts.STAGE
     , SCALE = Consts.SCALE
@@ -9,8 +10,6 @@ const STAGE = Consts.STAGE
     , LINE_COLOR = 0xFFFFFF
     , LINE_THICKNESS = 1
     , ALPHA = 0.5
-    , ORIGIN_COLOR = 0xFFFFFF
-    , DIST_COLOR = 0xFF3300
     , RADIUS = 2;
 
 export default class Stage extends PIXI.Container {
@@ -26,20 +25,26 @@ export default class Stage extends PIXI.Container {
         this.addChild(this.graphics);
     }
 
-    drawLine(lineA, lineB, thickenss = LINE_THICKNESS, color = LINE_COLOR, alpha = ALPHA) {
+    drawLine(lineA, lineB, thickenss = LINE_THICKNESS) {
         lineA = lineA.clone().multiplyScalar(SCALE);
         lineB = lineB.clone().multiplyScalar(SCALE);
 
-        const g = this.graphics;
+        const alpha = ALPHA
+            , g = this.graphics
+            , color = PastelColor.generate().hex;
+
         g.lineStyle(thickenss, color, alpha);
         g.moveTo(lineA.x, lineA.y);
         g.lineTo(lineB.x, lineB.y);
     }
 
-    drawPoint(point, radius = RADIUS, color = ORIGIN_COLOR, alpha = ALPHA) {
+    drawPoint(point, radius = RADIUS) {
         point = point.clone().multiplyScalar(SCALE);
 
-        const g = this.graphics;
+        const alpha = ALPHA
+            , g = this.graphics
+            , color = PastelColor.generate().hex;
+
         g.beginFill(color, alpha);
         g.drawCircle(point.x, point.y, radius, color, alpha);
         g.endFill();

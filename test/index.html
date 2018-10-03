@@ -65,7 +65,12 @@
 
         function getFrameWidth() {
             var nav = document.getElementsByName('nav')[0];
-            return window.innerWidth - nav;
+            return window.innerWidth - nav.offsetWidth;
+        }
+
+        function getFrameHeight() {
+            const nav = document.getElementsByName('nav')[0];
+            return window.innerHeight - nav.offsetHeight;
         }
 
         var frame, parent = document.getElementsByClassName('canvas')[0];
@@ -78,6 +83,7 @@
 
         window.frame = frame;
         frame.name = 'canvas';
+        frame.className = 'canvas';
         frame.width = '100%';
         frame.height = '100%';
         frame.frameBorder = 0;

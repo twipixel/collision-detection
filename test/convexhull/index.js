@@ -50,7 +50,9 @@ class Main {
         window.addEventListener('keyup', this.onKeyUp.bind(this));
     }
 
-    onResize() {}
+    onResize() {
+        this.resizeWindow();
+    }
 
     updateLoop (ms) {
         this.update(ms);
