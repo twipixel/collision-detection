@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>R-TREE</title>
+    <style type="text/css">
+        :root {
+            --bg-color: #33383D;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+        }
+
+        #datGuiHolder {
+            position: absolute;
+        }
+
+        #canvas {
+            margin: 0px;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript" src="./../../external/lib/test.common.js"></script>
+<script>
+    (function(){
+
+        addScriptToBodySync('./../../external/vendor/dat.gui.js');
+
+        if (navigator.userAgent.indexOf('Electron') >= 0) {
+            // Install babel hooks to the browser process
+            require('babel-core/register')();
+            require('./index');
+        } else {
+            // commons 은 build 할 때 생성합니다.
+            addScriptToHeadSync('../bundle/commons.js');
+            const loc = window.location.pathname
+                , dir = loc.substring(0, loc.lastIndexOf('/'))
+                , folders = dir.split('/')
+                , currentFolder = folders[folders.length - 1];
+            addScriptToBodySync(`../bundle/${currentFolder}.js`);
+        }
+    })();
+</script>
+</body>
+</html>
