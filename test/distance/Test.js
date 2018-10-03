@@ -1,10 +1,6 @@
 import Vector from '../../src/Vector';
-import Shape from '../../src/gjk/Shape';
 import Consts from '../../src/gjk/Consts';
-import Vertices from '../../src/gjk/Vertices';
-import GJK from '../../src/gjk/GJK';
 import ConvexHull from '../../src/convexhull/ConvexHull';
-import MinkowskiDifference from '../../src/gjk/MinkowskiDifference';
 import KeyCode from "../../src/consts/KeyCode";
 
 const TOTAL = 30
@@ -15,19 +11,14 @@ const TOTAL = 30
     , TOP_RIGHT = {x: 17, y: 17}
     , RAD_TO_DEG = 180 / Math.PI;
 
-const triangles = createPolygons(3, TOTAL);
-const rectangles = createPolygons(4, TOTAL);
-
-/*const triangles = [
-    // [new Vector(3, 1), new Vector(3, 5), new Vector(6, 4)],
-    [new Vector(4, 11), new Vector(4, 5), new Vector(9, 9)],
-    // [new Vector(0, -1), new Vector(3, 1), new Vector(1, 3)],
+const LINE = [
+    [new Vector(1, 0), new Vector(0, 1)],
+    [new Vector(-1, 0), new Vector(0, 1)],
+    [new Vector(4, 0), new Vector(0, -4)],
+    [new Vector(-6, 0), new Vector(0, -7)],
+    [new Vector(7, 0), new Vector(0, 4)],
+    [new Vector(-6, 0), new Vector(0, 1)]
 ];
-const rectangles = [
-    // [new Vector(8, 1), new Vector(8, 5), new Vector(11, 5), new Vector(11, 1)],
-    [new Vector(5, 7), new Vector(7, 3), new Vector(10, 2), new Vector(12, 7)],
-    // [new Vector(2, -2), new Vector(5, -1), new Vector(4, 2), new Vector(1, 1)],
-];*/
 
 
 export default class Test extends PIXI.Container {
@@ -44,7 +35,6 @@ export default class Test extends PIXI.Container {
     }
 
     initialize() {
-        this.shapes = [];
         this.next();
     }
 
@@ -56,63 +46,20 @@ export default class Test extends PIXI.Container {
         this.on('mousedown', this.mouseDownListener);
     }
 
-    displayCollision() {
+    display() {
         this.clear();
-        this.checkCollision();
+        this.displayDistance();
     }
 
     clear() {
-        this.shapes.forEach((shape) => {
-            this.removeChild(shape);
-            shape.destroy();
-        });
 
-        this.shapes.length = 0;
-        this.shapes = [];
-
-        if (!this.minkowski) {
-            return;
-        }
-        this.removeChild(this.minkowski);
-        this.minkowski.destroy();
     }
 
-    checkCollision() {
-        const index1 = Math.floor(Math.random() * triangles.length)
-            , index2 = Math.floor(Math.random() * rectangles.length)
-            , vertices1 = new Vertices(triangles[index1])
-            , vertices2 = new Vertices(rectangles[index2]);
+    displayDistance() {
 
-        vertices1.multiply(SCALE);
-        vertices2.multiply(SCALE);
-
-        const shape1 = new Shape(vertices1.vertices, SCALE)
-            , shape2 = new Shape(vertices2.vertices, SCALE);
-        this.minkowski = new MinkowskiDifference(vertices1.vertices, vertices2.vertices);
-        this.minkowski.x = (STAGE.width / 3) * 2;
-        this.minkowski.y = (STAGE.height / 3) * 2;
-
-        this.addChild(shape1);
-        this.addChild(shape2);
-        this.addChild(this.minkowski);
-
-        this.shapes.push(shape1);
-        this.shapes.push(shape2);
-
-        vertices1.divide(SCALE);
-        vertices2.divide(SCALE);
-
-        const collision = GJK.checkCollision(vertices1.vertices, vertices2.vertices);
-
-        console.log('');
-        console.log('---------------------------');
-        console.log('COLLISION [', collision, ']');
-        console.log('---------------------------');
     }
 
     next() {
-        console.clear();
-
         if (this.intervalId) {
             clearInterval(this.intervalId);
         }
@@ -122,7 +69,8 @@ export default class Test extends PIXI.Container {
         this.intervalId = setInterval(this.displayCollision, INTERVAL);
     }
 
-    update() {}
+    update() {
+    }
 
     resize() {
         this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);

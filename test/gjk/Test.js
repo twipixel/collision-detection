@@ -118,7 +118,7 @@ export default class Test extends PIXI.Container {
         }
 
         this.displayCollision();
-        this.displayCollision = this.displayCollision.bind(this);
+        this.display = this.displayCollision.bind(this);
         this.intervalId = setInterval(this.displayCollision, INTERVAL);
     }
 
