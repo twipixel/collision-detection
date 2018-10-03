@@ -1472,6 +1472,8 @@ export default class Vector
 
 
     /**
+     * 단순히 길이 비교를 하려면 length 를 사용하기 보다는 lengthSq 를 사용하게 빠르다.
+     * length 는 Math.sqrt (제곱근) 처리를 하기 때문에 단순 길이 비교시 lengthSq 를 사용하는 것이 빠릅니다.
      * Squared length / magnitude
      *
      * ### Examples:
