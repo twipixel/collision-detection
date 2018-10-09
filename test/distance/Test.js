@@ -46,6 +46,7 @@ export default class Test extends PIXI.Container {
         this.stage.x = HW;
         this.stage.y = HH;
         this.addChild(this.stage);
+        this.next = this.next.bind(this);
 
         this.next();
     }
@@ -103,7 +104,6 @@ export default class Test extends PIXI.Container {
 
         this.initProperties();
         this.draw();
-        this.next = this.next.bind(this);
         this.intervalId = setInterval(this.next, INTERVAL);
     }
 

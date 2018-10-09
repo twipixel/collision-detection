@@ -2,13 +2,10 @@ import Vector from '../../src/Vector';
 import Shape from '../../src/gjk/Shape';
 import Consts from '../../src/gjk/Consts';
 import Vertices from '../../src/gjk/Vertices';
+import GJK from '../../src/gjk/GJK';
 import ConvexHull from '../../src/convexhull/ConvexHull';
 import MinkowskiDifference from '../../src/gjk/MinkowskiDifference';
-import Gjk from '../../src/dyn4j/Gjk';
-import Convex from '../../src/dyn4j/Convex';
-import Polygon from '../../src/dyn4j/Polygon';
 import KeyCode from "../../src/consts/KeyCode";
-import Penetration from "../../src/dyn4j/Penetration";
 
 const TOTAL = 30
     , INTERVAL = 600000
@@ -31,18 +28,6 @@ const rectangles = [
     [new Vector(5, 7), new Vector(7, 3), new Vector(10, 2), new Vector(12, 7)],
     // [new Vector(2, -2), new Vector(5, -1), new Vector(4, 2), new Vector(1, 1)],
 ];*/
-
-const errorCase1 = [
-    // [new Vector(2, 7), new Vector(12, 3), new Vector(12, 17)],
-    // [new Vector(8, 8), new Vector(10, 7), new Vector(14, 8)],
-    [new Vector(10, 13), new Vector(14, 15), new Vector(11, 14)],
-];
-
-const errorCase2 = [
-    // [new Vector(14, 2), new Vector(17, 2), new Vector(14, 7), new Vector(9, 7)],
-    // [new Vector(7, 5), new Vector(15, 10), new Vector(16, 11), new Vector(15, 14)],
-    [new Vector(9, 8), new Vector(14, 15), new Vector(4, 15), new Vector(3, 12)],
-];
 
 
 export default class Test extends PIXI.Container {
@@ -94,15 +79,10 @@ export default class Test extends PIXI.Container {
     }
 
     checkCollision() {
-        /*const index1 = Math.floor(Math.random() * triangles.length)
+        const index1 = Math.floor(Math.random() * triangles.length)
             , index2 = Math.floor(Math.random() * rectangles.length)
             , vertices1 = new Vertices(triangles[index1])
-            , vertices2 = new Vertices(rectangles[index2]);*/
-
-        const index1 = Math.floor(Math.random() * errorCase1.length)
-            , index2 = Math.floor(Math.random() * errorCase2.length)
-            , vertices1 = new Vertices(errorCase1[index1])
-            , vertices2 = new Vertices(errorCase2[index2]);
+            , vertices2 = new Vertices(rectangles[index2]);
 
         vertices1.multiply(SCALE);
         vertices2.multiply(SCALE);
@@ -123,22 +103,17 @@ export default class Test extends PIXI.Container {
         vertices1.divide(SCALE);
         vertices2.divide(SCALE);
 
-        const polygon1 = new Polygon(vertices1.vertices)
-            , polygon2 = new Polygon(vertices2.vertices);
+        const collision = GJK.checkCollision(vertices1.vertices, vertices2.vertices);
 
-        console.log('polygon1', polygon1);
-        console.log('polygon2', polygon2);
-
-
-        const gjk = new Gjk()
-            , penetration = new Penetration();
-        
-        const isCollision = gjk.detect(polygon1, polygon2, penetration);
-
-        console.log('isCollision', isCollision);
+        console.log('');
+        console.log('---------------------------');
+        console.log('COLLISION [', collision, ']');
+        console.log('---------------------------');
     }
 
     next() {
+        console.clear();
+
         if (this.intervalId) {
             clearInterval(this.intervalId);
         }
@@ -147,8 +122,7 @@ export default class Test extends PIXI.Container {
         this.intervalId = setInterval(this.displayCollision, INTERVAL);
     }
 
-    update() {
-    }
+    update() {}
 
     resize() {
         this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);

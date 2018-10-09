@@ -1,4 +1,4 @@
-webpackJsonp([4],{
+webpackJsonp([5],{
 
 /***/ 0:
 /***/ (function(module, exports, __webpack_require__) {
@@ -9,7 +9,7 @@ webpackJsonp([4],{
 	
 	__webpack_require__(1);
 	
-	var _Test = __webpack_require__(344);
+	var _Test = __webpack_require__(351);
 	
 	var _Test2 = _interopRequireDefault(_Test);
 	
@@ -89,7 +89,7 @@ webpackJsonp([4],{
 
 /***/ }),
 
-/***/ 344:
+/***/ 351:
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';

@@ -84,8 +84,9 @@ leftEndpoint < 0rigin < rightEndpoint
 
 
 
+##### 관련 링크
 
-
+- [dyn4 Java Collision Detection and Physics Engine](https://github.com/dyn4j/dyn4j)
 
 
 

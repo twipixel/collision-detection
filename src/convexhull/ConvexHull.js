@@ -53,7 +53,7 @@ export default class ConvexHull {
         for (let i = 0, n = stack.length; i < n; i++) {
             const index = stack[i];
             const point = points[index];
-            convexHull.push({x: point.x, y: point.y});
+            convexHull.push(new Vector(point.x, point.y));
         }
 
         return convexHull;

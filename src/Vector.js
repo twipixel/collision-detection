@@ -1127,6 +1127,33 @@ export default class Vector
 
 
     /**
+     * Sets this vector to the left-handed normal of this vector.
+     * @return {Vector} this vector
+     * @see #getLeftHandOrthogonalVector()
+     */
+    left()
+    {
+        const temp = this.x;
+        this.x = this.y;
+        this.y = -temp;
+        return this;
+    }
+
+
+    /**
+     * Sets this vector to the right-handed normal of this vector.
+     * @return {@link Vector2} this vector
+     * @see #getRightHandOrthogonalVector()
+     */
+    right()
+    {
+        const temp = this.x;
+        this.x = -this.y;
+        this.y = temp;
+        return this;
+    }
+
+    /**
      * Calculates the dot product of this vector and another
      *
      * ### Examples:
@@ -1430,6 +1457,12 @@ export default class Vector
     }
 
 
+    getMagnitudeSquared()
+    {
+        return this.x * this.x + this.y * this.y;
+    }
+
+
     /**
      * Calculates the squared euclidean distance between this vector and another
      *
@@ -1502,6 +1535,18 @@ export default class Vector
         return this.length();
     }
 
+
+    to(vec)
+    {
+        return new Vector(vec.x - this.x, vec.y - this.y);
+    }
+
+
+    set(vec)
+    {
+        this.x = vec.x;
+        this.y = vec.y;
+    }
 
     /**
      * Returns a true if vector is (0, 0)
