@@ -28,7 +28,7 @@ import Epsilon from './Epsilon';
 import MinkowskiSum from './MinkowskiSum';
 
 const DEFAULT_MAX_ITERATIONS = 30;
-const DEFAULT_DETECT_EPSILON = 0.0;
+const DEFAULT_DETECT_EPSILON = 0;
 
 export default class Gjk {
     constructor(minkowskiPenetrationSolver) {
@@ -58,8 +58,12 @@ export default class Gjk {
         // choose some search direction
         const direction = this.getInitialDirection(convex1, convex2);
 
+        console.log('ms', ms);
+        console.log('direction', direction);
+
         // perform the detection
         if (this.detect2(ms, simplex, direction)) {
+            console.log('simplex', simplex);
             // this.minkowskiPenetrationSolver.getPenetration(simplex, ms, penetration);
             return true;
         }
@@ -75,6 +79,7 @@ export default class Gjk {
      * @returns {boolean}
      */
     detect2(ms, simplex, direction) {
+        console.log('dectec2', ms, simplex, direction);
         // check for a zero direction vector
         if (direction.isZero()) {
             direction.set(1, 0);
@@ -82,7 +87,8 @@ export default class Gjk {
         // add the first point
         simplex[0] = ms.getSupportPoint(direction);
         // is the support point past the origin along d?
-        if (simplex[0].dot(direction) <= 0.0) {
+        if (simplex[0].dot(direction) <= 0) {
+            console.log('case 1');
             return false;
         }
         // negate the search direction
@@ -92,22 +98,26 @@ export default class Gjk {
             // always add another point to the simplex at the beginning of the loop
             simplex.push(ms.getSupportPoint(direction));
             // make sure that the last point we added was past the origin
+            console.log(simplex.length, simplex[simplex.length - 1].dot(direction));
             if (simplex[simplex.length - 1].dot(direction) <= DEFAULT_DETECT_EPSILON) {
                 // a is not past the origin so therefore the shapes do not intersect
                 // here we treat the origin on the line as no intersection
                 // immediately return with null indicating no penetration
+                console.log('case 2');
                 return false;
             } else {
                 // if it is past the origin, then test whether the simplex contains the origin
                 if (this.checkSimplex(simplex, direction)) {
                     // if the simplex contains the origin then we know that there is an intersection.
                     // if we broke out of the loop then we know there was an intersection
+                    console.log('hit');
                     return true;
                 }
                 // if the simplex does not contain the origin then we need to loop using the new
                 // search direction and simplex
             }
         }
+        console.log('case 3');
         return false;
     }
 
@@ -127,6 +137,7 @@ export default class Gjk {
      * @returns {boolean}
      */
     checkSimplex(simplex, direction) {
+        console.log('checkSimplex', simplex.length, simplex, direction);
         // this method should never be supplied anything other than 2 or 3 points for the simplex
         // get the last point added (a)
         const a = simplex[simplex.length - 1];
@@ -144,12 +155,14 @@ export default class Gjk {
             const acPerp = Vector.tripleProduct(ab, ac, ac);
             // see where the origin is at
             const acLocation = acPerp.dot(ao);
-            if (acLocation >= 0.0) {
+            if (acLocation >= 0) {
                 // the origin lies on the right side of A->C
                 // because of the condition for the gjk loop to continue the origin
                 // must lie between A and C so remove B and set the
                 // new search direction to A->C perpendicular vector
+                console.log('** simplex', simplex);
                 simplex.splice(1, 1);
+                console.log('**** simplex', simplex);
                 // this used to be direction.set(Vector.tripleProduct(ac, ao, ac));
                 // but was changed since the origin may lie on the segment created
                 // by a -> c in which case would produce a zero vector normal
@@ -159,14 +172,16 @@ export default class Gjk {
                 const abPerp = Vector.tripleProduct(ac, ab, ab);
                 const abLocation = abPerp.dot(ao);
                 // the origin lies on the left side of A->C
-                if (abLocation < 0.0) {
+                if (abLocation < 0) {
                     // the origin lies on the right side of A->B and therefore in the
                     // triangle, we have an intersection
                     return true;
                 } else {
                     // the origin lies between A and B so remove C and set the
                     // search direction to A->B perpendicular vector
+                    console.log('## simplex', simplex);
                     simplex.splice(0, 1);
+                    console.log('#### simplex', simplex);
                     // this used to be direction.set(Vector.tripleProduct(ab, ao, ab));
                     // but was changed since the origin may lie on the segment created
                     // by a -> b in which case would produce a zero vector normal

@@ -22,6 +22,10 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+import Vector from '../Vector';
+
+
 export default class MinkowskiSum {
 
     /**
@@ -40,10 +44,8 @@ export default class MinkowskiSum {
     getSupportPoint(direction) {
         // get the farthest point in the given direction in convex1
         const point1 = this.convex1.getFarthestPoint(direction);
-        direction.invert();
         // get the farthest point in the opposite direction in convex2
-        const point2 = this.convex2.getFarthestPoint(direction);
-        direction.invert();
+        const point2 = this.convex2.getFarthestPoint(Vector.negate(direction));
         // return the Minkowski sum point
         return point1.subtract(point2);
     }

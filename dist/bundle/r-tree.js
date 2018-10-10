@@ -9,7 +9,7 @@ webpackJsonp([5],{
 	
 	__webpack_require__(1);
 	
-	var _Test = __webpack_require__(351);
+	var _Test = __webpack_require__(352);
 	
 	var _Test2 = _interopRequireDefault(_Test);
 	
@@ -89,7 +89,7 @@ webpackJsonp([5],{
 
 /***/ }),
 
-/***/ 351:
+/***/ 352:
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';

@@ -20,7 +20,7 @@ export default class MinkowskiDifference extends PIXI.Container {
         this.addChild(this.graphics);
 
         const vertices = this.getVertices(vertices1, vertices2)
-            , convexHull = ConvexHull.generate(vertices);
+            , convexHull = this.convexHull = ConvexHull.generate(vertices);
 
         this.texts = [];
         this.drawAxes();
