@@ -15,10 +15,10 @@ const TOTAL = 30
     , TOP_RIGHT = {x: 17, y: 17}
     , RAD_TO_DEG = 180 / Math.PI;
 
-// const triangles = createPolygons(3, TOTAL);
-// const rectangles = createPolygons(4, TOTAL);
+const triangles = createPolygons(3, TOTAL);
+const rectangles = createPolygons(4, TOTAL);
 
-const triangles = [
+/*const triangles = [
     // [new Vector(3, 1), new Vector(3, 5), new Vector(6, 4)],
     // [new Vector(4, 11), new Vector(4, 5), new Vector(9, 9)],
     // [new Vector(0, -1), new Vector(3, 1), new Vector(1, 3)],
@@ -29,7 +29,7 @@ const rectangles = [
     // [new Vector(5, 7), new Vector(7, 3), new Vector(10, 2), new Vector(12, 7)],
     // [new Vector(2, -2), new Vector(5, -1), new Vector(4, 2), new Vector(1, 1)],
     [new Vector(9, 8), new Vector(3, 12), new Vector(4, 15), new Vector(14, 15)],
-];
+];*/
 
 
 export default class Test extends PIXI.Container {

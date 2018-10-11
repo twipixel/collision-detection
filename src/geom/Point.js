@@ -1,9 +1,10 @@
 import Vector from '../Vector';
+import PastelColor from '../utils/PastelColor';
 
 
 export default class Point extends PIXI.Graphics
 {
-    constructor(x = 0, y = 0, radius = 10, color = 0xff3300, alpha = 0.5)
+    constructor(x = 0, y = 0, radius = 10, color = PastelColor.generate().hex, alpha = 0.5)
     {
         super();
 

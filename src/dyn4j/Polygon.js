@@ -64,15 +64,16 @@ export default class Polygon extends Convex {
         point.set(this.vertices[0]);
         // prime the projection amount
         let max = direction.dot(this.vertices[0]);
-        this.vertices.forEach(vertex => {
-            const projection = direction.dot(vertex);
+        const size = this.vertices.length;
+        for (let i = 1; i < size; i++) {
+            const vertex = this.vertices[i]
+                , projection = direction.dot(vertex);
 
             if (projection > max) {
                 point.set(vertex);
+                max = projection;
             }
-            // set the new maximum
-            max = projection;
-        });
+        }
 
         return point;
     }

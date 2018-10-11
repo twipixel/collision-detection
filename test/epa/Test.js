@@ -32,7 +32,7 @@ const rectangles = [
     // [new Vector(2, -2), new Vector(5, -1), new Vector(4, 2), new Vector(1, 1)],
 ];*/
 
-const errorCase1 = [
+/*const errorCase1 = [
     // [new Vector(2, 7), new Vector(12, 3), new Vector(12, 17)],
     // [new Vector(8, 8), new Vector(10, 7), new Vector(14, 8)],
     [new Vector(10, 13), new Vector(14, 15), new Vector(11, 14)],
@@ -42,7 +42,7 @@ const errorCase2 = [
     // [new Vector(14, 2), new Vector(17, 2), new Vector(14, 7), new Vector(9, 7)],
     // [new Vector(7, 5), new Vector(15, 10), new Vector(16, 11), new Vector(15, 14)],
     [new Vector(9, 8), new Vector(14, 15), new Vector(4, 15), new Vector(3, 12)],
-];
+];*/
 
 
 export default class Test extends PIXI.Container {
@@ -60,7 +60,7 @@ export default class Test extends PIXI.Container {
 
     initialize() {
         this.shapes = [];
-        this.displayCollision = this.displayCollision.bind(this);
+        this.display = this.displayCollision.bind(this);
         this.next();
     }
 
@@ -94,15 +94,15 @@ export default class Test extends PIXI.Container {
     }
 
     checkCollision() {
-        /*const index1 = Math.floor(Math.random() * triangles.length)
+        const index1 = Math.floor(Math.random() * triangles.length)
             , index2 = Math.floor(Math.random() * rectangles.length)
             , vertices1 = new Vertices(triangles[index1])
-            , vertices2 = new Vertices(rectangles[index2]);*/
+            , vertices2 = new Vertices(rectangles[index2]);
 
-        const index1 = Math.floor(Math.random() * errorCase1.length)
+        /*const index1 = Math.floor(Math.random() * errorCase1.length)
             , index2 = Math.floor(Math.random() * errorCase2.length)
             , vertices1 = new Vertices(errorCase1[index1])
-            , vertices2 = new Vertices(errorCase2[index2]);
+            , vertices2 = new Vertices(errorCase2[index2]);*/
 
         vertices1.multiply(SCALE);
         vertices2.multiply(SCALE);

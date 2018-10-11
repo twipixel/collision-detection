@@ -151,7 +151,7 @@ export default class Painter
     }
 
 
-    static drawArrow(graphics, movePoint, toPoint, isClear = true, thickness = 1, color = 0xFF3300, alpha = 0.7)
+    static drawArrow(graphics, movePoint, toPoint, isClear = true, thickness = 1, color = 0xFF3300, alpha = 0.7, scale = 5)
     {
         if (isClear === true) {
             graphics.clear();
@@ -180,14 +180,38 @@ export default class Painter
         var vector = new Vector(movePoint.x - toPoint.x, movePoint.y - toPoint.y);
         var left = vector.clone().rotate(45).invert();
         var right = vector.clone().rotate(-45).invert();
-        left.multiplyScalar(5);
-        right.multiplyScalar(5);
-        vector.invert().multiplyScalar(15);
+        left.multiplyScalar(scale);
+        right.multiplyScalar(scale);
+        vector.invert().multiplyScalar(scale * 3);
 
         graphics.lineTo(movePoint.x + vector.x, movePoint.y + vector.y);
         graphics.moveTo(movePoint.x, movePoint.y);
         graphics.lineTo(movePoint.x + left.x, movePoint.y + left.y);
         graphics.moveTo(movePoint.x, movePoint.y);
         graphics.lineTo(movePoint.x + right.x, movePoint.y + right.y);
+    }
+
+
+    static drawDirection(graphics, me, target, isClear = true, thickness = 1, color = 0xFF3300, alpha = 0.7, scale = 5)
+    {
+        if (isClear === true) {
+            graphics.clear();
+        }
+
+        graphics.lineStyle(thickness, color, alpha);
+        graphics.moveTo(me.x, me.y);
+
+        var to = me.to(target);
+        var left = to.clone().rotate(45).invert();
+        var right = to.clone().rotate(-45).invert();
+        left.multiplyScalar(scale);
+        right.multiplyScalar(scale);
+        to.invert().multiplyScalar(scale * 3);
+
+        graphics.lineTo(me.x + to.x, me.y + to.y);
+        graphics.moveTo(me.x, me.y);
+        graphics.lineTo(me.x + left.x, me.y + left.y);
+        graphics.moveTo(me.x, me.y);
+        graphics.lineTo(me.x + right.x, me.y + right.y);
     }
 }

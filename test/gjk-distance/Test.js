@@ -45,7 +45,7 @@ export default class Test extends PIXI.Container {
 
     initialize() {
         this.shapes = [];
-        this.displayCollision = this.displayCollision.bind(this);
+        this.display = this.displayCollision.bind(this);
         this.next();
     }
 
