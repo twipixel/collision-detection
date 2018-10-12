@@ -113,7 +113,7 @@ export default class GJK
         console.log(str(a), str(d, true), Vector.dotProduct(a, d).toFixed(2));
 
         // support 점과 방향이 같은 방향이 아닐 경우
-        if (Vector.dotProduct(a, d) <= 0) {
+        if (a.dot(d) <= 0) {
             // 마지막에 추가 된 점이 d의 방향으로 원점을 지나치지 않은 경우
             // 그 다음 Minkowski 합은 원점을 포함 할 수 없습니다.
             // 추가 된 마지막 점은 Minkowski Difference의 가장자리에 있습니다.

@@ -117,13 +117,20 @@ export default class Test extends PIXI.Container {
         const acLocation = acPerp.dot(ao);
         const abLocation = abPerp.dot(ao);
 
+        console.log('a.dot(d)', a.dot(new Vector().to(a)));
         console.log('ao', ao);
         console.log('acLocation', acLocation);
         console.log('abLocation', abLocation);
 
-        Painter.drawDirection(
+        /**
+         * 삼각형 안에 원점이 포함 여부 체크
+         * 1. simplex a 가 원점을 지나고 a.dot(direction) < 0
+         * 2. ac 수직선분 안쪽에 원점이 있고 acPerp.dot(ao) < 0
+         * 3. ab 수직선분 안쪽에 원점이 있으면 포함 abPerp.dot(ao) < 0
+         */
+        /*Painter.drawDirection(
             this.stage.graphics, new Vector(), Vector.negate(a),
-            false, 1, PastelColor.generate().hex, 0.7, 0.1);
+            false, 1, PastelColor.generate().hex, 0.7, 0.1);*/
 
         Painter.drawDirection(
             this.stage.graphics,
