@@ -73,10 +73,10 @@ export default class Gjk {
      * @param ms {MinkowskiSum}
      * @param simplex {Vector[]}
      * @param direction {Vector}
-     * @param history {History}
+     * @param history {History} 디버그용
      * @returns {boolean}
      */
-    detect2(ms, simplex, direction, history) {
+    detect2(ms, simplex, direction, history = null) {
         // 디버그용 히스토리
         const directions = new Array(3);
         // check for a zero direction vector
@@ -89,7 +89,11 @@ export default class Gjk {
         // is the support point past the origin along d?
         // support point 방향을 따라 원점을 지나는지 체크 (원점을 지나지 않는다면X)
         if (simplex[0].dot(direction) <= 0) {
-            history.setHistory(simplex, directions);
+
+            if (history) {
+                history.setHistory(simplex, directions);
+            }
+
             return false;
         }
         // negate the search direction
@@ -104,21 +108,33 @@ export default class Gjk {
                 // a is not past the origin so therefore the shapes do not intersect
                 // here we treat the origin on the line as no intersection
                 // immediately return with null indicating no penetration
-                history.setHistory(simplex, directions);
+
+                if (history) {
+                    history.setHistory(simplex, directions);
+                }
+
                 return false;
             } else {
                 // if it is past the origin, then test whether the simplex contains the origin
                 if (this.checkSimplex(simplex, direction)) {
                     // if the simplex contains the origin then we know that there is an intersection.
                     // if we broke out of the loop then we know there was an intersection
-                    history.setHistory(simplex, directions);
+
+                    if (history) {
+                        history.setHistory(simplex, directions);
+                    }
+
                     return true;
                 }
                 // if the simplex does not contain the origin then we need to loop using the new
                 // search direction and simplex
             }
         }
-        history.setHistory(simplex, directions);
+
+        if (history) {
+            history.setHistory(simplex, directions);
+        }
+
         return false;
     }
 

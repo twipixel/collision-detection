@@ -1,4 +1,5 @@
 import Vector from '../../src/Vector';
+import History from '../../src/History';
 import Shape from '../../src/gjk/Shape';
 import Consts from '../../src/gjk/Consts';
 import Vertices from '../../src/gjk/Vertices';

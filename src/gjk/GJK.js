@@ -89,7 +89,7 @@ export default class GJK
      * @paran history {History} simplex 와 direction 히스토리
      * @returns {boolean} 충돌 여부
      */
-    static checkCollision(vertices1, vertices2, history)
+    static checkCollision(vertices1, vertices2, history = null)
     {
         // consoleVertices(vertices1, vertices2);
 
@@ -121,7 +121,11 @@ export default class GJK
             // 그 다음 Minkowski 합은 원점을 포함 할 수 없습니다.
             // 추가 된 마지막 점은 Minkowski Difference의 가장자리에 있습니다.
             console.log('       CASE1[', 'NO', ']');
-            history.setHistory(simplex, directions);
+
+            if (history) {
+                history.setHistory(simplex, directions);
+            }
+
             return false; // no collision
         }
 
@@ -139,7 +143,11 @@ export default class GJK
             if (Vector.dotProduct(a, d) <= 0) {
                 console.log(str(a), str(d, true), Vector.dotProduct(a, d).toFixed(2));
                 console.log('       CASE2[', 'NO', ']');
-                history.setHistory(simplex, directions);
+
+                if (history) {
+                    history.setHistory(simplex, directions);
+                }
+
                 return false; // no collision
             }
 
@@ -187,7 +195,11 @@ export default class GJK
                 // ab 수직 선분이 원점 반대 방향을 향하고 있으면
                 // 즉, 원점이 삼각형 안에 있으면
                 if (Vector.dotProduct(abperp, ao) < 0) {
-                    history.setHistory(simplex, directions);
+
+                    if (history) {
+                        history.setHistory(simplex, directions);
+                    }
+
                     return true; // collision
                 }
 
@@ -199,7 +211,10 @@ export default class GJK
             --index;
         }
 
-        history.setHistory(simplex, directions);
+        if (history) {
+            history.setHistory(simplex, directions);
+        }
+
         return false;
     }
 
