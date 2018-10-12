@@ -1,4 +1,5 @@
 import Vector from '../../src/Vector';
+import History from '../../src/History';
 import Shape from '../../src/gjk/Shape';
 import Consts from '../../src/gjk/Consts';
 import Vertices from '../../src/gjk/Vertices';
@@ -131,10 +132,12 @@ export default class Test extends PIXI.Container {
 
 
         const gjk = new Gjk()
-            , penetration = new Penetration();
+            , penetration = new Penetration()
+            , history = new History();
         
-        const isCollision = gjk.detect(polygon1, polygon2, penetration);
+        const isCollision = gjk.detect(polygon1, polygon2, penetration, history);
 
+        console.log('isCollision', isCollision);
         console.log('isCollision', isCollision);
     }
 

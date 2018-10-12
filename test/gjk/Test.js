@@ -1,4 +1,5 @@
 import Vector from '../../src/Vector';
+import History from '../../src/History';
 import Shape from '../../src/gjk/Shape';
 import Consts from '../../src/gjk/Consts';
 import Vertices from '../../src/gjk/Vertices';
@@ -6,6 +7,7 @@ import GJK from '../../src/gjk/GJK';
 import ConvexHull from '../../src/convexhull/ConvexHull';
 import MinkowskiDifference from '../../src/gjk/MinkowskiDifference';
 import KeyCode from "../../src/consts/KeyCode";
+
 
 const TOTAL = 30
     , INTERVAL = 600000
@@ -104,11 +106,13 @@ export default class Test extends PIXI.Container {
         vertices1.divide(SCALE);
         vertices2.divide(SCALE);
 
-        const collision = GJK.checkCollision(vertices1.vertices, vertices2.vertices);
+        const history = new History();
+        const collision = GJK.checkCollision(vertices1.vertices, vertices2.vertices, history);
 
         console.log('');
         console.log('---------------------------');
         console.log('COLLISION [', collision, ']');
+        console.log('HISTORY [', history, ']');
         console.log('---------------------------');
     }
 

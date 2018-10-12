@@ -86,14 +86,16 @@ export default class GJK
      * 충돌 검사
      * @param vertices1 {Vector[]}
      * @param vertices2 {Vector[]}
+     * @paran history {History} simplex 와 direction 히스토리
      * @returns {boolean} 충돌 여부
      */
-    static checkCollision(vertices1, vertices2)
+    static checkCollision(vertices1, vertices2, history)
     {
         // consoleVertices(vertices1, vertices2);
 
         let iterCount = 0, index = 0;   // index of current vertex of simplex
-        let a, b, c, d, ao, ab, ac, abperp, acperp, simplex = new Array(3);
+        let a, b, c, d, ao, ab, ac, abperp, acperp,
+            simplex = new Array(3), directions = new Array(3);
 
         // 두 폴리곤 중심 좌표를 통해서 방향을 구합니다.
         const position1 = this.averagePoint(vertices1); // not a CoG but
@@ -110,6 +112,7 @@ export default class GJK
 
         // set the first support as initial point of the new simplex
         a = simplex[0] = this.support(vertices1, vertices2, d);
+        directions[0] = d;
         console.log(str(a), str(d, true), Vector.dotProduct(a, d).toFixed(2));
 
         // support 점과 방향이 같은 방향이 아닐 경우
@@ -117,7 +120,8 @@ export default class GJK
             // 마지막에 추가 된 점이 d의 방향으로 원점을 지나치지 않은 경우
             // 그 다음 Minkowski 합은 원점을 포함 할 수 없습니다.
             // 추가 된 마지막 점은 Minkowski Difference의 가장자리에 있습니다.
-            console.log('CASE1[', 'NO', ']');
+            console.log('       CASE1[', 'NO', ']');
+            history.setHistory(simplex, directions);
             return false; // no collision
         }
 
@@ -130,10 +134,12 @@ export default class GJK
             console.log(iterCount);
 
             a = simplex[++index] = this.support(vertices1, vertices2, d);
+            directions[index] = d;
 
             if (Vector.dotProduct(a, d) <= 0) {
                 console.log(str(a), str(d, true), Vector.dotProduct(a, d).toFixed(2));
-                console.log('CASE2[', 'NO', ']');
+                console.log('       CASE2[', 'NO', ']');
+                history.setHistory(simplex, directions);
                 return false; // no collision
             }
 
@@ -181,6 +187,7 @@ export default class GJK
                 // ab 수직 선분이 원점 반대 방향을 향하고 있으면
                 // 즉, 원점이 삼각형 안에 있으면
                 if (Vector.dotProduct(abperp, ao) < 0) {
+                    history.setHistory(simplex, directions);
                     return true; // collision
                 }
 
@@ -192,6 +199,7 @@ export default class GJK
             --index;
         }
 
+        history.setHistory(simplex, directions);
         return false;
     }
 

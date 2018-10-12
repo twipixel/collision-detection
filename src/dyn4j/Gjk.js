@@ -48,8 +48,9 @@ export default class Gjk {
      * @param convex1 {Convex}
      * @param convex2 {Convex}
      * @param penetration {Penetraion}
+     * @param history {History}
      */
-    detect(convex1, convex2, penetration) {
+    detect(convex1, convex2, penetration, history) {
         const simplex = [];
 
         // create a Minkowski sum
@@ -59,7 +60,7 @@ export default class Gjk {
         const direction = this.getInitialDirection(convex1, convex2);
 
         // perform the detection
-        if (this.detect2(ms, simplex, direction)) {
+        if (this.detect2(ms, simplex, direction, history)) {
             // this.minkowskiPenetrationSolver.getPenetration(simplex, ms, penetration);
             return true;
         }
@@ -72,18 +73,23 @@ export default class Gjk {
      * @param ms {MinkowskiSum}
      * @param simplex {Vector[]}
      * @param direction {Vector}
+     * @param history {History}
      * @returns {boolean}
      */
-    detect2(ms, simplex, direction) {
+    detect2(ms, simplex, direction, history) {
+        // 디버그용 히스토리
+        const directions = new Array(3);
         // check for a zero direction vector
         if (direction.isZero()) {
             direction.set(1, 0);
         }
         // add the first point
         simplex[0] = ms.getSupportPoint(direction);
+        directions[0] = direction;
         // is the support point past the origin along d?
         // support point 방향을 따라 원점을 지나는지 체크 (원점을 지나지 않는다면X)
         if (simplex[0].dot(direction) <= 0) {
+            history.setHistory(simplex, directions);
             return false;
         }
         // negate the search direction
@@ -92,23 +98,27 @@ export default class Gjk {
         for (let i = 0; i < DEFAULT_MAX_ITERATIONS; i++) {
             // always add another point to the simplex at the beginning of the loop
             simplex.push(ms.getSupportPoint(direction));
+            directions[simplex.length - 1] = direction;
             // make sure that the last point we added was past the origin
             if (simplex[simplex.length - 1].dot(direction) <= DEFAULT_DETECT_EPSILON) {
                 // a is not past the origin so therefore the shapes do not intersect
                 // here we treat the origin on the line as no intersection
                 // immediately return with null indicating no penetration
+                history.setHistory(simplex, directions);
                 return false;
             } else {
                 // if it is past the origin, then test whether the simplex contains the origin
                 if (this.checkSimplex(simplex, direction)) {
                     // if the simplex contains the origin then we know that there is an intersection.
                     // if we broke out of the loop then we know there was an intersection
+                    history.setHistory(simplex, directions);
                     return true;
                 }
                 // if the simplex does not contain the origin then we need to loop using the new
                 // search direction and simplex
             }
         }
+        history.setHistory(simplex, directions);
         return false;
     }
 

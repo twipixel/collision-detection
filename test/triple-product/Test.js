@@ -7,7 +7,11 @@ import Stage from '../../src/geom/Stage';
 import KeyCode from "../../src/consts/KeyCode";
 import Painter from "../../src/utils/Painter";
 import PastelColor from '../../src/utils/PastelColor';
-import Epsilon from "../../src/dyn4j/Epsilon";
+import MinkowskiDifference from "../../src/gjk/MinkowskiDifference";
+import Gjk from "../../src/dyn4j/Gjk";
+import Penetration from "../../src/dyn4j/Penetration";
+import History from "../../src/History";
+import Polygon from "../../src/dyn4j/Polygon";
 
 const TOTAL = 30
     , INTERVAL = 600000
@@ -18,6 +22,31 @@ const TOTAL = 30
     , RAD_TO_DEG = 180 / Math.PI;
 
 const triangles = createPolygons(3, TOTAL);
+const rectangles = createPolygons(4, TOTAL);
+
+/*const triangles = [
+    // [new Vector(3, 1), new Vector(3, 5), new Vector(6, 4)],
+    [new Vector(4, 11), new Vector(4, 5), new Vector(9, 9)],
+    // [new Vector(0, -1), new Vector(3, 1), new Vector(1, 3)],
+];
+const rectangles = [
+    // [new Vector(8, 1), new Vector(8, 5), new Vector(11, 5), new Vector(11, 1)],
+    [new Vector(5, 7), new Vector(7, 3), new Vector(10, 2), new Vector(12, 7)],
+    // [new Vector(2, -2), new Vector(5, -1), new Vector(4, 2), new Vector(1, 1)],
+];*/
+
+/*const errorCase1 = [
+    // [new Vector(2, 7), new Vector(12, 3), new Vector(12, 17)],
+    // [new Vector(8, 8), new Vector(10, 7), new Vector(14, 8)],
+    [new Vector(10, 13), new Vector(14, 15), new Vector(11, 14)],
+];
+
+const errorCase2 = [
+    // [new Vector(14, 2), new Vector(17, 2), new Vector(14, 7), new Vector(9, 7)],
+    // [new Vector(7, 5), new Vector(15, 10), new Vector(16, 11), new Vector(15, 14)],
+    [new Vector(9, 8), new Vector(14, 15), new Vector(4, 15), new Vector(3, 12)],
+];*/
+
 
 export default class Test extends PIXI.Container {
     constructor(renderer) {
@@ -68,9 +97,28 @@ export default class Test extends PIXI.Container {
     }
 
     displayPrep() {
-        const index = Math.floor(Math.random() * triangles.length)
-            , vertices = new Vertices(triangles[index]);
+        const index1 = Math.floor(Math.random() * triangles.length)
+            , index2 = Math.floor(Math.random() * rectangles.length)
+            , vertices1 = new Vertices(triangles[index1])
+            , vertices2 = new Vertices(rectangles[index2]);
 
+        const polygon1 = new Polygon(vertices1.vertices)
+            , polygon2 = new Polygon(vertices2.vertices);
+
+        const gjk = new Gjk()
+            , penetration = new Penetration()
+            , history = new History();
+
+        const isCollision = gjk.detect(polygon1, polygon2, penetration, history);
+        
+        console.log('       [COLLISION]', isCollision);
+
+        if (history.simplex.length !== 3) {
+            return;
+        }
+
+        const vertices = new Vertices(history.simplex);
+        const directions = history.directions;
         vertices.multiply(SCALE);
 
         this.stage = new Stage();
@@ -101,9 +149,10 @@ export default class Test extends PIXI.Container {
             this.stage.addChild(text);
         });
 
-        const ARROW_SCALE = 0.00001;
+        const ARROW_SCALE = 0.000001;
         const simplex = vertices.vertices;
         const a = simplex[simplex.length - 1];
+        const d = directions[simplex.length - 1];
         // this is the same as a.to(ORIGIN);
         const ao = Vector.negate(a);
         // then we have a triangle
@@ -117,7 +166,7 @@ export default class Test extends PIXI.Container {
         const acLocation = acPerp.dot(ao);
         const abLocation = abPerp.dot(ao);
 
-        console.log('a.dot(d)', a.dot(new Vector().to(a)));
+        console.log('a.dot(d)', a.dot(d));
         console.log('ao', ao);
         console.log('acLocation', acLocation);
         console.log('abLocation', abLocation);
@@ -128,9 +177,9 @@ export default class Test extends PIXI.Container {
          * 2. ac 수직선분 안쪽에 원점이 있고 acPerp.dot(ao) < 0
          * 3. ab 수직선분 안쪽에 원점이 있으면 포함 abPerp.dot(ao) < 0
          */
-        /*Painter.drawDirection(
-            this.stage.graphics, new Vector(), Vector.negate(a),
-            false, 1, PastelColor.generate().hex, 0.7, 0.1);*/
+        Painter.drawDirection(
+            this.stage.graphics, a, d,
+            false, 1, PastelColor.generate().hex, 0.7, 0.005);
 
         Painter.drawDirection(
             this.stage.graphics,
