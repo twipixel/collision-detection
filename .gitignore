@@ -168,4 +168,7 @@ Temporary Items
 package-lock.json
 
 
+# Project
+dist
+
 

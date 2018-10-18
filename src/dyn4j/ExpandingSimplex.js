@@ -23,6 +23,9 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import PriorityQueue from 'priorityqueue';
+import ExpandingSimplexEdge from './ExpandingSimplexEdge';
+
 
 export default class ExpandingSimplex {
 
@@ -32,6 +35,18 @@ export default class ExpandingSimplex {
      */
     constructor(simplex) {
         this.winding = this.getWinding(simplex);
+        this.queue = new PriorityQueue();
+
+        const size = simplex.length;
+        for (let i = 0; i < size; i++) {
+            // compute j
+            let j = i + 1 == size ? 0 : i + 1;
+            // get the points that make up the current edge
+            const a = simplex.get(i)
+                , b = simplex.get(j);
+            // create the edge
+            this.queue.add(new ExpandingSimplexEdge(a, b, this.winding));
+        }
     }
 
 
@@ -59,5 +74,25 @@ export default class ExpandingSimplex {
             }
         }
         return 0;
+    }
+
+    /**
+     *
+     * @returns {ExpandingSimplexEdge}
+     */
+    getClosestEdge() {
+        return this.queue.peek();
+    }
+
+    /**
+     *
+     * @param point {Vector}
+     */
+    expand(point) {
+        const edge = this.queue.poll();
+        const edge1 = new ExpandingSimplexEdge(edge.point1, point, this.winding);
+        const edge2 = new ExpandingSimplexEdge(point, edge.point2, this.winding);
+        this.queue.add(edge1);
+        this.queue.add(edge2);
     }
 }

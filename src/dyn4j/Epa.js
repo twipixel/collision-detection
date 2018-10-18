@@ -24,6 +24,7 @@
  */
 
 import Epsilon from './Epsilon';
+import ExpandingSimplex from './ExpandingSimplex';
 
 
 const DEFAULT_MAX_ITERATIONS = 100
@@ -52,5 +53,10 @@ export default class Epa {
      * @param penetration {Penetration}
      */
     getPenetration(simplex, minkowskiSum, penetration) {
+        const smplx = new ExpandingSimplex(simplex);
+        let edge = null, point = null;
+
+        for (let i = 0; i < this.maxIterations; i++) {
+        }
     }
 }
