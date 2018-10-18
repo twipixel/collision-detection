@@ -23,34 +23,41 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Epsilon from './Epsilon';
 
-
-const DEFAULT_MAX_ITERATIONS = 100
-    , DEFAULT_DISTANCE_EPSILON = Math.sqrt(Epsilon.E);
-
-
-export default class Epa {
-
-    static get DEFAULT_MAX_ITERATIONS() {
-        return DEFAULT_MAX_ITERATIONS;
-    }
-
-    static get DEFAULT_DISTANCE_EPSILON() {
-        return DEFAULT_DISTANCE_EPSILON;
-    }
-
-    constructor() {
-        this.maxIterations = DEFAULT_MAX_ITERATIONS;
-        this.distanceEpsilon = DEFAULT_DISTANCE_EPSILON;
-    }
+export default class ExpandingSimplex {
 
     /**
-     * 침투 결과를 반환합니다.
+     *
      * @param simplex {Vector[]}
-     * @param minkowskiSum {MinkowskiSum}
-     * @param penetration {Penetration}
      */
-    getPenetration(simplex, minkowskiSum, penetration) {
+    constructor(simplex) {
+        this.winding = this.getWinding(simplex);
+    }
+
+
+    /**
+     * 심플렉스에 주어진 방향을 리턴합니다.
+     *
+     * -1 시계 방향
+     * 1 반 시계 방향
+     * @param simplex {Vector[]}
+     */
+    getWinding(simplex) {
+        const size = simplex.length;
+
+        for (let i = 0; i < size; i++) {
+            let j = i + 1 === size ? 0 : i + 1;
+            const a = simplex.get(i)
+                , b = simplex.get(j);
+
+            if (a.cross(b) > 0) {
+                // 외적을 통해 외적 값이 양수면 반시계 방향
+                return 1;
+            } else if (a.cross(b) < 0) {
+                // 음수면 반시계 방향
+                return -1;
+            }
+        }
+        return 0;
     }
 }
