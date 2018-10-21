@@ -79,7 +79,7 @@ export default class Epa {
         return this.maxIterations;
     }
 
-    setMaxIterations(mxIterations) {
+    setMaxIterations(maxIterations) {
         if (maxIterations < 5) {
             throw new Error('collision.narrowphase.epa.invalidMaximumIterations');
         }
