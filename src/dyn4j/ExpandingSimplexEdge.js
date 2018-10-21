@@ -1,3 +1,6 @@
+import Vector from '../Vector';
+
+
 export default class ExpandingSimplexEdge {
 
     /**
@@ -11,8 +14,10 @@ export default class ExpandingSimplexEdge {
         this.normal = new Vector(point2.x - point1.x, point2.y - point1.y);
 
         if (winding < 0) {
+            // 시계 방향이면 오른쪽
             this.normal.right();
         } else {
+            // 반시계 방향이면 왼쪽
             this.normal.left();
         }
 

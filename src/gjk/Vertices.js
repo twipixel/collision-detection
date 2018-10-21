@@ -1,3 +1,4 @@
+import Vector from '../Vector';
 
 
 export default class Vertices {
@@ -17,5 +18,13 @@ export default class Vertices {
             vertex.x /= scalar;
             vertex.y /= scalar;
         });
+    }
+
+    clone() {
+        const vertices = [];
+        this.vertices.forEach((vertex, index) => {
+            vertices[index] = vertex.clone();
+        });
+        return vertices;
     }
 }

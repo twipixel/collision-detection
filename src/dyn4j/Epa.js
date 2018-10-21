@@ -57,6 +57,43 @@ export default class Epa {
         let edge = null, point = null;
 
         for (let i = 0; i < this.maxIterations; i++) {
+            edge = smplx.getClosestEdge();
+            point = minkowskiSum.getSupportPoint(edge.normal);
+
+            const projection = point.dot(edge.normal);
+
+            if ((projection - edge.distance) < this.distanceEpsilon) {
+                penetration.normal = edge.normal;
+                penetration.depth = projection;
+                return;
+            }
+
+            smplx.expand(point);
         }
+
+        penetration.normal = edge.normal;
+        penetration.depth = point.dot(edge.normal);
+    }
+
+    getMxItrations() {
+        return this.maxIterations;
+    }
+
+    setMaxIterations(mxIterations) {
+        if (maxIterations < 5) {
+            throw new Error('collision.narrowphase.epa.invalidMaximumIterations');
+        }
+        this.maxIterations = maxIterations;
+    }
+
+    getDistanceEpsilon() {
+        return this.distanceEpsilon;
+    }
+
+    setDistanceEpsilon(distanceEpsilon) {
+        if (distanceEpsilon <= 0) {
+            throw new Error('collision.narrowphase.epa.invalidDistanceEpsilon');
+        }
+        this.distanceEpsilon = distanceEpsilon;
     }
 }

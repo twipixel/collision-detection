@@ -173,7 +173,6 @@ export default class Painter
         graphics.moveTo(movePoint.x, movePoint.y);
         graphics.lineTo(movePoint.x + right.x, movePoint.y + right.y);*/
 
-
         graphics.lineStyle(thickness, color, alpha);
         graphics.moveTo(movePoint.x, movePoint.y);
 

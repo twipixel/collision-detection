@@ -6,12 +6,15 @@ const FONT_SIZE = '9px'
     , SCALE = Consts.SCALE;
 
 export default class Shape extends PIXI.Container {
-    constructor(vertices = []) {
+    constructor(vertices = [], lineColor, lineAlpha = 0.5) {
         super();
-        const color = PastelColor.generate();
+        lineColor = lineColor ? lineColor : PastelColor.generate().hex;
+        lineColor = typeof lineColor === 'number' ? '0x' + lineColor.toString(16) : lineColor;
+        const textColor = lineColor.replace('0x', '#');
         this.vertices = vertices;
-        this.lineColor = color.hex;
-        this.textColor = color.hexShap;
+        this.lineColor = lineColor;
+        this.lineAlpha = lineAlpha;
+        this.textColor = textColor;
         this.graphics = new PIXI.Graphics();
         this.addChild(this.graphics);
         this.labels = this.createLabel();
@@ -40,7 +43,7 @@ export default class Shape extends PIXI.Container {
             , origin = vertices[0];
 
         g.clear();
-        g.lineStyle(1, this.lineColor, 0.5);
+        g.lineStyle(1, this.lineColor, this.lineAlpha);
         g.moveTo(origin.x, origin.y);
         vertices.forEach((vertex, index) => {
             g.lineTo(vertex.x, vertex.y);

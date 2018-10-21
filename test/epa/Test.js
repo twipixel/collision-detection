@@ -6,10 +6,13 @@ import Vertices from '../../src/gjk/Vertices';
 import ConvexHull from '../../src/convexhull/ConvexHull';
 import MinkowskiDifference from '../../src/gjk/MinkowskiDifference';
 import Gjk from '../../src/dyn4j/Gjk';
-import Convex from '../../src/dyn4j/Convex';
+import Epa from '../../src/dyn4j/Epa';
 import Polygon from '../../src/dyn4j/Polygon';
 import KeyCode from "../../src/consts/KeyCode";
-import Penetration from "../../src/dyn4j/Penetration";
+import PastelColor from '../../src/utils/PastelColor';
+import Penetration from '../../src/dyn4j/Penetration';
+import Painter from '../../src/utils/Painter';
+
 
 const TOTAL = 30
     , INTERVAL = 600000
@@ -61,6 +64,8 @@ export default class Test extends PIXI.Container {
 
     initialize() {
         this.shapes = [];
+        this.graphics = new PIXI.Graphics();
+        this.addChild(this.graphics);
         this.display = this.displayCollision.bind(this);
         this.next();
     }
@@ -92,13 +97,17 @@ export default class Test extends PIXI.Container {
         }
         this.removeChild(this.minkowski);
         this.minkowski.destroy();
+
+        this.graphics.clear();
     }
 
     checkCollision() {
         const index1 = Math.floor(Math.random() * triangles.length)
             , index2 = Math.floor(Math.random() * rectangles.length)
             , vertices1 = new Vertices(triangles[index1])
-            , vertices2 = new Vertices(rectangles[index2]);
+            , vertices2 = new Vertices(rectangles[index2])
+            , penetrationColor = 0xFF3300
+            , penetrationAlpha = 0.7;
 
         /*const index1 = Math.floor(Math.random() * errorCase1.length)
             , index2 = Math.floor(Math.random() * errorCase2.length)
@@ -108,18 +117,22 @@ export default class Test extends PIXI.Container {
         vertices1.multiply(SCALE);
         vertices2.multiply(SCALE);
 
-        const shape1 = new Shape(vertices1.vertices, SCALE)
-            , shape2 = new Shape(vertices2.vertices, SCALE);
+        const shape1 = new Shape(vertices1.vertices)
+            , shape2 = new Shape(vertices2.vertices)
+            , shape3 = new Shape(vertices2.clone(), penetrationColor, penetrationAlpha);
+
         this.minkowski = new MinkowskiDifference(vertices1.vertices, vertices2.vertices);
         this.minkowski.x = (STAGE.width / 3) * 2;
         this.minkowski.y = (STAGE.height / 3) * 2;
 
         this.addChild(shape1);
         this.addChild(shape2);
+        this.addChild(shape3);
         this.addChild(this.minkowski);
 
         this.shapes.push(shape1);
         this.shapes.push(shape2);
+        this.shapes.push(shape3);
 
         vertices1.divide(SCALE);
         vertices2.divide(SCALE);
@@ -127,18 +140,29 @@ export default class Test extends PIXI.Container {
         const polygon1 = new Polygon(vertices1.vertices)
             , polygon2 = new Polygon(vertices2.vertices);
 
-        console.log('polygon1', polygon1);
-        console.log('polygon2', polygon2);
-
-
-        const gjk = new Gjk()
+        const gjk = new Gjk(new Epa())
             , penetration = new Penetration()
             , history = new History();
         
-        const isCollision = gjk.detect(polygon1, polygon2, penetration, history);
+        const isCollision = gjk.detect(polygon1, polygon2, penetration, history)
+            , arrow = Vector.multiplyScalar(penetration.normal, penetration.depth).multiplyScalar(SCALE);
 
+        this.graphics.x = this.minkowski.x;
+        this.graphics.y = this.minkowski.y;
+        this.graphics.lineStyle(2, penetrationColor, penetrationAlpha);
+        this.graphics.moveTo(0, 0);
+        this.graphics.lineTo(arrow.x, arrow.y);
+
+        shape3.x = arrow.x;
+        shape3.y = arrow.y;
+        if (!isCollision) {
+            shape3.visible = false;
+        }
+
+        console.log('polygon1', polygon1);
+        console.log('polygon2', polygon2);
         console.log('isCollision', isCollision);
-        console.log('isCollision', isCollision);
+        console.log('penetration', penetration);
     }
 
     next() {
@@ -146,8 +170,8 @@ export default class Test extends PIXI.Container {
             clearInterval(this.intervalId);
         }
 
-        this.displayCollision();
-        this.intervalId = setInterval(this.displayCollision, INTERVAL);
+        this.display();
+        this.intervalId = setInterval(this.display, INTERVAL);
     }
 
     update() {

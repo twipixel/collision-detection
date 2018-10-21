@@ -26,6 +26,7 @@
 import Vector from '../Vector';
 import Epsilon from './Epsilon';
 import MinkowskiSum from './MinkowskiSum';
+import ExpandingSimplex from "./ExpandingSimplex";
 
 const DEFAULT_MAX_ITERATIONS = 30;
 const DEFAULT_DETECT_EPSILON = 0;
@@ -61,7 +62,10 @@ export default class Gjk {
 
         // perform the detection
         if (this.detect2(ms, simplex, direction, history)) {
-            // this.minkowskiPenetrationSolver.getPenetration(simplex, ms, penetration);
+
+            if (this.minkowskiPenetrationSolver) {
+                this.minkowskiPenetrationSolver.getPenetration(simplex, ms, penetration);
+            }
             return true;
         }
 

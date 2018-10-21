@@ -23,7 +23,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import PriorityQueue from 'priorityqueue';
+import PriorityQueue from 'stablepriorityqueue';
 import ExpandingSimplexEdge from './ExpandingSimplexEdge';
 
 
@@ -35,15 +35,24 @@ export default class ExpandingSimplex {
      */
     constructor(simplex) {
         this.winding = this.getWinding(simplex);
-        this.queue = new PriorityQueue();
+
+        this.queue = new PriorityQueue((a, b) => {
+            if (a.distance < b.distance) {
+                return -1;
+            }
+            if (a.distance > b.distance) {
+                return 1;
+            }
+            return 0;
+        });
 
         const size = simplex.length;
         for (let i = 0; i < size; i++) {
             // compute j
             let j = i + 1 == size ? 0 : i + 1;
             // get the points that make up the current edge
-            const a = simplex.get(i)
-                , b = simplex.get(j);
+            const a = simplex[i]
+                , b = simplex[j];
             // create the edge
             this.queue.add(new ExpandingSimplexEdge(a, b, this.winding));
         }
@@ -62,8 +71,8 @@ export default class ExpandingSimplex {
 
         for (let i = 0; i < size; i++) {
             let j = i + 1 === size ? 0 : i + 1;
-            const a = simplex.get(i)
-                , b = simplex.get(j);
+            const a = simplex[i]
+                , b = simplex[j];
 
             if (a.cross(b) > 0) {
                 // 외적을 통해 외적 값이 양수면 반시계 방향

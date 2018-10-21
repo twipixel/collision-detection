@@ -14,7 +14,9 @@
   },
   "author": "",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "stablepriorityqueue": "^0.1.2"
+  },
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-loader": "^6.2.7",
@@ -30,7 +32,6 @@
     "eslint": "^5.6.1",
     "jquery": "^3.1.1",
     "path": "^0.12.7",
-    "priorityqueue": "^0.2.1",
     "raw-loader": "^0.5.1",
     "remove-webpack-plugin": "^1.2.2",
     "webpack": "^1.13.3",
