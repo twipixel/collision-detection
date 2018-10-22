@@ -60,6 +60,7 @@ export default class Epa {
         const smplx = new ExpandingSimplex(simplex);
         let edge = null, point = null;
 
+        console.log('getPenetration', 'smplx.length', smplx.length, smplx);
         for (let i = 0; i < this.maxIterations; i++) {
             edge = smplx.getClosestEdge();
             point = minkowskiSum.getSupportPoint(edge.normal);
