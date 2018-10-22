@@ -45,9 +45,9 @@ export default class Epa {
         this.maxIterations = DEFAULT_MAX_ITERATIONS;
         this.distanceEpsilon = DEFAULT_DISTANCE_EPSILON;
 
-        console.log('EPA');
-        console.log('maxIterations', this.maxIterations);
-        console.log('distanceEpsilon', this.distanceEpsilon);
+        // console.log('EPA');
+        // console.log('maxIterations', this.maxIterations);
+        // console.log('distanceEpsilon', this.distanceEpsilon);
     }
 
     /**
@@ -57,10 +57,16 @@ export default class Epa {
      * @param penetration {Penetration}
      */
     getPenetration(simplex, minkowskiSum, penetration) {
-        const smplx = new ExpandingSimplex(simplex);
+        // ExpadingSimplex를 생성하면 이미 normal 과 depth 를 알고 있는게 아닌가?
+        const smplx = new ExpandingSimplex(simplex)
+            , peek = smplx.queue.peek();
         let edge = null, point = null;
 
-        console.log('getPenetration', 'smplx.length', smplx.length, smplx);
+        console.log('getPenetration', 'smplx.size', smplx.queue.size);
+
+        // 침투 결과는 이미 충돌이 되었을 때 simplex 로 구합니다.
+        // PriorityQueue 로 가장 근전합 Edge 를 알고 있습니다.
+        // 근접한 Edge normal 로 simplex 를 반환합니다.
         for (let i = 0; i < this.maxIterations; i++) {
             edge = smplx.getClosestEdge();
             point = minkowskiSum.getSupportPoint(edge.normal);
@@ -71,6 +77,12 @@ export default class Epa {
             if ((projection - edge.distance) < this.distanceEpsilon) {
                 penetration.normal = edge.normal;
                 penetration.depth = projection;
+
+                console.log('----------------------------------');
+                console.log('penetration', penetration.normal, penetration.depth);
+                console.log('----------------------------------');
+                console.log('peek', peek.normal, peek.distance);
+                console.log('----------------------------------');
                 return;
             }
 
@@ -79,6 +91,12 @@ export default class Epa {
 
         penetration.normal = edge.normal;
         penetration.depth = point.dot(edge.normal);
+
+        console.log('----------------------------------');
+        console.log('penetration', penetration.normal, penetration.depth);
+        console.log('----------------------------------');
+        console.log('peek', peek.normal, peek.distance);
+        console.log('----------------------------------');
     }
 
     getMxItrations() {
