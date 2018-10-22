@@ -104,12 +104,14 @@ export default class Test extends PIXI.Container {
         vertices1.divide(SCALE);
         vertices2.divide(SCALE);
 
-        const collision = GJK.checkCollision(vertices1.vertices, vertices2.vertices);
+        const edge = GJK.getClosestEdge(vertices1.vertices, vertices2.vertices);
+    }
 
-        console.log('');
-        console.log('---------------------------');
-        console.log('COLLISION [', collision, ']');
-        console.log('---------------------------');
+    testClosetPointToOrigin() {
+        // d = 1.71
+        const a = new Vector(-4, -1)
+            , b = new Vector(1, 3);
+        console.log(GJK.closetPointToOrigin(a, b));
     }
 
     next() {

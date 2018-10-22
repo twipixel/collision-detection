@@ -1,6 +1,5 @@
 import Vector from '../Vector';
-import Painter from '../utils/Painter';
-
+import Epsilon from '../dyn4j/Epsilon';
 
 /**
  * GJK Algorithm (Gilbert-Johnson-Keerthi)
@@ -9,6 +8,9 @@ import Painter from '../utils/Painter';
  * https://www.haroldserrano.com/blog/visualizing-the-gjk-collision-algorithm
  * https://github.com/juhl/collision-detection-2d
  */
+
+const TOLERANCE = Math.sqrt(Epsilon.E);
+
 export default class GJK
 {
     /**
@@ -216,6 +218,67 @@ export default class GJK
         }
 
         return false;
+    }
+
+    static getClosestEdge(vertices1, vertices2, history = null)
+    {
+        let c, d, dc, da, distance, p1, p2;
+        const simplex = [];
+        // 두 폴리곤 중심 좌표를 통해서 방향을 구합니다.
+        const position1 = this.averagePoint(vertices1); // not a CoG but
+        const position2 = this.averagePoint(vertices2); // it's ok for GJK )
+
+        // initial direction from the center of 1st body to the center of 2nd body
+        // 방향 vector
+        d = Vector.subtract(position1, position2);
+
+        simplex.push(this.support(vertices1, vertices2, d));
+        simplex.push(this.support(vertices1, vertices2, Vector.negate(d)));
+
+        d = GJK.closetPointToOrigin(simplex[0], simplex[1]).point;
+
+        for (let i = 0; i < 100; i++) {
+            d = Vector.negate(d);
+
+            if(d.isZero()) {
+                return false;
+            }
+
+            c = this.support(vertices1, vertices2, d);
+            dc = c.dot(d);
+            da = simplex[0].dot(d);
+
+            if (dc - da < TOLERANCE) {
+                distance = d.magnitude();
+                return true;
+            }
+
+            p1 = GJK.closetPointToOrigin(simplex[0], c).point;
+            p2 = GJK.closetPointToOrigin(c, simplex[1]).point;
+
+            if (p1.magnitude() < p2.magnitude()) {
+                simplex[1] = c;
+                d = p1;
+            } else {
+                simplex[0] = c;
+                d = p2;
+            }
+        }
+        
+        console.log('d', d);
+    }
+
+    static closetPointToOrigin(a, b)
+    {
+        const ab = a.to(b)
+            , ao = a.to(new Vector())
+            , projAoOntoAb = ao.dot(ab)
+            , lengthSquared = ab.dot(ab)
+            , t = projAoOntoAb / lengthSquared
+            , closetPoint = Vector.multiplyScalar(ab, t).add(a)
+            , d = closetPoint.magnitude();
+
+        return {point: closetPoint, depth: d};
     }
 
 

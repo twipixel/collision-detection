@@ -52,21 +52,29 @@ export default class Epa {
 
     /**
      * 침투 결과를 반환합니다.
+     * 시작점 GJK 의 Simplex 로 시작합니다.
      * @param simplex {Vector[]}
      * @param minkowskiSum {MinkowskiSum}
      * @param penetration {Penetration}
      */
     getPenetration(simplex, minkowskiSum, penetration) {
-        // ExpadingSimplex를 생성하면 이미 normal 과 depth 를 알고 있는게 아닌가?
+        // ExpadingSimplex를 생성하여 Edge 의 normal 과 depth 를 생성합니다.
         const smplx = new ExpandingSimplex(simplex)
             , peek = smplx.queue.peek();
         let edge = null, point = null;
 
         console.log('getPenetration', 'smplx.size', smplx.queue.size);
 
-        // 침투 결과는 이미 충돌이 되었을 때 simplex 로 구합니다.
-        // PriorityQueue 로 가장 근전합 Edge 를 알고 있습니다.
-        // 근접한 Edge normal 로 simplex 를 반환합니다.
+        // GJK 의 충돌 결과의 Simplex 로 시작합니다.
+        // PriorityQueue 로 가장 근접합 Edge 의 normal 로 support 함수를 통해 simplex 를 반환합니다.
+        // simplex를 가장 근접한 Edge normal 에 projection 을 합니다.
+        // 가장 근접한 edge 의 깊이와 투영 거리가 허용 오차 안에 있으면 침투 normal 과 거리를 를 구한 것입니다.
+        // 허용 오차에 있지 않다는 건 Edge 가 볼록하지 않다는 것이여서 볼록하도록 확장합니다.
+        // 확장할 때는 가장 가까운 Edge 사이에 새 점을 추가해야합니다.
+        // 이렇게 하면 모양이 볼록하게 유지됩니다.
+        // 볼록하게 확장 한 후 다시 가장 근접한 Edge 를 구하고
+        // 해당 normal 로 support 함수를 통해 simplex 를 구해서 가장 근접한 Edge 의 깊이와 투영 거리가 오차 안에 있는지 체크
+        // 허용 오차면 해당 Edge normal 과 프로젝션이 침투 거리가 됩니다.
         for (let i = 0; i < this.maxIterations; i++) {
             edge = smplx.getClosestEdge();
             point = minkowskiSum.getSupportPoint(edge.normal);

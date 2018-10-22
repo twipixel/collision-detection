@@ -47,6 +47,8 @@ export default class ExpandingSimplex {
         });
 
         const size = simplex.length;
+
+        console.log('size', size);
         for (let i = 0; i < size; i++) {
             // compute j
             let j = i + 1 == size ? 0 : i + 1;
@@ -56,6 +58,8 @@ export default class ExpandingSimplex {
             // create the edge
             this.queue.add(new ExpandingSimplexEdge(a, b, this.winding));
         }
+
+        console.log('this.queue.size', this.queue.size);
     }
 
 
