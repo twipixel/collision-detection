@@ -44,6 +44,10 @@ export default class Epa {
     constructor() {
         this.maxIterations = DEFAULT_MAX_ITERATIONS;
         this.distanceEpsilon = DEFAULT_DISTANCE_EPSILON;
+
+        console.log('EPA');
+        console.log('maxIterations', this.maxIterations);
+        console.log('distanceEpsilon', this.distanceEpsilon);
     }
 
     /**
@@ -62,6 +66,7 @@ export default class Epa {
 
             const projection = point.dot(edge.normal);
 
+            console.log(i, 'edge.distance:', edge.distance, 'projection', projection, '(projection - edge.distance)', (projection - edge.distance));
             if ((projection - edge.distance) < this.distanceEpsilon) {
                 penetration.normal = edge.normal;
                 penetration.depth = projection;
