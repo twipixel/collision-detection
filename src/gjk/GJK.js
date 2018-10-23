@@ -220,25 +220,25 @@ export default class GJK
         return false;
     }
 
-    static getClosestEdge(vertices1, vertices2, history = null)
+    static getClosetEdge(vertices1, vertices2, history = null)
     {
-        let c, d, dc, da, distance, p1, p2;
         const simplex = [];
+        let c, d, dc, da, distance, p1, p2;
+
         // 두 폴리곤 중심 좌표를 통해서 방향을 구합니다.
         const position1 = this.averagePoint(vertices1); // not a CoG but
         const position2 = this.averagePoint(vertices2); // it's ok for GJK )
 
         // initial direction from the center of 1st body to the center of 2nd body
-        // 방향 vector
         d = Vector.subtract(position1, position2);
 
         simplex.push(this.support(vertices1, vertices2, d));
-        simplex.push(this.support(vertices1, vertices2, Vector.negate(d)));
+        simplex.push(this.support(vertices1, vertices2, d.invert()));
 
-        d = GJK.closetPointToOrigin(simplex[0], simplex[1]).point;
+        d = GJK.getPointOnSegmentClosestToPoint(new Vector(0, 0), simplex[0], simplex[1]);
 
-        for (let i = 0; i < 100; i++) {
-            d = Vector.negate(d);
+        for (let i = 0; i < 30; i++) {
+            d = d.invert();
 
             if(d.isZero()) {
                 return false;
@@ -253,8 +253,8 @@ export default class GJK
                 return true;
             }
 
-            p1 = GJK.closetPointToOrigin(simplex[0], c).point;
-            p2 = GJK.closetPointToOrigin(c, simplex[1]).point;
+            p1 = GJK.getPointOnSegmentClosestToPoint(new Vector(0, 0), simplex[0], c);
+            p2 = GJK.getPointOnSegmentClosestToPoint(new Vector(0, 0), c, simplex[1]);
 
             if (p1.magnitude() < p2.magnitude()) {
                 simplex[1] = c;
@@ -268,7 +268,7 @@ export default class GJK
         console.log('d', d);
     }
 
-    static closetPointToOrigin(a, b)
+    static closestPointToOrigin(a, b)
     {
         const ab = a.to(b)
             , ao = a.to(new Vector())
@@ -279,6 +279,26 @@ export default class GJK
             , d = closetPoint.magnitude();
 
         return {point: closetPoint, depth: d};
+    }
+
+
+    static getPointOnSegmentClosestToPoint(point, linePoint1, linePoint2)
+    {
+        // create a vector from the point to the first line point
+        const p1ToP = Vector.subtract(point, linePoint1)
+            // create a vector representing the line
+            , line = Vector.subtract(linePoint2, linePoint1)
+            // get the length squared of the line
+            , ab2 = line.dot(line)
+            , ap_ab = p1ToP.dot(line);
+
+        if (ab2 <= TOLERANCE) {
+            return linePoint1.clone();
+        }
+
+        let t = ap_ab / ab2;
+        t = clamp(t, 0.0, 1.0);
+        return line.multiplyScalar(t).add(linePoint1);
     }
 
 
@@ -345,6 +365,17 @@ export default class GJK
     static midpoint(a, b)
     {
         return new Vector((a.x + b.x) / 2, (a.y + b.y) / 2);
+    }
+}
+
+
+function clamp(value, min, max) {
+    if (value <= max && value >= min) {
+        return value;
+    } else if (max < value) {
+        return max;
+    } else {
+        return min;
     }
 }
 

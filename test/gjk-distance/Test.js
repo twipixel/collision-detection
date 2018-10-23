@@ -104,14 +104,14 @@ export default class Test extends PIXI.Container {
         vertices1.divide(SCALE);
         vertices2.divide(SCALE);
 
-        const edge = GJK.getClosestEdge(vertices1.vertices, vertices2.vertices);
+        const edge = GJK.getClosetEdge(vertices1.vertices, vertices2.vertices);
     }
 
     testClosetPointToOrigin() {
         // d = 1.71
         const a = new Vector(-4, -1)
             , b = new Vector(1, 3);
-        console.log(GJK.closetPointToOrigin(a, b));
+        console.log(GJK.closestPointToOrigin(a, b));
     }
 
     next() {
