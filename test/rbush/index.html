@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>R-TREE</title>
+    <title>RBUSH</title>
     <style type="text/css">
         :root {
             --bg-color: #33383D;
@@ -28,9 +28,14 @@
     </style>
 </head>
 <body>
+<div id="datGuiHolder" class="datGuiHolder"></div>
+<canvas id="canvas"></canvas>
 <script type="text/javascript" src="./../../external/lib/test.common.js"></script>
 <script>
     (function(){
+
+        addScriptToBodySync('../../external/vendor/pixi.js');
+        addScriptToBodySync('../../external/vendor/animation.js');
         addScriptToBodySync('./../../external/vendor/dat.gui.js');
 
         if (navigator.userAgent.indexOf('Electron') >= 0) {
