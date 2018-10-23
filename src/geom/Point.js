@@ -13,6 +13,8 @@ export default class Point extends PIXI.Graphics
 
         this.x = x;
         this.y = y;
+        this.color = color;
+        this.alpha = alpha;
         this.render(radius, color, alpha);
     }
 

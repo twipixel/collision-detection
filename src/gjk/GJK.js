@@ -1,5 +1,6 @@
 import Vector from '../Vector';
 import Epsilon from '../dyn4j/Epsilon';
+import MinkowskiSumPoint from "./MinkowskiSumPoint";
 
 /**
  * GJK Algorithm (Gilbert-Johnson-Keerthi)
@@ -9,7 +10,9 @@ import Epsilon from '../dyn4j/Epsilon';
  * https://github.com/juhl/collision-detection-2d
  */
 
-const TOLERANCE = Math.sqrt(Epsilon.E);
+const ORIGIN = new Vector(0, 0)
+    , DEFAULT_MAX_ITERATIONS = 30
+    , TOLERANCE = Math.sqrt(Epsilon.E);
 
 export default class GJK
 {
@@ -81,6 +84,21 @@ export default class GJK
         console.log('support(' + str(Vector.subtract(vertices1[i], vertices2[j])) + ')');
         // subtract (Minkowski sum) the two points to see if bodies 'overlap'
         return Vector.subtract(vertices1[i], vertices2[j]);
+    }
+
+
+    static support2(vertices1, vertices2, direction)
+    {
+        // get furthest point of first body along an arbitrary direction
+        const i = this.indexOfFurthestPoint(vertices1, direction);
+
+        // get furthest point of second body along the opposite direction
+        const j = this.indexOfFurthestPoint(vertices2, Vector.negate(direction));
+
+        console.log('d:' + str(direction, true), 'i:' + str(vertices1[i]));
+        console.log('d:' + str(Vector.negate(direction), true), 'j:' + str(vertices2[j]));
+        console.log('support(' + str(Vector.subtract(vertices1[i], vertices2[j])) + ')');
+        return new MinkowskiSumPoint(vertices1[i], vertices2[j]);
     }
 
 
@@ -220,52 +238,176 @@ export default class GJK
         return false;
     }
 
-    static getClosetEdge(vertices1, vertices2, history = null)
+    static distance(vertices1, vertices2, separation = null)
     {
-        const simplex = [];
-        let c, d, dc, da, distance, p1, p2;
+        let a, b, c, d, p1, p2, p1Mag, p2Mag, projection;
 
         // 두 폴리곤 중심 좌표를 통해서 방향을 구합니다.
-        const position1 = this.averagePoint(vertices1); // not a CoG but
-        const position2 = this.averagePoint(vertices2); // it's ok for GJK )
+        const c1 = this.averagePoint(vertices1); // not a CoG but
+        const c2 = this.averagePoint(vertices2); // it's ok for GJK )
 
         // initial direction from the center of 1st body to the center of 2nd body
-        d = Vector.subtract(position1, position2);
+        d = Vector.subtract(c1, c2);
 
-        simplex.push(this.support(vertices1, vertices2, d));
-        simplex.push(this.support(vertices1, vertices2, d.invert()));
+        if (d.isZero()) {
+            return false;
+        }
 
-        d = GJK.getPointOnSegmentClosestToPoint(new Vector(0, 0), simplex[0], simplex[1]);
+        a = this.support2(vertices1, vertices2, d);
+        b = this.support2(vertices1, vertices2, d.invert());
 
-        for (let i = 0; i < 30; i++) {
+        d = GJK.getPointOnSegmentClosestToPoint(ORIGIN, a.point, b.point);
+
+        for (let i = 0; i < DEFAULT_MAX_ITERATIONS; i++) {
             d = d.invert();
 
-            if(d.isZero()) {
+            if(d.lengthSq() <= TOLERANCE) {
+                // if the closest point is the origin then the shapes are not separated
                 return false;
             }
 
-            c = this.support(vertices1, vertices2, d);
-            dc = c.dot(d);
-            da = simplex[0].dot(d);
+            c = this.support2(vertices1, vertices2, d);
 
-            if (dc - da < TOLERANCE) {
-                distance = d.magnitude();
+            if (GJK.containsOrigin(a.point, b.point, c.point)) {
+                // if it does then return false;
+                return false;
+            }
+
+            // see if the new point is far enough along d
+            projection = c.point.dot(d);
+
+            if ((projection - a.point.dot(d)) < TOLERANCE) {
+                // then the new point we just made is not far enough
+                // in the direction of n so we can stop now
+                // normalize d
+                d.normalize();
+
+                separation.normal = d;
+                separation.distance = -c.point.dot(d);
+                GJK.findClosestPoints(a, b, separation);
+
+                console.log('NONO1');
                 return true;
             }
 
-            p1 = GJK.getPointOnSegmentClosestToPoint(new Vector(0, 0), simplex[0], c);
-            p2 = GJK.getPointOnSegmentClosestToPoint(new Vector(0, 0), c, simplex[1]);
+            p1 = GJK.getPointOnSegmentClosestToPoint(ORIGIN, a.point, c.point);
+            p2 = GJK.getPointOnSegmentClosestToPoint(ORIGIN, c.point, b.point);
+            p1Mag = p1.lengthSq();
+            p2Mag = p2.lengthSq();
 
-            if (p1.magnitude() < p2.magnitude()) {
-                simplex[1] = c;
+            if (p1Mag <= TOLERANCE) {
+                d.normalize()();
+                separation.distance = p1.normalize();
+                separation.normal = d;
+                GJK.findClosestPoints(a, c, separation);
+                console.log('NONO2');
+                return true;
+            } else if (p2Mag <= TOLERANCE) {
+                d.normalize();
+                separation.distance = p2.normalize();
+                separation.normal = d;
+                GJK.findClosestPoints(c, b, separation);
+                console.log('NONO3');
+                return true;
+            }
+
+            if (p1Mag < p2Mag) {
+                b = c;
                 d = p1;
             } else {
-                simplex[0] = c;
+                a = c;
                 d = p2;
             }
         }
         
-        console.log('d', d);
+        d.normalize();
+        separation.normal = d;
+        separation.distance = -c.point.dot(d);
+        GJK.findClosestPoints(a, b, separation);
+        console.log('NONO4');
+        return true;
+    }
+
+    /**
+     * Returns true if the origin is within the triangle given by
+     * a, b, and c.
+     * <p>
+     * If the origin lies on the same side of all the points then we
+     * know that the origin is in the triangle.
+     * <pre> sign(location(origin, a, b)) == sign(location(origin, b, c)) == sign(location(origin, c, a))</pre>
+     * The {@link Segment#getLocation(Vector2, Vector2, Vector2)} method
+     * can be simplified because we are using the origin as the search point:
+     * <pre> = (b.x - a.x) * (origin.y - a.y) - (origin.x - a.x) * (b.y - a.y)
+     * = (b.x - a.x) * (-a.y) - (-a.x) * (b.y - a.y)
+     * = -a.y * b.x + a.y * a.x + a.x * b.y - a.x * a.y
+     * = -a.y * b.x + a.x * b.y
+     * = a.x * b.y - a.y * b.x
+     * = a.cross(b)</pre>
+     * @param a the first point
+     * @param b the second point
+     * @param c the third point
+     * @return boolean
+     */
+    static containsOrigin(a, b, c) {
+        const sa = a.cross(b)
+            , sb = b.cross(c)
+            , sc = c.cross(a);
+        return (sa * sb > 0 && sa * sc > 0);
+    }
+
+    /**
+     * Finds the closest points on A and B given the termination simplex and places
+     * them into point1 and point2 of the given {@link Separation} object.
+     * <p>
+     * The support points used to obtain a and b are not good enough since the support
+     * methods of {@link Convex} {@link Shape}s only return the farthest <em>vertex</em>, not
+     * necessarily the farthest point.
+     * @param a the first simplex point
+     * @param b the second simplex point
+     * @param separation the {@link Separation} object to populate
+     * @see <a href="http://www.dyn4j.org/2010/04/gjk-distance-closest-points/" target="_blank">GJK - Distance &amp; Closest Points</a>
+     */
+    static findClosestPoints(a, b, separation)
+    {
+        const p1 = new Vector()
+            , p2 = new Vector()
+            , l = Vector.subtract(a.point, b.point);
+
+        if (l.isZero()) {
+            p1.set(a.supportPoint1);
+            p2.set(a.supportPoint2);
+        } else {
+            const ll = l.dot(l)
+                , l2 = -l.dot(a.point) / ll
+                , l1 = 1 - l2;
+
+            // check if either lambda1 or lambda2 is less than zero
+            if (l1 < 0) {
+                // if lambda1 is less than zero then that means that
+                // the support points of the Minkowski point B are
+                // the closest points
+                p1.set(b.supportPoint1);
+                p2.set(b.supportPoint2);
+            } else if (l2 < 0) {
+                // if lambda2 is less than zero then that means that
+                // the support points of the Minkowski point A are
+                // the closest points
+                p1.set(a.supportPoint1);
+                p2.set(a.supportPoint2);
+            } else {
+                // compute the closest points using lambda1 and lambda2
+                // this is the expanded version of
+                // p1 = a.p1.multiply(l1).add(b.p1.multiply(l2));
+                // p2 = a.p2.multiply(l1).add(b.p2.multiply(l2));
+                p1.x = a.supportPoint1.x * l1 + b.supportPoint1.x * l2;
+                p1.y = a.supportPoint1.y * l1 + b.supportPoint1.y * l2;
+                p2.x = a.supportPoint2.x * l1 + b.supportPoint2.x * l2;
+                p2.y = a.supportPoint2.y * l1 + b.supportPoint2.y * l2;
+            }
+        }
+        // set the new points in the separation object
+        separation.point1 = p1;
+        separation.point2 = p2;
     }
 
     static closestPointToOrigin(a, b)
@@ -282,6 +424,21 @@ export default class GJK
     }
 
 
+    /**
+     * Returns the point on the given line segment closest to the given point.
+     * <p>
+     * If the point closest to the given point is on the line created by the
+     * given line segment, but is not on the line segment then either of the segments
+     * end points will be returned.
+     * <p>
+     * Assumes all points are in world space.
+     * @see Segment#getPointOnLineClosestToPoint(Vector2, Vector2, Vector2)
+     * @param point the point
+     * @param linePoint1 the first point of the line
+     * @param linePoint2 the second point of the line
+     * @return {@link Vector2}
+     * @throws NullPointerException if point, linePoint1, or linePoint2 is null
+     */
     static getPointOnSegmentClosestToPoint(point, linePoint1, linePoint2)
     {
         // create a vector from the point to the first line point

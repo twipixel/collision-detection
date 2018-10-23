@@ -1,8 +1,9 @@
 import Vector from '../../src/Vector';
-import History from '../../src/History';
+import Point from '../../src/geom/Point';
 import Shape from '../../src/gjk/Shape';
 import Consts from '../../src/gjk/Consts';
 import Vertices from '../../src/gjk/Vertices';
+import Separation from '../../src/gjk/Separation';
 import GJK from '../../src/gjk/GJK';
 import ConvexHull from '../../src/convexhull/ConvexHull';
 import MinkowskiDifference from '../../src/gjk/MinkowskiDifference';
@@ -46,6 +47,9 @@ export default class Test extends PIXI.Container {
 
     initialize() {
         this.shapes = [];
+        this.points = [];
+        this.graphics = new PIXI.Graphics();
+        this.addChild(this.graphics);
         this.display = this.displayCollision.bind(this);
         this.next();
     }
@@ -64,19 +68,30 @@ export default class Test extends PIXI.Container {
     }
 
     clear() {
-        this.shapes.forEach((shape) => {
+        this.shapes.forEach(shape => {
             this.removeChild(shape);
             shape.destroy();
+        });
+
+        this.points.forEach(point => {
+            this.removeChild(point);
+            point.destroy();
         });
 
         this.shapes.length = 0;
         this.shapes = [];
 
+        this.points.length = 0;
+        this.points = [];
+
         if (!this.minkowski) {
             return;
         }
+
         this.removeChild(this.minkowski);
         this.minkowski.destroy();
+
+        this.graphics.clear();
     }
 
     checkCollision() {
@@ -104,7 +119,37 @@ export default class Test extends PIXI.Container {
         vertices1.divide(SCALE);
         vertices2.divide(SCALE);
 
-        const edge = GJK.getClosetEdge(vertices1.vertices, vertices2.vertices);
+        const separation = new Separation();
+        const isDistance = GJK.distance(vertices1.vertices, vertices2.vertices, separation);
+
+        if (isDistance) {
+            const p1 = new Point(0, 0, 3)
+                , p2 = new Point(0, 0, 3)
+                , point1 = Vector.multiplyScalar(separation.point1, SCALE)
+                , point2 = Vector.multiplyScalar(separation.point2, SCALE)
+                , arrow = Vector.multiplyScalar(separation.normal, separation.distance).multiplyScalar(SCALE)
+                , direction1 = Vector.add(point1, arrow)
+                , direction2 = Vector.add(point2, arrow);
+
+            p1.x = point1.x;
+            p1.y = point1.y;
+            p2.x = point2.x;
+            p2.y = point2.y;
+            this.addChild(p1);
+            this.addChild(p2);
+            this.points.push(p1);
+            this.points.push(p2);
+
+            this.graphics.lineStyle(2, p1.color, p1.alpha);
+            this.graphics.moveTo(p1.x, p1.y);
+            this.graphics.lineTo(direction1.x, direction1.y);
+            this.graphics.lineStyle(2, p2.color, p2.alpha);
+            this.graphics.moveTo(p2.x, p2.y);
+            this.graphics.lineTo(direction2.x, direction2.y);
+        }
+
+        console.log('distance', isDistance);
+        console.log('separation', separation);
     }
 
     testClosetPointToOrigin() {
@@ -121,8 +166,8 @@ export default class Test extends PIXI.Container {
             clearInterval(this.intervalId);
         }
 
-        this.displayCollision();
-        this.intervalId = setInterval(this.displayCollision, INTERVAL);
+        this.display();
+        this.intervalId = setInterval(this.display, INTERVAL);
     }
 
     update() {}
