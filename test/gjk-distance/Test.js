@@ -143,9 +143,6 @@ export default class Test extends PIXI.Container {
             this.graphics.lineStyle(2, p1.color, p1.alpha);
             this.graphics.moveTo(p1.x, p1.y);
             this.graphics.lineTo(direction1.x, direction1.y);
-            this.graphics.lineStyle(2, p2.color, p2.alpha);
-            this.graphics.moveTo(p2.x, p2.y);
-            this.graphics.lineTo(direction2.x, direction2.y);
         }
 
         console.log('distance', isDistance);

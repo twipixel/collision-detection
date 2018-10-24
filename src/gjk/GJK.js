@@ -285,8 +285,6 @@ export default class GJK
                 separation.normal = d;
                 separation.distance = -c.point.dot(d);
                 GJK.findClosestPoints(a, b, separation);
-
-                console.log('NONO1');
                 return true;
             }
 
@@ -296,18 +294,16 @@ export default class GJK
             p2Mag = p2.lengthSq();
 
             if (p1Mag <= TOLERANCE) {
-                d.normalize()();
+                d.normalize();
                 separation.distance = p1.normalize();
                 separation.normal = d;
                 GJK.findClosestPoints(a, c, separation);
-                console.log('NONO2');
                 return true;
             } else if (p2Mag <= TOLERANCE) {
                 d.normalize();
                 separation.distance = p2.normalize();
                 separation.normal = d;
                 GJK.findClosestPoints(c, b, separation);
-                console.log('NONO3');
                 return true;
             }
 
@@ -324,7 +320,6 @@ export default class GJK
         separation.normal = d;
         separation.distance = -c.point.dot(d);
         GJK.findClosestPoints(a, b, separation);
-        console.log('NONO4');
         return true;
     }
 
