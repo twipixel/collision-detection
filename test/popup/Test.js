@@ -1,7 +1,5 @@
+import { PATH } from './const';
 
-
-const LINE_PATH = [
-];
 
 
 export default class Test extends PIXI.Container {
@@ -18,7 +16,8 @@ export default class Test extends PIXI.Container {
     }
 
     initialize() {
-
+        console.log('PATH', PATH);
+        this.drawLine(PATH[0]);
     }
 
     addEvent() {
@@ -30,5 +29,21 @@ export default class Test extends PIXI.Container {
     resize() {
         this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
     }
+
+    drawLine(str) {
+        const lines = JSON.parse(str);
+
+        console.log('drawLine', str);
+        console.log('lines', lines);
+
+
+        let lineShape;
+
+        lines.forEach(line => {
+           console.log('line', line);
+           lineShape = new Line(line);
+        });
+    }
+
 
 }

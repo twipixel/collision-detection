@@ -130,6 +130,19 @@ export default class Polygon extends Shape
             graphics.lineTo(this.points[i].x, this.points[i].y);
         }
         graphics.lineTo(this.points[0].x, this.points[0].y);
+
+        if (!this.debugPoints) {
+            return;
+        }
+
+        graphics.lineStyle(0.5, 0xff3300);
+        graphics.moveTo(this.debugPoints[0].x, this.debugPoints[0].y);
+
+        for (var j = 0; j < this.debugPoints.length; j++) {
+            graphics.lineTo(this.debugPoints[j].x, this.debugPoints[j].y);
+        }
+
+        graphics.lineTo(this.debugPoints[0].x, this.debugPoints[0].y);
     }
 
 
