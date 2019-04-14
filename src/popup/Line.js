@@ -10,7 +10,8 @@ export default class Line extends PIXI.Graphics {
   }
 
   initialize() {
-    
+    this.beginFill(0x333333);
+    this.moveTo
   }
 
   draw() {

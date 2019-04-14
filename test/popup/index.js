@@ -49,7 +49,9 @@ class Main {
         window.onresize = this.onResize.bind(this);
     }
 
-    onResize() {}
+    onResize() {
+        this.resizeWindow();
+    }
 
     updateLoop (ms) {
         this.update(ms);
