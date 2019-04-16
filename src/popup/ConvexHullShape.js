@@ -1,13 +1,27 @@
-import Vector from '../../src/Vector';
 import Shape from '../../src/sat/Shape';
-import Projection from '../../src/sat/Projection';
-import PointUtil from "../utils/PointUtil";
+import Vector from "../Vector";
+import Projection from "../sat/Projection";
+import PastelColor from "../utils/PastelColor";
 
-
-export default class Popup extends Shape {
+export default class ConvexHullShape extends Shape {
     constructor(points) {
         super();
         this.points = points;
+    }
+
+    draw(graphics) {
+        const g = graphics
+            , p = this.points
+            , total = p.length;
+
+        g.lineStyle(1, PastelColor.generate().hex, 0.5);
+        g.moveTo(p[0].x, p[0].y);
+
+        for (let i = 1, n = total; i < n; i += 1) {
+            g.lineTo(p[i].x, p[i].y);
+        }
+
+        g.lineTo(p[0].x, p[0].y);
     }
 
     /**

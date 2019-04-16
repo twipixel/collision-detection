@@ -5,6 +5,8 @@ import PastelColor from '../../src/utils/PastelColor';
 import Line from '../../src/popup/Line';
 import Popup from '../../src/popup/Popup';
 import KeyCode from "../../src/consts/KeyCode";
+import ConvexHull from "../../src/convexhull/ConvexHull";
+import ConvexHullShape from '../../src/popup/ConvexHullShape';
 
 const STAGE_WIDTH = 4081
   , STAGE_HEIGHT = 3308
@@ -47,6 +49,8 @@ export default class Test extends PIXI.Container {
     this.drawLine();
     this.drawPopup();
     this.drawOutLine();
+
+
     for (let i = 0; i < 10; i += 1) {
       this.checkCollision();
     }
@@ -56,7 +60,6 @@ export default class Test extends PIXI.Container {
     const random = parseInt(Math.random() * PATH_COLLISION.length, 10)
       , last = PATH_COLLISION.length - 1;
 
-    console.log('udpatePasth', random);
     const path = JSON.parse(PATH_COLLISION[random]);
     this.paths = path.lines;
     this.points = path.points;
@@ -127,7 +130,14 @@ export default class Test extends PIXI.Container {
   }
 
   checkCollision() {
+
+    if (this.collisions) {
+      this.convexHullCollision();
+      return;
+    }
+
     const lines = this.lines
+        , collisions = []
       , popup = this.popup
       , popupGraphics = this.popupGraphics;
 
@@ -145,8 +155,29 @@ export default class Test extends PIXI.Container {
         popup.move(dx, dy);
         popupGraphics.x += dx;
         popupGraphics.y += dy;
+          collisions.push(line);
       }
     });
+
+    this.collisions = collisions;
+  }
+
+    convexHullCollision() {
+
+    const collisions = this.collisions;
+        let points = [];
+
+        collisions.map(line => {
+            points = points.concat(line.points);
+        });
+
+      const convexHull = new ConvexHullShape(ConvexHull.generate(points));
+
+      console.log('convexHullCollsion', points);
+      console.log('convexHull', convexHull);
+
+      this.clear();
+      convexHull.draw(this.debugGraphics);
   }
 
   drawOutLine() {
