@@ -121,6 +121,20 @@ export default class PointUtil {
         return point.y;
     }
 
+    static getCenter(points)
+    {
+      const total = points.length,
+        sum = new PIXI.Point();
+
+      for (let i = 0; i < total; i += 1) {
+        const point = points[i];
+        sum.x += point.x;
+        sum.y += point.y;
+      }
+
+      return new PIXI.Point(sum.x / points.length, sum.y / points.length);
+    }
+
 
     /**
      * 포인트로 bounds 를 구합니다.
