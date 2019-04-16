@@ -4,7 +4,6 @@ import PointUtil from '../../src/utils/PointUtil';
 import PastelColor from '../../src/utils/PastelColor';
 import Line from '../../src/popup/Line';
 import Popup from '../../src/popup/Popup';
-import Mouse from "../../src/utils/Mouse";
 import KeyCode from "../../src/consts/KeyCode";
 
 const STAGE_WIDTH = 4081
@@ -64,7 +63,8 @@ export default class Test extends PIXI.Container {
   }
 
   addEvent() {
-    window.addEventListener('keyup', this.onKeyUp.bind(this));
+    this.keyUpListener = this.onKeyUp.bind(this);
+    window.addEventListener('keyup', this.keyUpListener);
   }
 
   resize() {
@@ -191,9 +191,8 @@ export default class Test extends PIXI.Container {
 
   update() {}
 
-  onKeyUp(e) {
-    console.log('onKeyUp', e);
-    switch (e.keyCode) {
+  onKeyUp(key) {
+    switch (key.keyCode) {
       case KeyCode.ESCAPE:
         this.clear();
         console.clear();
