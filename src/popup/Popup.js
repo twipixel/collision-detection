@@ -1,45 +1,12 @@
 import Vector from '../../src/Vector';
 import Shape from '../../src/sat/Shape';
 import Projection from '../../src/sat/Projection';
-import PastelColor from '../../src/utils/PastelColor';
+import PointUtil from "../utils/PointUtil";
 
-export default class Line extends Shape {
-  constructor(line, size = 20) {
+export default class Popup extends Shape {
+  constructor(points) {
     super();
-    this.line = line;
-    // this.color = PastelColor.generate().hex;
-    this.lineWidth = 1;
-    this.color = 0xFFFFFF;
-    this.alpha = 0.8;
-
-    this.a = Vector.fromObject(line.a);
-    this.b = Vector.fromObject(line.b);
-    this.ab = Vector.subtract(this.a, this.b);
-    this.ao = Vector.negate(this.a);
-    this.ap = Vector.tripleProduct(this.ab, this.ao, this.ab).norm().multiplyScalar(size);
-    this.nap = Vector.negate(this.ap);
-
-    this.p1 = new PIXI.Point(this.a.x + this.ap.x, this.a.y + this.ap.y);
-    this.p2 = new PIXI.Point(this.b.x + this.ap.x, this.b.y + this.ap.y);
-    this.p3 = new PIXI.Point(this.b.x + this.nap.x, this.b.y + this.nap.y);
-    this.p4 = new PIXI.Point(this.a.x + this.nap.x, this.a.y + this.nap.y);
-
-    this.points = [this.p1.clone(), this.p2.clone(), this.p3.clone(), this.p4.clone()];
-  }
-
-  draw(graphics) {
-    const g =  graphics
-      , p1 = this.p1
-      , p2 = this.p2
-      , p3 = this.p3
-      , p4 = this.p4;
-
-    g.lineStyle(this.lineWidth, this.color, this.alpha);
-    g.moveTo(p1.x, p1.y);
-    g.lineTo(p2.x, p2.y);
-    g.lineTo(p3.x, p3.y);
-    g.lineTo(p4.x, p4.y);
-    g.lineTo(p1.x, p1.y);
+    this.points = points;
   }
 
   /**

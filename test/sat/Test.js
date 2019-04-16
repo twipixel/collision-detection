@@ -145,7 +145,6 @@ export default class Test extends PIXI.Container {
     this.createPolygon(true);
   }
 
-
   addPolygon(index, useRandomRotate = true) {
     let polygon = new Polygon(this.context);
 

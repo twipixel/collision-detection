@@ -1,7 +1,11 @@
-import { PATH } from './const';
+import { PATH_COLLISION } from './const';
+import Vector from '../../src/Vector';
 import PointUtil from '../../src/utils/PointUtil';
 import PastelColor from '../../src/utils/PastelColor';
 import Line from '../../src/popup/Line';
+import Popup from '../../src/popup/Popup';
+import Mouse from "../../src/utils/Mouse";
+import KeyCode from "../../src/consts/KeyCode";
 
 const STAGE_WIDTH = 4081
   , STAGE_HEIGHT = 3308
@@ -22,30 +26,49 @@ export default class Test extends PIXI.Container {
   }
 
   initialize() {
-    console.log('PATH', PATH.length);
-
     this.debugGraphics = new PIXI.Graphics();
     this.addChild(this.debugGraphics);
 
-    const random = parseInt(Math.random() * PATH.length, 10)
-      , last = PATH.length - 1;
-    const path = JSON.parse(PATH[last]);
-    this.lines = path.lines;
-    this.points = path.points;
+    this.testPath();
+  }
 
+  clear() {
+    if (this.debugGraphics) {
+      this.debugGraphics.clear();
+    }
+
+    if (this.popupGraphics) {
+      this.removeChild(this.popupGraphics);
+    }
+  }
+
+  testPath() {
+    this.clear();
+    this.updatePath();
     this.drawLine();
     this.drawPopup();
     this.drawOutLine();
+    for (let i = 0; i < 10; i += 1) {
+      this.checkCollision();
+    }
+  }
+
+  updatePath() {
+    const random = parseInt(Math.random() * PATH_COLLISION.length, 10)
+      , last = PATH_COLLISION.length - 1;
+
+    console.log('udpatePasth', random);
+    const path = JSON.parse(PATH_COLLISION[random]);
+    this.paths = path.lines;
+    this.points = path.points;
   }
 
   addEvent() {
-  }
-
-  update() {
+    window.addEventListener('keyup', this.onKeyUp.bind(this));
   }
 
   resize() {
-    // this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
+    this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
     const PIXEL_RATIO = window.devicePixelRatio
       , SPACE = 0
       , SCREEN_WIDTH = this.canvas.width / PIXEL_RATIO - SPACE
@@ -59,34 +82,71 @@ export default class Test extends PIXI.Container {
   }
 
   drawLine() {
-    const lines = this.lines
-      , total = this.lines.length
+    const paths = this.paths
+      , total = this.paths.length
       , alpha = 0.8
-      , color = PastelColor.generate().hex;
+      , color = PastelColor.generate().hex
+      , lines = [];
 
     for (let i = 0; i < total; i += 1) {
-      const segement = lines[i]
-        , a = segement.a
-        , b = segement.b
-        , line = new Line(segement, 20);
+      const path = paths[i]
+        , a = path.a
+        , b = path.b
+        , line = new Line(path, 20);
 
       this.debugGraphics.lineStyle(5, color, alpha);
       this.debugGraphics.moveTo(a.x, a.y);
       this.debugGraphics.lineTo(b.x, b.y);
 
       line.draw(this.debugGraphics);
+      lines.push(line);
     }
+
+    this.lines = lines;
   }
 
   drawPopup() {
     const center = PointUtil.getCenter(this.points);
-    const popup = new PIXI.Graphics();
-    popup.beginFill(0x000000, 0.5);
-    popup.drawRect(0, 0, POPUP_WIDTH, POPUP_HEIGHT);
-    popup.endFill();
-    popup.x = center.x - POPUP_WIDTH / 2;
-    popup.y = center.y - POPUP_HEIGHT / 2;
-    this.addChild(popup);
+    const popupGraphics = new PIXI.Graphics();
+    popupGraphics.beginFill(0x000000, 0.5);
+    popupGraphics.drawRect(0, 0, POPUP_WIDTH, POPUP_HEIGHT);
+    popupGraphics.endFill();
+    popupGraphics.x = center.x - POPUP_WIDTH / 2;
+    popupGraphics.y = center.y - POPUP_HEIGHT / 2;
+    this.addChild(popupGraphics);
+
+    const popup = new Popup([
+      new PIXI.Point(center.x - POPUP_WIDTH / 2, center.y - POPUP_HEIGHT / 2),
+      new PIXI.Point(center.x + POPUP_WIDTH / 2, center.y - POPUP_HEIGHT / 2),
+      new PIXI.Point(center.x + POPUP_WIDTH / 2, center.y + POPUP_HEIGHT / 2),
+      new PIXI.Point(center.x - POPUP_WIDTH / 2, center.y + POPUP_HEIGHT / 2)
+    ]);
+
+    this.popup = popup;
+    this.popupGraphics = popupGraphics;
+  }
+
+  checkCollision() {
+    const lines = this.lines
+      , popup = this.popup
+      , popupGraphics = this.popupGraphics;
+
+    lines.forEach(line => {
+      const mtv = popup.collidesWith(line);
+
+      if (mtv.axis != undefined || mtv.overlap !== 0) {
+        if (mtv.axis === undefined) {
+          mtv.axis = new Vector(1, 1);
+        }
+
+        const dx = mtv.axis.x * mtv.overlap
+          , dy = mtv.axis.y * mtv.overlap;
+
+        popup.move(dx, dy);
+        popupGraphics.x += dx;
+        popupGraphics.y += dy;
+      }
+    });
   }
 
   drawOutLine() {
@@ -127,5 +187,20 @@ export default class Test extends PIXI.Container {
     this.addChild(rt);
     this.addChild(rb);
     this.addChild(lb);
+  }
+
+  update() {}
+
+  onKeyUp(e) {
+    console.log('onKeyUp', e);
+    switch (e.keyCode) {
+      case KeyCode.ESCAPE:
+        this.clear();
+        console.clear();
+        break;
+      case KeyCode.SPACE:
+        this.testPath();
+        break;
+    }
   }
 }
