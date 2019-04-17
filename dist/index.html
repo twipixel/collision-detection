@@ -66,47 +66,48 @@
 
 <script>
 
-    (function () {
+  (function () {
 
-        function getFrameWidth() {
-            var nav = document.getElementsByName('nav')[0];
-            return window.innerWidth - nav.offsetWidth;
-        }
+    function getFrameWidth() {
+      var nav = document.getElementsByName('nav')[0];
+      return window.innerWidth - nav.offsetWidth;
+    }
 
-        function getFrameHeight() {
-            const nav = document.getElementsByName('nav')[0];
-            return window.innerHeight - nav.offsetHeight;
-        }
+    function getFrameHeight() {
+      const nav = document.getElementsByName('nav')[0];
+      return window.innerHeight - nav.offsetHeight;
+    }
 
-        var frame, parent = document.getElementsByClassName('canvas')[0];
+    var frame, parent = document.getElementsByClassName('canvas')[0];
 
-        if (navigator.userAgent.indexOf('Electron') >= 0) {
-            frame = document.createElement('webview');
-        } else {
-            frame = document.createElement('iframe');
-        }
+    if (navigator.userAgent.indexOf('Electron') >= 0) {
+      frame = document.createElement('webview');
+    } else {
+      frame = document.createElement('iframe');
+    }
 
-        window.frame = frame;
-        frame.name = 'canvas';
-        frame.className = 'canvas';
-        frame.width = '100%';
-        frame.height = '100%';
-        frame.frameBorder = 0;
-        frame.scrolling = 'no';
-        parent.appendChild(frame);
+    window.frame = frame;
+    frame.id = 'iframe';
+    frame.name = 'canvas';
+    frame.className = 'canvas';
+    frame.width = '100%';
+    frame.height = '100%';
+    frame.frameBorder = 0;
+    frame.scrolling = 'no';
+    parent.appendChild(frame);
 
-        /**
-         * 시작 페이지 설정
-         */
-        // frame.src = "sat/index.html";
-        // frame.src = "triple-product/index.html";
-        // frame.src = "gjk-distance/index.html";
-        // frame.src = "priority-queue/index.html";
-        // frame.src = "epa/index.html";
-        // frame.src = "rbush/index.html";
-        // frame.src = "line/index.html";
-        frame.src = "popup/index.html";
-    }());
+    /**
+     * 시작 페이지 설정
+     */
+    // frame.src = "sat/index.html";
+    // frame.src = "triple-product/index.html";
+    // frame.src = "gjk-distance/index.html";
+    // frame.src = "priority-queue/index.html";
+    // frame.src = "epa/index.html";
+    // frame.src = "rbush/index.html";
+    // frame.src = "line/index.html";
+    frame.src = "popup/index.html";
+  }());
 
 
 </script>
