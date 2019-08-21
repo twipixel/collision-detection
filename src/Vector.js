@@ -716,6 +716,11 @@ export default class Vector
     }
 
 
+  /**
+   * 수선: 어떤 직선이나 평면에 대해 지각을 이루는 직선
+   * @param vec
+   * @returns {*}
+   */
     static perpendicular(vec)
     {
         const clone = vec.clone();
