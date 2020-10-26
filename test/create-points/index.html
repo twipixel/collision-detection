@@ -25,11 +25,20 @@
             height: 100%;
             background: var(--bg-color);
         }
+
+        #canvasContainer {
+            width: 100vw;
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
     </style>
 </head>
 <body>
 <div id="datGuiHolder" class="datGuiHolder"></div>
-<canvas id="canvas"></canvas>
+<div id="canvasContainer">
+    <canvas id="canvas"></canvas>
+</div>
 <script type="text/javascript" src="./../../external/lib/test.common.js"></script>
 <script>
     (function(){
