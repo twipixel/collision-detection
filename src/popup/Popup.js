@@ -99,4 +99,8 @@ export default class Popup extends Shape {
             point.y += dy;
         }
     }
+
+    getPoints() {
+        return this.points.slice();
+    }
 }

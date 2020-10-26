@@ -5,13 +5,13 @@ import PastelColor from '../../src/utils/PastelColor';
 import Line from '../../src/popup/Line';
 import Popup from '../../src/popup/Popup';
 import KeyCode from "../../src/consts/KeyCode";
-import ConvexHull from "../../src/convexhull/ConvexHull";
-import ConvexHullShape from '../../src/popup/ConvexHullShape';
 
 const STAGE_WIDTH = 4081
   , STAGE_HEIGHT = 3308
   , POPUP_WIDTH = 260 + 100
-  , POPUP_HEIGHT = 130 + 100;
+  , POPUP_HEIGHT = 130 + 100
+  , POPUP_COLOR = 0xFF3300
+  , LINE_COLOR = PastelColor.generate().hex;
 
 export default class Test extends PIXI.Container {
   constructor(renderer) {
@@ -28,9 +28,12 @@ export default class Test extends PIXI.Container {
 
   initialize() {
     this.debugGraphics = new PIXI.Graphics();
+    this.popupGraphics = new PIXI.Graphics();
     this.addChild(this.debugGraphics);
+    this.addChild(this.popupGraphics);
+    this.drawOutLine();
 
-    this.testPath();
+    this.test();
   }
 
   clear() {
@@ -39,29 +42,32 @@ export default class Test extends PIXI.Container {
     }
 
     if (this.popupGraphics) {
-      this.removeChild(this.popupGraphics);
+      this.popupGraphics.clear();
     }
   }
 
-  testPath() {
-    this.checkcount = 0;
-
+  test() {
     this.clear();
-    this.updatePath();
+    const points = this.createPoints();
+    this.createPopup(points);
     this.drawLine();
-    this.drawPopup();
-    this.drawOutLine();
 
-    this.checkCollision();
+    let count = 0
+      , limit = 100;
+    while (this.traceCollisions(POPUP_COLOR)) {
+      count = count + 1;
+      if (count > limit) break;
+    }
+    console.log('', );
+    console.log('test', 'count', count);
   }
 
-  updatePath() {
+  createPoints() {
     const random = parseInt(Math.random() * PATH_COLLISION.length, 10)
-      , last = PATH_COLLISION.length - 1;
-
     const path = JSON.parse(PATH_COLLISION[random]);
     this.paths = path.lines;
     this.points = path.points;
+    return this.points.slice();
   }
 
   addEvent() {
@@ -93,7 +99,7 @@ export default class Test extends PIXI.Container {
     const paths = this.paths
       , total = this.paths.length
       , alpha = 0.8
-      , color = PastelColor.generate().hex
+      , color = LINE_COLOR
       , lines = [];
 
     for (let i = 0; i < total; i += 1) {
@@ -113,64 +119,33 @@ export default class Test extends PIXI.Container {
     this.lines = lines;
   }
 
-  redrawLine() {
-    const lines = this.lines
-      , total = this.lines.length
-      , alpha = 0.8
-      , color = PastelColor.generate().hex;
-
-    for (let i = 0; i < total; i += 1) {
-      const line = lines[i]
-        , a = line.a
-        , b = line.b;
-
-      this.debugGraphics.lineStyle(5, color, alpha);
-      this.debugGraphics.moveTo(a.x, a.y);
-      this.debugGraphics.lineTo(b.x, b.y);
-      line.draw(this.debugGraphics);
-      lines.push(line);
-    }
-
-    this.lines = lines;
-  }
-
-  drawPopup() {
-    const center = PointUtil.getCenter(this.points);
+  createPopup(points) {
+    const center = PointUtil.getCenter(points);
     const popupPoints = [
       new PIXI.Point(center.x - POPUP_WIDTH / 2, center.y - POPUP_HEIGHT / 2),
       new PIXI.Point(center.x + POPUP_WIDTH / 2, center.y - POPUP_HEIGHT / 2),
       new PIXI.Point(center.x + POPUP_WIDTH / 2, center.y + POPUP_HEIGHT / 2),
       new PIXI.Point(center.x - POPUP_WIDTH / 2, center.y + POPUP_HEIGHT / 2)
     ];
-
     this.popup = new Popup(popupPoints);
-    const popupGraphics = this.popupGraphics = new PIXI.Graphics();
-    popupGraphics.lineStyle(1, PastelColor.generate().hex, 0.8);
-    popupGraphics.moveTo(0, 0);
-    popupGraphics.lineTo(POPUP_WIDTH, 0);
-    popupGraphics.lineTo(POPUP_WIDTH, POPUP_HEIGHT);
-    popupGraphics.lineTo(0, POPUP_HEIGHT);
-    popupGraphics.lineTo(0, 0);
-    popupGraphics.lineTo(POPUP_WIDTH, POPUP_HEIGHT);
-    popupGraphics.moveTo(POPUP_WIDTH, 0);
-    popupGraphics.lineTo(0, POPUP_HEIGHT);
-    popupGraphics.x = center.x - POPUP_WIDTH / 2;
-    popupGraphics.y = center.y - POPUP_HEIGHT / 2;
-    this.addChild(popupGraphics);
+    this.drawPoints(popupPoints, this.popupGraphics, 10, 0xFFFFFF, 0.5, true);
   }
 
-  checkCollision() {
-    if (this.checkcount > 20) {
-      return;
+  drawPoints(points, graphics, thickness = 1, color = 0xFFFFFF, alpha = 0.8, closedPath = false) {
+    if (!points || points.length === 0) return;
+    const total = points.length
+      , first = points[0];
+    graphics.lineStyle(thickness, color, alpha);
+    graphics.moveTo(first.x, first.y);
+    for (let i = 0; i < total; i += 1) {
+      const { x, y } = points[i];
+      graphics.lineTo(x, y);
     }
+    if (closedPath) graphics.lineTo(first.x, first.y);
+    graphics.endFill();
+  }
 
-    this.checkcount += 1;
-
-    if (this.collisions) {
-      this.checkConvexHullCollision();
-      return;
-    }
-
+  traceCollisions() {
     const lines = this.lines
       , collisions = []
       , popup = this.popup
@@ -183,69 +158,28 @@ export default class Test extends PIXI.Container {
         if (!mtv.axis) {
           mtv.axis = new Vector(1, 1);
         }
-
-        const dx = mtv.axis.x * mtv.overlap
-          , dy = mtv.axis.y * mtv.overlap;
-
-        popup.move(dx, dy);
-        popupGraphics.x += dx;
-        popupGraphics.y += dy;
         collisions.push(line);
       }
     });
 
-    this.collisions = collisions;
-
-    if (collisions) {
-      this.checkCollision();
-    }
-  }
-
-  checkConvexHullCollision() {
-    if (this.checkcount > 20) {
-      return;
-    }
-
-    const collisions = this.collisions;
-    this.collisions = null;
-
-    let points = [];
-    collisions.map(line => {
-      points = points.concat(line.points);
+    collisions.forEach(line => {
+      const mtv = popup.collidesWith(line);
+      if (mtv.overlap !== 0) {
+        if (!mtv.axis) {
+          mtv.axis = new Vector(1, 1);
+        }
+        const dx = mtv.axis.x * mtv.overlap
+          , dy = mtv.axis.y * mtv.overlap;
+        popup.move(dx, dy);
+        this.drawPoints(popup.getPoints(), popupGraphics, 1, POPUP_COLOR, 0.3, true);
+      }
     });
 
-    if (points.length === 0) {
-      return;
+    if (collisions.length === 0) {
+      this.drawPoints(popup.getPoints(), popupGraphics, 10, POPUP_COLOR, 0.8, true);
     }
 
-    const convexHull = new ConvexHullShape(ConvexHull.generate(points));
-
-    if (!convexHull.points || convexHull.points.length === 0) {
-      return;
-    }
-
-    this.debugGraphics.clear();
-    convexHull.draw(this.debugGraphics);
-
-    const popup = this.popup
-      , popupGraphics = this.popupGraphics
-      , mtv = popup.collidesWith(convexHull);
-
-    if (mtv.overlap !== 0) {
-      if (!mtv.axis) {
-        mtv.axis = new Vector(1, 1);
-      }
-
-      const dx = mtv.axis.x * mtv.overlap
-        , dy = mtv.axis.y * mtv.overlap;
-
-      popup.move(dx, dy);
-      popupGraphics.x += dx;
-      popupGraphics.y += dy;
-
-      this.checkCollision();
-    }
-    this.redrawLine();
+    return collisions.length > 0;
   }
 
   drawOutLine() {
@@ -292,7 +226,7 @@ export default class Test extends PIXI.Container {
   }
 
   onMouseDown() {
-    this.testPath();
+    this.test();
   }
 
   onKeyUp() {
@@ -302,7 +236,7 @@ export default class Test extends PIXI.Container {
         console.clear();
         break;
       case KeyCode.SPACE:
-        this.testPath();
+        this.test();
         break;
     }
   }
