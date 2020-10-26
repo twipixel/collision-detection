@@ -43,6 +43,10 @@ export default class Polygon extends Convex {
         this.center = this.getCenter();
     }
 
+    getPoints() {
+        return this.vertices.slice();
+    }
+
     getCenter() {
         const avg = new Vector()
             , vertices = this.vertices

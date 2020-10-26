@@ -1,28 +1,27 @@
+import SubwayLines from '../../src/consts/SubwayLines';
+import PointUtil from '../../src/utils/PointUtil';
 import PastelColor from '../../src/utils/PastelColor';
+import Line from '../../src/popup/Line';
+import Popup from '../../src/popup/Popup';
 import KeyCode from '../../src/consts/KeyCode';
+import Point from '../../src/sat/Point';
+import Points from '../../src/sat/Points';
 import ConvexHull from '../../src/convexhull/ConvexHull';
-import Point from '../../src/line/Point';
-import LineSegment from '../../src/line/LineSegment';
-import LineUtil from '../../src/line/LineUtil';
+import Gjk from '../../src/dyn4j/Gjk';
+import Epa from '../../src/dyn4j/Epa';
+import Penetration from '../../src/dyn4j/Penetration';
+import History from '../../src/History';
+import Polygon from '../../src/dyn4j/Polygon';
 import Vector from '../../src/Vector';
-import History from "../../src/History";
-import Gjk from "../../src/dyn4j/Gjk";
-import Epa from "../../src/dyn4j/Epa";
-import Polygon from "../../src/dyn4j/Polygon";
-import Penetration from "../../src/dyn4j/Penetration";
 
-const POINTS = []
-  , POPUP_POINTS = []
-  , POPUP_LINE_SEGMENT = []
-  , STAGE_WIDTH = 600
-  , STAGE_HEIGHT = 450
-  , POPUP_WIDTH = 105
-  , POPUP_HEIGHT = 52
-  , OUTLINE_COLOR = 0x5A9BEA
-  , CONVEX_HULL_COLOR = 0xFF0000
-  , LINE_COLOR = 0xFF0000
-  , POPUP_COLOR = PastelColor.generate().hex
-  , FIXED_POPUP_COLOR = PastelColor.generate().hex
+const STAGE_WIDTH = 4081
+  , STAGE_HEIGHT = 3308
+  , POPUP_WIDTH = 260 + 150
+  , POPUP_HEIGHT = 130 + 150
+  , POPUP_COLOR = 0xFF3300
+  , LINE_COLOR = PastelColor.generate().hex
+  , LINE_SIZE = 20
+  , SPACE = 5
   , gjk = new Gjk(new Epa())
   , penetration = new Penetration()
   , history = new History();
@@ -41,30 +40,15 @@ export default class Test extends PIXI.Container {
   }
 
   initialize() {
+    this.collisionsPoints = new Points();
     this.debugGraphics = new PIXI.Graphics();
-    this.pointsGraphics = new PIXI.Graphics();
-    this.convexHullGraphics = new PIXI.Graphics();
-    this.convexHullGraphics.y = STAGE_HEIGHT;
+    this.popupGraphics = new PIXI.Graphics();
     this.addChild(this.debugGraphics);
-    this.addChild(this.pointsGraphics);
-    this.addChild(this.convexHullGraphics);
+    this.addChild(this.popupGraphics);
     this.drawOutLine();
 
-    this.pointsPopupGraphics = new PIXI.Graphics();
-    this.convexHullPopupGrahics = new PIXI.Graphics();
-    this.convexHullPopupGrahics.y = STAGE_HEIGHT;
-    this.addChild(this.pointsPopupGraphics);
-    this.addChild(this.convexHullPopupGrahics);
-    this.drawPopup(this.pointsPopupGraphics, true);
-    this.drawPopup(this.convexHullPopupGrahics);
-
-    this.result1 = new PIXI.Graphics();
-    this.result1.x = STAGE_WIDTH;
-    this.result2 = new PIXI.Graphics();
-    this.result2.x = STAGE_WIDTH;
-    this.result2.y = STAGE_HEIGHT;
-    this.addChild(this.result1);
-    this.addChild(this.result2);
+    this.test();
+    this.testPoints();
   }
 
   clear() {
@@ -73,181 +57,54 @@ export default class Test extends PIXI.Container {
     }
 
     if (this.popupGraphics) {
-      this.removeChild(this.popupGraphics);
+      this.popupGraphics.clear();
     }
   }
 
-  addEvent() {
-    this.mouseDownListener = this.onMouseDown.bind(this);
-    this.on('mousedown', this.mouseDownListener);
-  }
+  test() {
+    this.clear();
+    this.collisionsPoints.clear();
+    const points = this.createPoints();
+    this.createPopup(points);
+    this.drawLine();
 
-  resize() {
-    this.hitArea = new PIXI.Rectangle(0, 0, STAGE_WIDTH, STAGE_HEIGHT * 2);
-  }
-
-  drawOutLine() {
-    const graphics = this.outline = new PIXI.Graphics()
-      , w = STAGE_WIDTH
-      , h = STAGE_HEIGHT;
-    graphics.lineStyle(2, OUTLINE_COLOR, 1);
-    graphics.drawRect(0, 0, w * 2, h * 2);
-    graphics.moveTo(0, h);
-    graphics.lineTo(w * 2, h);
-    graphics.moveTo(w, 0);
-    graphics.lineTo(w, h * 2);
-    this.addChild(this.outline);
-  }
-
-  drawPopup(graphics, createPoints = false) {
-    const center = { x: STAGE_WIDTH / 2, y: STAGE_HEIGHT / 2 }
-      , x = graphics.x
-      , y = graphics.y
-      , w = POPUP_WIDTH
-      , h = POPUP_HEIGHT;
-
-    graphics.clear();
-    graphics.lineStyle(1, POPUP_COLOR, 0.8);
-    graphics.moveTo(0, 0);
-    graphics.lineTo(w, 0);
-    graphics.lineTo(w, h);
-    graphics.lineTo(0, h);
-    graphics.lineTo(0, 0);
-    graphics.lineTo(w, h);
-    graphics.moveTo(w, 0);
-    graphics.lineTo(0, h);
-    graphics.x = x + center.x - w / 2;
-    graphics.y = y + center.y - h / 2;
-
-    if (!createPoints) return;
-    const lt = new Point(graphics.x, graphics.y);
-    const rt = new Point(graphics.x + w, graphics.y);
-    const rb = new Point(graphics.x + w, graphics.y + h);
-    const lb = new Point(graphics.x, graphics.y + h );
-    POPUP_POINTS.push(lt.clone());
-    POPUP_POINTS.push(rt.clone());
-    POPUP_POINTS.push(rb.clone());
-    POPUP_POINTS.push(lb.clone());
-    POPUP_LINE_SEGMENT.push(new LineSegment(lt.clone(), rt.clone())); // top line segment
-    POPUP_LINE_SEGMENT.push(new LineSegment(rt.clone(), rb.clone())); // right line segment
-    POPUP_LINE_SEGMENT.push(new LineSegment(rb.clone(), lb.clone())); // bottom line segment
-    POPUP_LINE_SEGMENT.push(new LineSegment(lb.clone(), lt.clone())); // left line segment
-  }
-
-  drawLines() {
-    const graphics = this.pointsGraphics
-      , points = POINTS
-      , total = POINTS.length;
-
-    if (total < 1) return;
-    graphics.clear();
-    graphics.lineStyle(1, LINE_COLOR, 0.8);
-    graphics.moveTo(points[0].x, points[0].y);
-    for (let i = 0; i < total; i += 1) {
-      const { x, y } = points[i];
-      graphics.lineTo(x, y);
-    }
-  }
-
-  drawConvexHull(points, useClear = true, thickness = 1, color = CONVEX_HULL_COLOR, alpha = 1) {
-    if (!points || points.length < 2) return;
-    const clone = points.slice()
-      , convexHull = ConvexHull.generate(clone)
-      , graphics = this.convexHullGraphics;
-
-    if (useClear) graphics.clear();
-    graphics.lineStyle(thickness, color, alpha);
-    graphics.moveTo(convexHull[0].x, convexHull[0].y);
-    for (let i = 1, n = convexHull.length; i < n; i++) {
-      graphics.lineTo(convexHull[i].x, convexHull[i].y);
-    }
-    graphics.lineTo(convexHull[0].x, convexHull[0].y);
-  }
-
-  getIntersections() {
-    const total = POINTS.length;
-    if (total < 2) return null;
-    const popupLineSegments = POPUP_LINE_SEGMENT
-      , points = POINTS.slice()
-      , intersections = [];
-
-    for (let i = 0; i < total - 1; i += 1) {
-      const line = new LineSegment(points[i], points[i + 1]);
-      for (let j = 0; j < 4; j += 1) {
-        const popupLine = popupLineSegments[j]
-          , intersection = LineUtil.intersection(line, popupLine);
-        if (intersection) {
-          intersections.push(points[i], points[i + 1]);
-          break;
-        }
+    let count = 0
+      , limit = 20;
+    while (this.traceCollisions()) {
+      count = count + 1;
+      if (count > limit) {
+        this.moveCollisionsPoints();
+        break;
       }
     }
-    return intersections;
+    console.log('TEST', count);
   }
 
-  drawPoints(points, graphics, thickness = 1, color = 0xFFFFFF, alpha = 1, closePath = false) {
-    if (!points || points.length === 0) return;
-    const total = points.length
-      , first = points[0];
-
-    graphics.lineStyle(thickness, color, alpha);
-    graphics.moveTo(first.x, first.y);
-    for (let i = 1; i < total; i += 1) {
-      const { x, y } = points[i];
-      graphics.lineTo(x, y);
-    }
-    if (closePath) graphics.lineTo(first.x, first.y);
-  }
-
-  // 충돌된 선분만 convexHull 로 생성하여 GJK 적용
-  drawResult1() {
-    if (!this.intersections) return;
-    const lineVertices = this.getVertices(this.intersections)
-      , popupVertices = this.getVertices(POPUP_POINTS);
-    if (!lineVertices || lineVertices.length === 0) return;
-
-    const graphics = this.result1
-      , popupConvexHull = ConvexHull.generate(popupVertices);
-
-    graphics.clear();
-    this.drawPoints(lineVertices, graphics, 1, LINE_COLOR, 0.8, );
-    this.drawPoints(popupConvexHull, graphics, 1, POPUP_COLOR, 0.8, true);
-  }
-
-  drawResult2() {
-    if (!this.intersections) return;
-    const lineVertices = this.getVertices(this.intersections)
-      , popupVertices = this.getVertices(POPUP_POINTS);
-    if (!lineVertices || lineVertices.length === 0) return;
-
-    const graphics = this.result2
-      , lineConvexHull = ConvexHull.generate(lineVertices)
-      , linePolygon = new Polygon(lineConvexHull)
-      , popupConvexHull = ConvexHull.generate(popupVertices)
-      , popupPolygon = new Polygon(popupConvexHull)
+  moveCollisionsPoints() {
+    const graphics = this.popupGraphics
+      , linePolygon = this.getPolygon(this.collisionsPoints.getPoints())
+      , popupPolygon = this.getPolygon(this.initPopupPoints.slice())
       , isCollision = gjk.detect(linePolygon, popupPolygon, penetration, history);
 
-    graphics.clear();
-    this.drawPoints(lineConvexHull, graphics, 1, LINE_COLOR, 0.8, true);
-    this.drawPoints(popupConvexHull, graphics, 1, POPUP_COLOR, 0.8, true);
+    this.drawPoints(linePolygon.getPoints(), graphics, 5, 0x00FFFF, 0.5, true);
 
     if (isCollision) {
-      const movement = Vector.multiplyScalar(penetration.normal, penetration.depth);
-      // 충돌 후 팝업 위치
-      const movedPopup = popupConvexHull.slice().map(({ x, y }) => {
+      const movement = Vector.multiplyScalar(penetration.normal, penetration.depth + LINE_SIZE + SPACE);
+      const movedPopup = popupPolygon.getPoints().map(({ x, y }) => {
         return new Vector(x + movement.x, y + movement.y);
       });
-
-      console.log('movedPopup', movedPopup);
-      this.drawPoints(movedPopup, graphics, 1, FIXED_POPUP_COLOR, 0.8, true);
-      return movedPopup;
+      this.drawPoints(movedPopup, graphics, 10, 0x00FFFF, 0.8, true);
     }
-    return null;
   }
 
-  generateConvexHull(points) {
-    if (!points || points.length === 0) return;
-    const total = points.length;
+  moveFinal() {
+
+  }
+
+  getPolygon(points) {
+    const vertices = this.getVertices(points)
+      , convexHull = ConvexHull.generate(vertices);
+    return new Polygon(convexHull)
   }
 
   getVertices(points) {
@@ -259,46 +116,205 @@ export default class Test extends PIXI.Container {
     return vertices;
   }
 
-  update() {
-    this.drawLines();
-    this.intersections = this.getIntersections();
-    this.drawConvexHull(this.intersections, true, 1, CONVEX_HULL_COLOR, 1);
-    this.drawConvexHull(POINTS, false,1, 0x00FFFF, 0.3);
+  createPoints() {
+    const total = SubwayLines.length
+      , index = parseInt(Math.random() * total, 10)
+      // , index = total - 1
+      , path = JSON.parse(SubwayLines[index]);
 
-    this.drawResult1();
-    const movedPopup = this.drawResult2();
+    console.log('total', total, 'index', index);
+    this.paths = path.lines;
+    this.points = path.points;
+    return this.points.slice();
+  }
 
-    if (movedPopup) {
-      this.drawPoints(movedPopup, this.result1, 1, FIXED_POPUP_COLOR, 0.8, true);
+  addEvent() {
+    // 왜 안될까...
+    document.addEventListener('keypress', (key) => {
+      console.log(key);
+      this.onKeyUp(key);
+    });
+
+    this.mouseDownListener = this.onMouseDown.bind(this);
+    this.on('mousedown', this.mouseDownListener);
+  }
+
+  resize() {
+    this.hitArea = new PIXI.Rectangle(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
+    const PIXEL_RATIO = window.devicePixelRatio
+      , SPACE = 0
+      , SCREEN_WIDTH = this.canvas.width / PIXEL_RATIO - SPACE
+      , SCREEN_HEIGHT = this.canvas.height / PIXEL_RATIO - SPACE
+      , SCALE_X = SCREEN_WIDTH / STAGE_WIDTH
+      , SCALE_Y = SCREEN_HEIGHT / STAGE_HEIGHT;
+
+    // 꾸겨넣기
+    this.scale.x = SCALE_X;
+    this.scale.y = SCALE_Y;
+  }
+
+  drawLine() {
+    const paths = this.paths
+      , total = this.paths.length
+      , alpha = 0.8
+      , color = LINE_COLOR
+      , lines = [];
+
+    for (let i = 0; i < total; i += 1) {
+      const path = paths[i]
+        , a = path.a
+        , b = path.b
+        , line = new Line(path, LINE_SIZE);
+
+      this.debugGraphics.lineStyle(5, color, alpha);
+      this.debugGraphics.moveTo(a.x, a.y);
+      this.debugGraphics.lineTo(b.x, b.y);
+
+      line.draw(this.debugGraphics);
+      lines.push(line);
     }
+
+    this.lines = lines;
   }
 
-  clear() {
-    POINTS.length = 0;
-    this.pointsGraphics.clear();
+  createPopup(points) {
+    const center = PointUtil.getCenter(points);
+    const popupPoints = [
+      new PIXI.Point(center.x - POPUP_WIDTH / 2, center.y - POPUP_HEIGHT / 2),
+      new PIXI.Point(center.x + POPUP_WIDTH / 2, center.y - POPUP_HEIGHT / 2),
+      new PIXI.Point(center.x + POPUP_WIDTH / 2, center.y + POPUP_HEIGHT / 2),
+      new PIXI.Point(center.x - POPUP_WIDTH / 2, center.y + POPUP_HEIGHT / 2)
+    ];
+    this.initPopupPoints = popupPoints.map(({ x, y }) => new Vector(x, y));
+    this.popup = new Popup(popupPoints);
+    this.drawPoints(popupPoints, this.popupGraphics, 10, 0xFFFFFF, 0.5, true);
   }
 
-  export() {
-    console.log('export!');
-    console.log(POINTS);
-    console.log(JSON.stringify({ points: POINTS }));
+  drawPoints(points, graphics, thickness = 1, color = 0xFFFFFF, alpha = 0.8, closedPath = false) {
+    if (!points || points.length === 0) return;
+    const total = points.length
+      , first = points[0];
+    graphics.lineStyle(thickness, color, alpha);
+    graphics.moveTo(first.x, first.y);
+    for (let i = 0; i < total; i += 1) {
+      const { x, y } = points[i];
+      graphics.lineTo(x, y);
+    }
+    if (closedPath) graphics.lineTo(first.x, first.y);
+    graphics.endFill();
   }
 
-  onMouseDown(event) {
-    const { x, y } = event.data.global;
-    POINTS.push({ x, y });
+  traceCollisions() {
+    const lines = this.lines
+      , collisions = []
+      , popup = this.popup
+      , popupGraphics = this.popupGraphics;
+
+    lines.forEach(line => {
+      const mtv = popup.collidesWith(line);
+
+      if (mtv.overlap !== 0) {
+        if (!mtv.axis) {
+          mtv.axis = new Vector(1, 1);
+        }
+        collisions.push(line);
+        const { a, b } = line;
+        this.collisionsPoints.addPoint(new Point(a.x, a.y));
+        this.collisionsPoints.addPoint(new Point(b.x, b.y));
+      }
+    });
+
+    collisions.forEach(line => {
+      const mtv = popup.collidesWith(line);
+      if (mtv.overlap !== 0) {
+        if (!mtv.axis) {
+          mtv.axis = new Vector(1, 1);
+        }
+        const dx = mtv.axis.x * mtv.overlap
+          , dy = mtv.axis.y * mtv.overlap;
+        popup.move(dx, dy);
+        this.drawPoints(popup.getPoints(), popupGraphics, 1, POPUP_COLOR, 0.1, true);
+      }
+    });
+
+    if (collisions.length === 0) {
+      this.drawPoints(popup.getPoints(), popupGraphics, 10, POPUP_COLOR, 0.8, true);
+    }
+
+    return collisions.length > 0;
   }
 
-  onKeyUp(key) {
+  drawOutLine() {
+    this.outline = new PIXI.Graphics();
+    this.outline.lineStyle(2, 0x5A9BEA);
+    this.outline.drawRect(0, 0, 4081, 3308);
+    this.addChild(this.outline);
+
+    const side = 10
+      , x = side
+      , y = side
+      , lt = new PIXI.Graphics()
+      , rt = new PIXI.Graphics()
+      , rb = new PIXI.Graphics()
+      , lb = new PIXI.Graphics();
+
+    lt.beginFill(0xFF3300);
+    rt.beginFill(0xFF3300);
+    rb.beginFill(0xFF3300);
+    lb.beginFill(0xFF3300);
+    lt.drawRect(0, 0, side, side);
+    rt.drawRect(0, 0, side, side);
+    rb.drawRect(0, 0, side, side);
+    lb.drawRect(0, 0, side, side);
+    lt.endFill();
+    rt.endFill();
+    rb.endFill();
+    lb.endFill();
+    lt.x = x;
+    lt.y = y;
+    rt.x = STAGE_WIDTH - x;
+    rt.y = y;
+    rb.x = STAGE_WIDTH - x;
+    rb.y = STAGE_HEIGHT - y;
+    lb.x = x;
+    lb.y = STAGE_HEIGHT - y;
+    this.addChild(lt);
+    this.addChild(rt);
+    this.addChild(rb);
+    this.addChild(lb);
+  }
+
+  update() {
+  }
+
+  testPoints() {
+    const points = new Points([
+      new Point(10, 10),
+      new Point(20, 10),
+      new Point( 30, 10),
+      new Point( 40, 10),
+      new Point(0, 0),
+      new Point(0, 10),
+      new Point(0, 20)
+    ]);
+
+    console.log('points', points.getPoints().length);
+    points.addPoint(new Point(40, 10));
+  }
+
+  onMouseDown() {
+    this.test();
+  }
+
+  onKeyUp() {
     switch (key.keyCode) {
       case KeyCode.ESCAPE:
         this.clear();
+        console.clear();
         break;
       case KeyCode.SPACE:
-      case KeyCode.ENTER:
-        this.export();
+        this.test();
         break;
-
     }
   }
 }

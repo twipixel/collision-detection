@@ -1,4 +1,5 @@
-import { PATH_COLLISION } from './const';
+import { PATH_COLLISION } from '../../src/consts/SubwayLines';
+import SubwayLines from '../../src/consts/SubwayLines';
 import Vector from '../../src/Vector';
 import PointUtil from '../../src/utils/PointUtil';
 import PastelColor from '../../src/utils/PastelColor';
@@ -63,8 +64,10 @@ export default class Test extends PIXI.Container {
   }
 
   createPoints() {
-    const random = parseInt(Math.random() * PATH_COLLISION.length, 10)
-    const path = JSON.parse(PATH_COLLISION[random]);
+    const total = SubwayLines.length
+      , index = parseInt(Math.random() * total, 10)
+      // , index = total - 1
+      , path = JSON.parse(SubwayLines[index]);
     this.paths = path.lines;
     this.points = path.points;
     return this.points.slice();
