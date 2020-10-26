@@ -1,4 +1,3 @@
-import { PATH_COLLISION } from '../../src/consts/SubwayLines';
 import SubwayLines from '../../src/consts/SubwayLines';
 import Vector from '../../src/Vector';
 import PointUtil from '../../src/utils/PointUtil';
@@ -7,7 +6,9 @@ import Line from '../../src/popup/Line';
 import Popup from '../../src/popup/Popup';
 import KeyCode from "../../src/consts/KeyCode";
 
-const STAGE_WIDTH = 4081
+let index = 0;
+const totalSubwayLines = SubwayLines.length
+  , STAGE_WIDTH = 4081
   , STAGE_HEIGHT = 3308
   , POPUP_WIDTH = 260 + 100
   , POPUP_HEIGHT = 130 + 100
@@ -49,25 +50,29 @@ export default class Test extends PIXI.Container {
 
   test() {
     this.clear();
-    const points = this.createPoints();
+    const points = this.createPoints(index);
     this.createPopup(points);
     this.drawLine();
 
+    console.log('test index:', index);
+    index = index + 1;
+    index = index > totalSubwayLines - 1 ? 0 : index;
+
     let count = 0
-      , limit = 100;
+      , limit = 20;
     while (this.traceCollisions(POPUP_COLOR)) {
       count = count + 1;
       if (count > limit) break;
     }
-    console.log('', );
-    console.log('test', 'count', count);
   }
 
-  createPoints() {
-    const total = SubwayLines.length
-      , index = parseInt(Math.random() * total, 10)
-      // , index = total - 1
-      , path = JSON.parse(SubwayLines[index]);
+  createPoints(index) {
+    if (index >= totalSubwayLines) return;
+    // index = parseInt(Math.random() * totalSubwayLines, 10);
+    // index = totalSubwayLines - 1
+    // index = 34
+    const path = JSON.parse(SubwayLines[index]);
+
     this.paths = path.lines;
     this.points = path.points;
     return this.points.slice();

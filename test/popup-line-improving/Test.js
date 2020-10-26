@@ -14,7 +14,9 @@ import History from '../../src/History';
 import Polygon from '../../src/dyn4j/Polygon';
 import Vector from '../../src/Vector';
 
-const STAGE_WIDTH = 4081
+let index = 0;
+const totalSubwayLines = SubwayLines.length
+  , STAGE_WIDTH = 4081
   , STAGE_HEIGHT = 3308
   , POPUP_WIDTH = 260 + 150
   , POPUP_HEIGHT = 130 + 150
@@ -64,9 +66,13 @@ export default class Test extends PIXI.Container {
   test() {
     this.clear();
     this.collisionsPoints.clear();
-    const points = this.createPoints();
+    const points = this.createPoints(index);
     this.createPopup(points);
     this.drawLine();
+
+    console.log('test index:', index);
+    index = index + 1;
+    index = index > totalSubwayLines - 1 ? 0 : index;
 
     let count = 0
       , limit = 20;
@@ -77,7 +83,6 @@ export default class Test extends PIXI.Container {
         break;
       }
     }
-    console.log('TEST', count);
   }
 
   moveCollisionsPoints() {
@@ -116,13 +121,13 @@ export default class Test extends PIXI.Container {
     return vertices;
   }
 
-  createPoints() {
-    const total = SubwayLines.length
-      , index = parseInt(Math.random() * total, 10)
-      // , index = total - 1
-      , path = JSON.parse(SubwayLines[index]);
+  createPoints(index) {
+    if (index >= totalSubwayLines) return;
+    // index = parseInt(Math.random() * totalSubwayLines, 10);
+    // index = totalSubwayLines - 1
+    // index = 34
+    const path = JSON.parse(SubwayLines[index]);
 
-    console.log('total', total, 'index', index);
     this.paths = path.lines;
     this.points = path.points;
     return this.points.slice();
