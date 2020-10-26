@@ -1,8 +1,9 @@
 import PastelColor from '../../src/utils/PastelColor';
-import KeyCode from "../../src/consts/KeyCode";
-import ConvexHull from "../../src/convexhull/ConvexHull";
+import KeyCode from '../../src/consts/KeyCode';
+import ConvexHull from '../../src/convexhull/ConvexHull';
 
 const POINTS = []
+  , POPUP_POINTS = []
   , STAGE_WIDTH = 600
   , STAGE_HEIGHT = 450
   , POPUP_WIDTH = 105
@@ -39,7 +40,7 @@ export default class Test extends PIXI.Container {
     this.convexHullPopupGrahics.y = STAGE_HEIGHT;
     this.addChild(this.pointsPopupGraphics);
     this.addChild(this.convexHullPopupGrahics);
-    this.drawPopup(this.pointsPopupGraphics);
+    this.drawPopup(this.pointsPopupGraphics, true);
     this.drawPopup(this.convexHullPopupGrahics);
   }
 
@@ -69,26 +70,39 @@ export default class Test extends PIXI.Container {
       , w = STAGE_WIDTH
       , h = STAGE_HEIGHT;
     graphics.lineStyle(2, OUTLINE_COLOR, 1);
-    graphics.drawRect(0, 0, w, h * 2);
+    graphics.drawRect(0, 0, w * 2, h * 2);
     graphics.moveTo(0, h);
-    graphics.lineTo(w, h);
+    graphics.lineTo(w * 2, h);
+    graphics.moveTo(w, 0);
+    graphics.lineTo(w, h * 2);
     this.addChild(this.outline);
   }
 
-  drawPopup(graphics) {
-    const center = { x: STAGE_WIDTH / 2, y: STAGE_HEIGHT / 2 };
+  drawPopup(graphics, createPoints = false) {
+    const center = { x: STAGE_WIDTH / 2, y: STAGE_HEIGHT / 2 }
+      , x = graphics.x
+      , y = graphics.y
+      , w = POPUP_WIDTH
+      , h = POPUP_HEIGHT;
+
     graphics.clear();
     graphics.lineStyle(1, PastelColor.generate().hex, 0.8);
     graphics.moveTo(0, 0);
-    graphics.lineTo(POPUP_WIDTH, 0);
-    graphics.lineTo(POPUP_WIDTH, POPUP_HEIGHT);
-    graphics.lineTo(0, POPUP_HEIGHT);
+    graphics.lineTo(w, 0);
+    graphics.lineTo(w, h);
+    graphics.lineTo(0, h);
     graphics.lineTo(0, 0);
-    graphics.lineTo(POPUP_WIDTH, POPUP_HEIGHT);
-    graphics.moveTo(POPUP_WIDTH, 0);
-    graphics.lineTo(0, POPUP_HEIGHT);
-    graphics.x = center.x - POPUP_WIDTH / 2;
-    graphics.y = graphics.y + center.y - POPUP_HEIGHT / 2;
+    graphics.lineTo(w, h);
+    graphics.moveTo(w, 0);
+    graphics.lineTo(0, h);
+    graphics.x = x + center.x - w / 2;
+    graphics.y = y + center.y - h / 2;
+
+    if (!createPoints) return;
+    POPUP_POINTS.push({ x: graphics.x, y: graphics.y });
+    POPUP_POINTS.push({ x: graphics.x + w, y: graphics.y });
+    POPUP_POINTS.push({ x: graphics.x + w, y: graphics.y + h });
+    POPUP_POINTS.push({ x: graphics.x, y: graphics.y + h });
   }
 
   drawPoints() {
