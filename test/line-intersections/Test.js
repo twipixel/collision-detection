@@ -74,9 +74,9 @@ export default class Test extends PIXI.Container {
       , w = STAGE_WIDTH
       , h = STAGE_HEIGHT;
     graphics.lineStyle(2, OUTLINE_COLOR, 1);
-    graphics.drawRect(0, 0, w * 2, h * 2);
+    graphics.drawRect(0, 0, w, h * 2);
     graphics.moveTo(0, h);
-    graphics.lineTo(w * 2, h);
+    graphics.lineTo(w, h);
     graphics.moveTo(w, 0);
     graphics.lineTo(w, h * 2);
     this.addChild(this.outline);

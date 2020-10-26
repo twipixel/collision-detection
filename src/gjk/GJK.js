@@ -79,9 +79,9 @@ export default class GJK
         // get furthest point of second body along the opposite direction
         const j = this.indexOfFurthestPoint(vertices2, Vector.negate(direction));
 
-        console.log('d:' + str(direction, true), 'i:' + str(vertices1[i]));
-        console.log('d:' + str(Vector.negate(direction), true), 'j:' + str(vertices2[j]));
-        console.log('support(' + str(Vector.subtract(vertices1[i], vertices2[j])) + ')');
+        // console.log('d:' + str(direction, true), 'i:' + str(vertices1[i]));
+        // console.log('d:' + str(Vector.negate(direction), true), 'j:' + str(vertices2[j]));
+        // console.log('support(' + str(Vector.subtract(vertices1[i], vertices2[j])) + ')');
         // subtract (Minkowski sum) the two points to see if bodies 'overlap'
         return Vector.subtract(vertices1[i], vertices2[j]);
     }
@@ -95,9 +95,9 @@ export default class GJK
         // get furthest point of second body along the opposite direction
         const j = this.indexOfFurthestPoint(vertices2, Vector.negate(direction));
 
-        console.log('d:' + str(direction, true), 'i:' + str(vertices1[i]));
-        console.log('d:' + str(Vector.negate(direction), true), 'j:' + str(vertices2[j]));
-        console.log('support(' + str(Vector.subtract(vertices1[i], vertices2[j])) + ')');
+        // console.log('d:' + str(direction, true), 'i:' + str(vertices1[i]));
+        // console.log('d:' + str(Vector.negate(direction), true), 'j:' + str(vertices2[j]));
+        // console.log('support(' + str(Vector.subtract(vertices1[i], vertices2[j])) + ')');
         return new MinkowskiSumPoint(vertices1[i], vertices2[j]);
     }
 
@@ -133,14 +133,14 @@ export default class GJK
         // set the first support as initial point of the new simplex
         a = simplex[0] = this.support(vertices1, vertices2, d);
         directions[0] = d;
-        console.log(str(a), str(d, true), Vector.dotProduct(a, d).toFixed(2));
+        // console.log(str(a), str(d, true), Vector.dotProduct(a, d).toFixed(2));
 
         // support 점과 방향이 같은 방향이 아닐 경우
         if (a.dot(d) <= 0) {
             // 마지막에 추가 된 점이 d의 방향으로 원점을 지나치지 않은 경우
             // 그 다음 Minkowski 합은 원점을 포함 할 수 없습니다.
             // 추가 된 마지막 점은 Minkowski Difference의 가장자리에 있습니다.
-            console.log('       CASE1[', 'NO', ']');
+            // console.log('       CASE1[', 'NO', ']');
 
             if (history) {
                 history.setHistory(simplex, directions);
@@ -154,15 +154,15 @@ export default class GJK
         while (true) {
             iterCount++;
 
-            console.log('');
-            console.log(iterCount);
+            // console.log('');
+            // console.log(iterCount);
 
             a = simplex[++index] = this.support(vertices1, vertices2, d);
             directions[index] = d;
 
             if (Vector.dotProduct(a, d) <= 0) {
-                console.log(str(a), str(d, true), Vector.dotProduct(a, d).toFixed(2));
-                console.log('       CASE2[', 'NO', ']');
+                // console.log(str(a), str(d, true), Vector.dotProduct(a, d).toFixed(2));
+                // console.log('       CASE2[', 'NO', ']');
 
                 if (history) {
                     history.setHistory(simplex, directions);
@@ -195,22 +195,22 @@ export default class GJK
             //ac와 수직
             acperp = Vector.tripleProduct(ab, ac, ac);
 
-            console.log('a', a, 'b', b, 'c', c);
-            console.log('ao', ao, 'ab', ab, 'ac', ac);
-            console.log('acperp', acperp, acperp.clone().norm());
-            console.log('dotProduct(acperp, ao)', Vector.dotProduct(acperp, ao));
+            // console.log('a', a, 'b', b, 'c', c);
+            // console.log('ao', ao, 'ab', ab, 'ac', ac);
+            // console.log('acperp', acperp, acperp.clone().norm());
+            // console.log('dotProduct(acperp, ao)', Vector.dotProduct(acperp, ao));
 
             // ac 수직 선분이 a가 원점을 향하는 방향 반대편에 있고
             // 즉, ac 수직 선분 안쪽에 원점이 있으면
             if (Vector.dotProduct(acperp, ao) >= 0) {
                 d = acperp; // new direction is normal to AC towards Origin
-                console.log('new direction is normal to AC towards Origin', d);
+                // console.log('new direction is normal to AC towards Origin', d);
             }
             else {
                 // ab 수직 선분
                 abperp = Vector.tripleProduct(ac, ab, ab);
-                console.log('abperp', abperp, abperp.clone().norm());
-                console.log('dotProduct(abperp, ao)', Vector.dotProduct(abperp, ao));
+                // console.log('abperp', abperp, abperp.clone().norm());
+                // console.log('dotProduct(abperp, ao)', Vector.dotProduct(abperp, ao));
 
                 // ab 수직 선분이 원점 반대 방향을 향하고 있으면
                 // 즉, 원점이 삼각형 안에 있으면
@@ -315,7 +315,7 @@ export default class GJK
                 d = p2;
             }
         }
-        
+
         d.normalize();
         separation.normal = d;
         separation.distance = -c.point.dot(d);

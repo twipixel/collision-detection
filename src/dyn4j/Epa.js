@@ -63,7 +63,7 @@ export default class Epa {
             , peek = smplx.queue.peek();
         let edge = null, point = null;
 
-        console.log('getPenetration', 'smplx.size', smplx.queue.size);
+        // console.log('getPenetration', 'smplx.size', smplx.queue.size);
 
         // GJK 의 충돌 결과의 Simplex 로 시작합니다.
         // PriorityQueue 로 가장 근접합 Edge 의 normal 로 support 함수를 통해 simplex 를 반환합니다.
@@ -81,16 +81,16 @@ export default class Epa {
 
             const projection = point.dot(edge.normal);
 
-            console.log(i, 'edge.distance:', edge.distance, 'projection', projection, '(projection - edge.distance)', (projection - edge.distance));
+            // console.log(i, 'edge.distance:', edge.distance, 'projection', projection, '(projection - edge.distance)', (projection - edge.distance));
             if ((projection - edge.distance) < this.distanceEpsilon) {
                 penetration.normal = edge.normal;
                 penetration.depth = projection;
 
-                console.log('----------------------------------');
-                console.log('penetration', penetration.normal, penetration.depth);
-                console.log('----------------------------------');
-                console.log('peek', peek.normal, peek.distance);
-                console.log('----------------------------------');
+                // console.log('----------------------------------');
+                // console.log('penetration', penetration.normal, penetration.depth);
+                // console.log('----------------------------------');
+                // console.log('peek', peek.normal, peek.distance);
+                // console.log('----------------------------------');
                 return;
             }
 
@@ -100,11 +100,11 @@ export default class Epa {
         penetration.normal = edge.normal;
         penetration.depth = point.dot(edge.normal);
 
-        console.log('----------------------------------');
-        console.log('penetration', penetration.normal, penetration.depth);
-        console.log('----------------------------------');
-        console.log('peek', peek.normal, peek.distance);
-        console.log('----------------------------------');
+        // console.log('----------------------------------');
+        // console.log('penetration', penetration.normal, penetration.depth);
+        // console.log('----------------------------------');
+        // console.log('peek', peek.normal, peek.distance);
+        // console.log('----------------------------------');
     }
 
     getMxItrations() {
