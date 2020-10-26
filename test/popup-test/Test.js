@@ -1,17 +1,12 @@
-import Vector from '../../src/Vector';
-import PointUtil from '../../src/utils/PointUtil';
 import PastelColor from '../../src/utils/PastelColor';
-import Line from '../../src/popup/Line';
-import Popup from '../../src/popup/Popup';
 import KeyCode from "../../src/consts/KeyCode";
 import ConvexHull from "../../src/convexhull/ConvexHull";
-import ConvexHullShape from '../../src/popup/ConvexHullShape';
 
 const POINTS = []
-  , STAGE_WIDTH = 1024
-  , STAGE_HEIGHT = 768
-  , POPUP_WIDTH = 260
-  , POPUP_HEIGHT = 130
+  , STAGE_WIDTH = 600
+  , STAGE_HEIGHT = 450
+  , POPUP_WIDTH = 105
+  , POPUP_HEIGHT = 52
   , OUTLINE_COLOR = 0x5A9BEA
   , CONVEX_HULL_COLOR = 0xFF0000
   , LINE_COLOR = 0xFF0000;
@@ -38,7 +33,14 @@ export default class Test extends PIXI.Container {
     this.addChild(this.pointsGraphics);
     this.addChild(this.convexHullGraphics);
     this.drawOutLine();
-    this.drawPopup();
+
+    this.pointsPopupGraphics = new PIXI.Graphics();
+    this.convexHullPopupGrahics = new PIXI.Graphics();
+    this.convexHullPopupGrahics.y = STAGE_HEIGHT;
+    this.addChild(this.pointsPopupGraphics);
+    this.addChild(this.convexHullPopupGrahics);
+    this.drawPopup(this.pointsPopupGraphics);
+    this.drawPopup(this.convexHullPopupGrahics);
   }
 
   clear() {
@@ -73,9 +75,9 @@ export default class Test extends PIXI.Container {
     this.addChild(this.outline);
   }
 
-  drawPopup() {
-    const center = { x: STAGE_WIDTH / 2, y: STAGE_HEIGHT / 2 }
-      , graphics = this.popupGraphics = new PIXI.Graphics();
+  drawPopup(graphics) {
+    const center = { x: STAGE_WIDTH / 2, y: STAGE_HEIGHT / 2 };
+    graphics.clear();
     graphics.lineStyle(1, PastelColor.generate().hex, 0.8);
     graphics.moveTo(0, 0);
     graphics.lineTo(POPUP_WIDTH, 0);
@@ -86,8 +88,7 @@ export default class Test extends PIXI.Container {
     graphics.moveTo(POPUP_WIDTH, 0);
     graphics.lineTo(0, POPUP_HEIGHT);
     graphics.x = center.x - POPUP_WIDTH / 2;
-    graphics.y = center.y - POPUP_HEIGHT / 2;
-    this.addChild(graphics);
+    graphics.y = graphics.y + center.y - POPUP_HEIGHT / 2;
   }
 
   drawPoints() {
