@@ -4,7 +4,7 @@
  *
  * License:
  *
- * Permission is hereby granted, free of charge, to any person 
+ * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation files
  * (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge,
@@ -68,10 +68,10 @@ function getPolygonPointClosestToCircle(polygon, circle) {
        length,
        testPoint,
        closestPoint;
-   
+
    for (var i=0; i < polygon.points.length; ++i) {
       testPoint = polygon.points[i];
-      length = Math.sqrt(Math.pow(testPoint.x - circle.x, 2), 
+      length = Math.sqrt(Math.pow(testPoint.x - circle.x, 2),
                          Math.pow(testPoint.y - circle.y, 2));
       if (length < min) {
          min = length;
@@ -132,7 +132,7 @@ function getMTV(shape1, shape2, displacement, axes) {
       else {
          if (overlap < minimumOverlap) {
             minimumOverlap = overlap;
-            axisWithSmallestOverlap = axis;    
+            axisWithSmallestOverlap = axis;
          }
       }
    }
@@ -157,7 +157,7 @@ var Point = function (x, y) {
 Point.prototype = {
    rotate: function (rotationPoint, angle) {
       var tx, ty, rx, ry;
-   
+
       tx = this.x - rotationPoint.x; // tx = translated X
       ty = this.y - rotationPoint.y; // ty = translated Y
 
@@ -167,7 +167,7 @@ Point.prototype = {
       ry = tx * Math.sin(-angle) + // ry = rotated Y
            ty * Math.cos(-angle);
 
-      return new Point(rx + rotationPoint.x, ry + rotationPoint.y); 
+      return new Point(rx + rotationPoint.x, ry + rotationPoint.y);
    }
 };
 
@@ -203,7 +203,7 @@ Line.prototype.intersectionPoint = function (line) {
    }
    return ip;
 };
-   
+
 // Bounding boxes................................................
 
 var BoundingBox = function(left, top, width, height) {
@@ -238,7 +238,7 @@ Vector.prototype = {
       this.x = uv.x * m;
       this.y = uv.y * m;
    },
-   
+
    dotProduct: function (vector) {
       return this.x * vector.x +
              this.y * vector.y;
@@ -326,7 +326,7 @@ Shape.prototype = {
    collidesWith: function (shape, displacement) {
       throw 'collidesWith(shape, displacement) not implemented';
    },
-   
+
    isPointInPath: function (context, x, y) {
       this.createPath(context);
       return context.isPointInPath(x, y);
@@ -374,7 +374,7 @@ Circle.prototype.createPath = function (context) {
    context.beginPath();
    context.arc(this.x, this.y, this.radius, 0, Math.PI*2, false);
 };
-   
+
 Circle.prototype.project = function (axis) {
    var scalars = [],
        point = new Point(this.x, this.y);
@@ -396,7 +396,7 @@ Circle.prototype.collidesWith = function (shape, displacement) {
       return circleCollidesWithCircle(this, shape, displacement);
    }
 };
-   
+
 
 // Polygons......................................................
 
@@ -410,7 +410,7 @@ Polygon.prototype = new Shape();
 
 Polygon.prototype.getAxes = function () {
    var v1, v2, surfaceVector, axes = [], pushAxis = true;
-      
+
    for (var i=0; i < this.points.length-1; i++) {
       v1 = new Vector(this.points[i]);
       v2 = new Vector(this.points[i+1]);
@@ -440,11 +440,11 @@ Polygon.prototype.addPoint = function (x, y) {
 Polygon.prototype.createPath = function (context) {
    if (this.points.length === 0)
       return;
-      
+
    context.beginPath();
    context.moveTo(this.points[0].x,
                   this.points[0].y);
-         
+
    for (var i=0; i < this.points.length; ++i) {
       context.lineTo(this.points[i].x,
                      this.points[i].y);
@@ -452,7 +452,7 @@ Polygon.prototype.createPath = function (context) {
 
    context.closePath();
 };
-   
+
 Polygon.prototype.move = function (dx, dy) {
    var point, x;
    for(var i=0; i < this.points.length; ++i) {
@@ -463,7 +463,7 @@ Polygon.prototype.move = function (dx, dy) {
 };
 
 Polygon.prototype.collidesWith = function (shape, displacement) {
-   if (shape.radius !== undefined) {
+   if (shape.radius) {
       return polygonCollidesWithCircle(this, shape, displacement);
    }
    else {
@@ -501,7 +501,7 @@ Polygon.prototype.boundingBox = function (dx, dy) {
 
 Polygon.prototype.centroid = function () {
    var pointSum = new Point(0,0);
-   
+
    for (var i=0, point; i < this.points.length; ++i) {
       point = this.points[i];
       pointSum.x += point.x;
@@ -528,7 +528,7 @@ Projection.prototype = {
 
       if (!this.overlaps(projection))
          return 0;
-      
+
       if (this.max > projection.max) {
          overlap = projection.max - this.min;
       }
@@ -583,7 +583,7 @@ ImageShape.prototype.drawImage = function (context) {
 
 ImageShape.prototype.stroke = function (context) {
    var self = this;
-   
+
    if (this.imageLoaded) {
       context.drawImage(this.image, this.points[0].x, this.points[0].y);
    }

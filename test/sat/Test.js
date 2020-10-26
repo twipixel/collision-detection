@@ -46,7 +46,7 @@ export default class Test extends PIXI.Container {
 
     this.mouseDownPoint = new PIXI.Point(0, 0);
     this.lastdrag = new PIXI.Point(0, 0);
-    this.shapeBeingDragged = undefined;
+    this.shapeBeingDragged = null;
 
     //this.createPolygon();
     this.createPolygonManual();
@@ -208,7 +208,7 @@ export default class Test extends PIXI.Container {
    */
   collisionDetected(mtv) {
     // 충돌 판정
-    if (mtv.axis != undefined || mtv.overlap !== 0) {
+    if (mtv.axis || mtv.overlap !== 0) {
       return true;
     }
     return false;
@@ -216,7 +216,7 @@ export default class Test extends PIXI.Container {
 
 
   checkMTVAxisDirection(mtv, collider, collidee) {
-    if (mtv.axis === undefined)
+    if (!mtv.axis)
       return;
 
     let colliderCenter = Vector.fromObject(collider.getCenter()),
@@ -238,7 +238,7 @@ export default class Test extends PIXI.Container {
    * @param collidee 충돌을 당한 객체
    */
   moveShapeByMTV(mtv, collider, collidee) {
-    if (mtv.axis === undefined) {
+    if (!mtv.axis) {
       mtv.axis = new Vector(1, 1);
     }
 
@@ -371,7 +371,7 @@ export default class Test extends PIXI.Container {
 
   onMouseUp() {
     debugGraphics.clear();
-    this.shapeBeingDragged = undefined;
+    this.shapeBeingDragged = null;
   }
 
 

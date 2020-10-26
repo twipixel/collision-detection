@@ -42,7 +42,7 @@ export default class Polygon extends Shape
      */
     collidesWith(shape)
     {
-        if (shape.radius !== undefined) {
+        if (shape.radius) {
             return this.polygonCollidesWithCircle(this, shape);
         }
         else {
@@ -56,7 +56,7 @@ export default class Polygon extends Shape
     {
         var axes = shape.getAxes();
 
-        if (axes === undefined) {
+        if (!axes) {
             return shape.polygonCollidesWithCircle(this, shape);
         }
         else {

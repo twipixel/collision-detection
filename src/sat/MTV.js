@@ -6,7 +6,7 @@ export default class MTV
      * @param axis
      * @param overlap
      */
-    constructor(overlap = undefined, axis = undefined)
+    constructor(overlap = null, axis = null)
     {
         this.axis = axis;
         this.overlap = overlap;

@@ -4,7 +4,7 @@
  *
  * License:
  *
- * Permission is hereby granted, free of charge, to any person 
+ * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation files
  * (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge,
@@ -86,7 +86,7 @@ function drawShapes() {
 function separate(mtv) {
    var dx, dy, velocityMagnitude, point;
 
-   if (mtv.axis === undefined) {
+   if (!mtv.axis) {
       point = new Point();
       velocityMagnitude = Math.sqrt(Math.pow(velocity.x, 2) +
                                     Math.pow(velocity.y, 2));
@@ -97,9 +97,9 @@ function separate(mtv) {
        console.log(point);
       mtv.axis = new Vector(point);
    }
-   
+
    dy = mtv.axis.y * mtv.overlap;
-   dx = mtv.axis.x * mtv.overlap 
+   dx = mtv.axis.x * mtv.overlap;
 
    if ((dx < 0 && velocity.x < 0) ||
        (dx > 0 && velocity.x > 0)) {
@@ -110,7 +110,7 @@ function separate(mtv) {
        (dy > 0 && velocity.y > 0)) {
       dy = -dy;
    }
-      
+
    shapeMoving.move(dx, dy);
 }
 
@@ -119,7 +119,7 @@ function checkMTVAxisDirection(mtv, collider, collidee) {
 
    if (mtv.axis === undefined)
       return;
-   
+
    centroid1 = new Vector(collider.getCenter()),
    centroid2 = new Vector(collidee.getCenter()),
    centroidVector = centroid2.subtract(centroid1),
@@ -138,7 +138,7 @@ function bounce(mtv, collider, collidee) {
        velocityUnitVector = velocityVector.normalize(),
        velocityVectorMagnitude = velocityVector.getMagnitude(),
        perpendicular;
-       
+
    if (shapeMoving) {
       checkMTVAxisDirection(mtv, collider, collidee)
 
@@ -174,7 +174,7 @@ function handleEdgeCollisions() {
    var bbox = shapeMoving.boundingBox(),
        right = bbox.left + bbox.width,
        bottom = bbox.top + bbox.height;
-      
+
    if (right > canvas.width || bbox.left < 0) {
       velocity.x = -velocity.x;
 
@@ -196,7 +196,7 @@ function handleEdgeCollisions() {
 
 function handleShapeCollisions() {
    var mtv;
-   
+
    shapes.forEach( function (shape) {
       if (shape !== shapeMoving) {
          mtv = shapeMoving.collidesWith(shape);
@@ -222,16 +222,16 @@ canvas.onmousedown = function (e) {
 
    if (showInstructions)
       showInstructions = false;
-   
+
    velocity.x = lastVelocity.x;
    velocity.y = lastVelocity.y;
 
    shapeMoving = undefined;
-   
+
    shapes.forEach( function (shape) {
       if (shape.isPointInPath(context, location.x, location.y)) {
          shapeMoving = shape;
-      }   
+      }
    });
 };
 
@@ -251,7 +251,7 @@ function animate(time) {
    else {
      context.clearRect(0,0,canvas.width,canvas.height);
      drawGrid('lightgray', 10, 10);
-   
+
      if (shapeMoving !== undefined) {
         elapsedTime = parseFloat(time - lastTime) / 1000;
         shapeMoving.move(velocity.x * elapsedTime,
@@ -259,7 +259,7 @@ function animate(time) {
 
         detectCollisions();
      }
-      
+
      drawShapes();
      lastTime = time;
 
@@ -280,7 +280,7 @@ function drawGrid(color, stepx, stepy) {
    context.shadowBlur = 0;;
    context.shadowOffsetX = 0;
    context.shadowOffsetY = 0;
-   
+
    context.strokeStyle = color;
    context.fillStyle = '#ffffff';
    context.lineWidth = 0.5;

@@ -179,8 +179,8 @@ export default class Test extends PIXI.Container {
     lines.forEach(line => {
       const mtv = popup.collidesWith(line);
 
-      if (mtv.axis != undefined || mtv.overlap !== 0) {
-        if (mtv.axis === undefined) {
+      if (mtv.overlap !== 0) {
+        if (!mtv.axis) {
           mtv.axis = new Vector(1, 1);
         }
 
@@ -231,8 +231,8 @@ export default class Test extends PIXI.Container {
       , popupGraphics = this.popupGraphics
       , mtv = popup.collidesWith(convexHull);
 
-    if (mtv.axis != undefined || mtv.overlap !== 0) {
-      if (mtv.axis === undefined) {
+    if (mtv.overlap !== 0) {
+      if (!mtv.axis) {
         mtv.axis = new Vector(1, 1);
       }
 

@@ -30,7 +30,7 @@ export default class Circle extends Shape
 
     collidesWith(shape)
     {
-        if (shape.radius === undefined) {
+        if (shape.radius) {
             return this.polygonCollidesWithCircle(shape, this);
         }
         else {
@@ -129,7 +129,7 @@ export default class Circle extends Shape
 
     getAxes()
     {
-        return undefined;
+        return null;
     }
 
 

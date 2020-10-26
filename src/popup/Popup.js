@@ -33,7 +33,7 @@ export default class Popup extends Shape {
      * @returns {*}
      */
     collidesWith(shape) {
-        if (shape.radius !== undefined) {
+        if (shape.radius) {
             return this.polygonCollidesWithCircle(this, shape);
         }
         else {
