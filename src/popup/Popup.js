@@ -10,6 +10,10 @@ export default class Popup extends Shape {
         this.points = points;
     }
 
+    setPoints(points) {
+        this.points = points;
+    }
+
     /**
      * 중점 좌표
      * @returns {PIXI.Point|*|svg.Point}

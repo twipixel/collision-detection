@@ -75,7 +75,7 @@ export default class Test extends PIXI.Container {
     index = index > totalSubwayLines - 1 ? 0 : index;
 
     let count = 0
-      , limit = 20;
+      , limit = 3;
     while (this.traceCollisions()) {
       count = count + 1;
       if (count > limit) {
@@ -83,6 +83,48 @@ export default class Test extends PIXI.Container {
         break;
       }
     }
+
+    console.log('count', count);
+  }
+
+  traceCollisions() {
+    const lines = this.lines
+      , collisions = []
+      , popup = this.popup
+      , popupGraphics = this.popupGraphics;
+
+    lines.forEach(line => {
+      const mtv = popup.collidesWith(line);
+
+      if (mtv.overlap !== 0) {
+        if (!mtv.axis) {
+          mtv.axis = new Vector(1, 1);
+        }
+        collisions.push(line);
+        const { a, b } = line;
+        this.collisionsPoints.addPoint(new Point(a.x, a.y));
+        this.collisionsPoints.addPoint(new Point(b.x, b.y));
+      }
+    });
+
+    collisions.forEach(line => {
+      const mtv = popup.collidesWith(line);
+      if (mtv.overlap !== 0) {
+        if (!mtv.axis) {
+          mtv.axis = new Vector(1, 1);
+        }
+        const dx = mtv.axis.x * mtv.overlap
+          , dy = mtv.axis.y * mtv.overlap;
+        popup.move(dx, dy);
+        this.drawPoints(popup.getPoints(), popupGraphics, 1, POPUP_COLOR, 0.1, true);
+      }
+    });
+
+    if (collisions.length === 0) {
+      this.drawPoints(popup.getPoints(), popupGraphics, 10, POPUP_COLOR, 0.8, true);
+    }
+
+    return collisions.length > 0;
   }
 
   moveCollisionsPoints() {
@@ -100,10 +142,6 @@ export default class Test extends PIXI.Container {
       });
       this.drawPoints(movedPopup, graphics, 10, 0x00FFFF, 0.8, true);
     }
-  }
-
-  moveFinal() {
-
   }
 
   getPolygon(points) {
@@ -207,46 +245,6 @@ export default class Test extends PIXI.Container {
     }
     if (closedPath) graphics.lineTo(first.x, first.y);
     graphics.endFill();
-  }
-
-  traceCollisions() {
-    const lines = this.lines
-      , collisions = []
-      , popup = this.popup
-      , popupGraphics = this.popupGraphics;
-
-    lines.forEach(line => {
-      const mtv = popup.collidesWith(line);
-
-      if (mtv.overlap !== 0) {
-        if (!mtv.axis) {
-          mtv.axis = new Vector(1, 1);
-        }
-        collisions.push(line);
-        const { a, b } = line;
-        this.collisionsPoints.addPoint(new Point(a.x, a.y));
-        this.collisionsPoints.addPoint(new Point(b.x, b.y));
-      }
-    });
-
-    collisions.forEach(line => {
-      const mtv = popup.collidesWith(line);
-      if (mtv.overlap !== 0) {
-        if (!mtv.axis) {
-          mtv.axis = new Vector(1, 1);
-        }
-        const dx = mtv.axis.x * mtv.overlap
-          , dy = mtv.axis.y * mtv.overlap;
-        popup.move(dx, dy);
-        this.drawPoints(popup.getPoints(), popupGraphics, 1, POPUP_COLOR, 0.1, true);
-      }
-    });
-
-    if (collisions.length === 0) {
-      this.drawPoints(popup.getPoints(), popupGraphics, 10, POPUP_COLOR, 0.8, true);
-    }
-
-    return collisions.length > 0;
   }
 
   drawOutLine() {
