@@ -20,8 +20,8 @@ let index = 0
 const totalSubwayLines = SubwayLines.length
   , STAGE_WIDTH = 4081
   , STAGE_HEIGHT = 3308
-  , POPUP_WIDTH = 260 + 150
-  , POPUP_HEIGHT = 130 + 150
+  , POPUP_WIDTH = 260 + 460
+  , POPUP_HEIGHT = 130 + 200
   , POPUP_COLOR = 0xFF3300
   , LINE_COLOR = PastelColor.generate().hex
   , LINE_SIZE = 20
@@ -169,7 +169,7 @@ export default class Test extends PIXI.Container {
     if (index >= totalSubwayLines) return;
     // index = parseInt(Math.random() * totalSubwayLines, 10);
     // index = totalSubwayLines - 1
-    // index = 20
+    // index = 24
     const path = JSON.parse(SubwayLines[index]);
 
     this.paths = path.lines;
@@ -236,7 +236,7 @@ export default class Test extends PIXI.Container {
     ];
     this.initPopupPoints = popupPoints.map(({ x, y }) => new Vector(x, y));
     this.popup = new Popup(popupPoints);
-    this.drawPoints(popupPoints, this.popupGraphics, 10, 0xFFFFFF, 0.5, true);
+    this.drawPoints(popupPoints, this.popupGraphics, 10, 0xFFFFFF, 0.1, true);
   }
 
   drawPoints(points, graphics, thickness = 1, color = 0xFFFFFF, alpha = 0.8, closedPath = false) {
