@@ -6,7 +6,9 @@ import Line from '../../src/popup/Line';
 import Popup from '../../src/popup/Popup';
 import KeyCode from "../../src/consts/KeyCode";
 
-let index = 0;
+let index = 0
+  , testIndexNumber = 0;
+
 const totalSubwayLines = SubwayLines.length
   , STAGE_WIDTH = 4081
   , STAGE_HEIGHT = 3308
@@ -54,16 +56,17 @@ export default class Test extends PIXI.Container {
     this.createPopup(points);
     this.drawLine();
 
-    console.log('test index:', index);
+    testIndexNumber = index;
     index = index + 1;
     index = index > totalSubwayLines - 1 ? 0 : index;
 
     let count = 0
       , limit = 20;
-    while (this.traceCollisions(POPUP_COLOR)) {
+    while (this.lineCollisions()) {
       count = count + 1;
       if (count > limit) break;
     }
+    console.log(testIndexNumber, 'TEST COLLISIONS COUNT', count);
   }
 
   createPoints(index) {
@@ -153,7 +156,7 @@ export default class Test extends PIXI.Container {
     graphics.endFill();
   }
 
-  traceCollisions() {
+  lineCollisions() {
     const lines = this.lines
       , collisions = []
       , popup = this.popup
@@ -179,7 +182,7 @@ export default class Test extends PIXI.Container {
         const dx = mtv.axis.x * mtv.overlap
           , dy = mtv.axis.y * mtv.overlap;
         popup.move(dx, dy);
-        this.drawPoints(popup.getPoints(), popupGraphics, 1, POPUP_COLOR, 0.3, true);
+        this.drawPoints(popup.getPoints(), popupGraphics, 1, POPUP_COLOR, 0.1, true);
       }
     });
 

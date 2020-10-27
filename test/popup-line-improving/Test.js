@@ -14,7 +14,9 @@ import History from '../../src/History';
 import Polygon from '../../src/dyn4j/Polygon';
 import Vector from '../../src/Vector';
 
-let index = 0;
+let index = 0
+  , testIndexNumber = 0;
+
 const totalSubwayLines = SubwayLines.length
   , STAGE_WIDTH = 4081
   , STAGE_HEIGHT = 3308
@@ -50,7 +52,7 @@ export default class Test extends PIXI.Container {
     this.drawOutLine();
 
     this.test();
-    this.testPoints();
+    // this.testPoints();
   }
 
   clear() {
@@ -70,24 +72,26 @@ export default class Test extends PIXI.Container {
     this.createPopup(points);
     this.drawLine();
 
-    console.log('test index:', index);
+    testIndexNumber = index;
     index = index + 1;
     index = index > totalSubwayLines - 1 ? 0 : index;
 
     let count = 0
-      , limit = 3;
-    while (this.traceCollisions()) {
+      , tryConvex = 3
+      , maxLimit = 30;
+    while (this.lineCollisions()) {
       count = count + 1;
-      if (count > limit) {
-        this.moveCollisionsPoints();
+      if (count % tryConvex === 0) {
+        this.convexHullCollisions(count / tryConvex === 1);
+      }
+      if (count > maxLimit) {
         break;
       }
     }
-
-    console.log('count', count);
+    console.log(testIndexNumber, 'TEST COLLISIONS COUNT', count);
   }
 
-  traceCollisions() {
+  lineCollisions() {
     const lines = this.lines
       , collisions = []
       , popup = this.popup
@@ -127,10 +131,11 @@ export default class Test extends PIXI.Container {
     return collisions.length > 0;
   }
 
-  moveCollisionsPoints() {
+  convexHullCollisions(useInitPopupPoint = true) {
     const graphics = this.popupGraphics
       , linePolygon = this.getPolygon(this.collisionsPoints.getPoints())
-      , popupPolygon = this.getPolygon(this.initPopupPoints.slice())
+      , popupPoints = useInitPopupPoint ? this.initPopupPoints.slice() : this.popup.getPoints()
+      , popupPolygon = this.getPolygon(popupPoints)
       , isCollision = gjk.detect(linePolygon, popupPolygon, penetration, history);
 
     this.drawPoints(linePolygon.getPoints(), graphics, 5, 0x00FFFF, 0.5, true);
@@ -140,6 +145,7 @@ export default class Test extends PIXI.Container {
       const movedPopup = popupPolygon.getPoints().map(({ x, y }) => {
         return new Vector(x + movement.x, y + movement.y);
       });
+      this.popup.setPoints(movedPopup);
       this.drawPoints(movedPopup, graphics, 10, 0x00FFFF, 0.8, true);
     }
   }
@@ -163,7 +169,7 @@ export default class Test extends PIXI.Container {
     if (index >= totalSubwayLines) return;
     // index = parseInt(Math.random() * totalSubwayLines, 10);
     // index = totalSubwayLines - 1
-    // index = 34
+    // index = 20
     const path = JSON.parse(SubwayLines[index]);
 
     this.paths = path.lines;
@@ -300,8 +306,6 @@ export default class Test extends PIXI.Container {
       new Point(0, 10),
       new Point(0, 20)
     ]);
-
-    console.log('points', points.getPoints().length);
     points.addPoint(new Point(40, 10));
   }
 
