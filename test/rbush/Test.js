@@ -14,6 +14,7 @@ export default class Test extends PIXI.Container {
     }
 
     initialize() {
+        this.test();
     }
 
     addEvent() {
@@ -24,6 +25,10 @@ export default class Test extends PIXI.Container {
         this.on('mousedown', this.mouseDownListener);
     }
 
+    test() {
+        console.log('Rbush Test');
+    }
+
     update() {}
 
     resize() {
@@ -31,6 +36,7 @@ export default class Test extends PIXI.Container {
     }
 
     onMouseDown() {
+        this.test();
     }
 
     onKeyUp(e) {
