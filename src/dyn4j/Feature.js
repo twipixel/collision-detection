@@ -25,15 +25,15 @@
 
 const NON_INDEXED = -1;
 export default class Feature {
-    static get NOT_INDEXED() {
-        return NON_INDEXED;
-    }
+  constructor(index) {
+    this.index = index;
+  }
 
-    constructor(index) {
-        this.index = index;
-    }
+  static get NOT_INDEXED() {
+    return NON_INDEXED;
+  }
 
-    getIndex() {
-        return this.index;
-    }
+  getIndex() {
+    return this.index;
+  }
 }

@@ -25,12 +25,12 @@
 import Feature from "./Feature";
 
 export default class PointFeature extends Feature {
-    constructor(point, index = Feature.NOT_INDEXED) {
-        super(index);
-        this.point = point;
-    }
+  constructor(point, index = Feature.NOT_INDEXED) {
+    super(index);
+    this.point = point;
+  }
 
-    getPoint() {
-        return this.point;
-    }
+  getPoint() {
+    return this.point;
+  }
 }

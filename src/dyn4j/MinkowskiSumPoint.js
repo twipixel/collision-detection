@@ -26,21 +26,21 @@ import Vector from '../../src/Vector';
 
 
 export default class MinkowskiSumPoint {
-    constructor(supportPoint1, supportPoint2) {
-        this.supportPoint1 = supportPoint1;
-        this.supportPoint2 = supportPoint2;
-        this.point = Vector.subtract(supportPoint1, supportPoint2);
-    }
+  constructor(supportPoint1, supportPoint2) {
+    this.supportPoint1 = supportPoint1;
+    this.supportPoint2 = supportPoint2;
+    this.point = Vector.subtract(supportPoint1, supportPoint2);
+  }
 
-    getSupportPoint1() {
-        return this.supportPoint1;
-    }
+  getSupportPoint1() {
+    return this.supportPoint1;
+  }
 
-    getSupportPoint2() {
-        return this.supportPoint2;
-    }
+  getSupportPoint2() {
+    return this.supportPoint2;
+  }
 
-    getPoint() {
-        return this.point;
-    }
+  getPoint() {
+    return this.point;
+  }
 }

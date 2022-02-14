@@ -62,7 +62,9 @@ export default class Test extends PIXI.Container {
     this.mouseDownListener = this.onMouseDown.bind(this);
     this.on('mousedown', this.mouseDownListener);
 
-    window.addEventListener('keyup', () => { console.log(arguments); });
+    window.addEventListener('keyup', () => {
+      console.log(arguments);
+    });
   }
 
   resize() {
@@ -83,7 +85,7 @@ export default class Test extends PIXI.Container {
   }
 
   drawPopup(graphics, createPoints = false) {
-    const center = { x: STAGE_WIDTH / 2, y: STAGE_HEIGHT / 2 }
+    const center = {x: STAGE_WIDTH / 2, y: STAGE_HEIGHT / 2}
       , x = graphics.x
       , y = graphics.y
       , w = POPUP_WIDTH
@@ -106,7 +108,7 @@ export default class Test extends PIXI.Container {
     const lt = new Point(graphics.x, graphics.y);
     const rt = new Point(graphics.x + w, graphics.y);
     const rb = new Point(graphics.x + w, graphics.y + h);
-    const lb = new Point(graphics.x, graphics.y + h );
+    const lb = new Point(graphics.x, graphics.y + h);
     POPUP_POINTS.push(lt.clone());
     POPUP_POINTS.push(rt.clone());
     POPUP_POINTS.push(rb.clone());
@@ -127,7 +129,7 @@ export default class Test extends PIXI.Container {
     graphics.lineStyle(1, LINE_COLOR, 0.8);
     graphics.moveTo(points[0].x, points[0].y);
     for (let i = 0; i < total; i += 1) {
-      const { x, y } = points[i];
+      const {x, y} = points[i];
       graphics.lineTo(x, y);
     }
   }
@@ -172,7 +174,7 @@ export default class Test extends PIXI.Container {
     this.drawPoints();
     this.intersections = this.getIntersections();
     this.drawConvexHull(this.intersections, true, 1, CONVEX_HULL_COLOR, 1);
-    this.drawConvexHull(POINTS, false,1, 0x00FFFF, 0.3);
+    this.drawConvexHull(POINTS, false, 1, 0x00FFFF, 0.3);
   }
 
   clear() {
@@ -183,11 +185,11 @@ export default class Test extends PIXI.Container {
   export() {
     console.log('export!');
     console.log(POINTS);
-    console.log(JSON.stringify({ points: POINTS }));
+    console.log(JSON.stringify({points: POINTS}));
   }
 
   onMouseDown(event) {
-    const { x, y } = event.data.global;
+    const {x, y} = event.data.global;
     POINTS.push(new Point(x, y));
   }
 

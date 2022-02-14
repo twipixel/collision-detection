@@ -149,7 +149,7 @@ export default class Test extends PIXI.Container {
     graphics.lineStyle(thickness, color, alpha);
     graphics.moveTo(first.x, first.y);
     for (let i = 0; i < total; i += 1) {
-      const { x, y } = points[i];
+      const {x, y} = points[i];
       graphics.lineTo(x, y);
     }
     if (closedPath) graphics.lineTo(first.x, first.y);

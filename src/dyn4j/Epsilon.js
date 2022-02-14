@@ -24,15 +24,15 @@
  */
 export default class Epsilon {
 
-    static get E() {
-        return Epsilon.compute();
-    }
+  static get E() {
+    return Epsilon.compute();
+  }
 
-    static compute() {
-        let e = 0.5;
-        while (1.0 + e > 1.0) {
-            e *= 0.5;
-        }
-        return e;
+  static compute() {
+    let e = 0.5;
+    while (1.0 + e > 1.0) {
+      e *= 0.5;
     }
+    return e;
+  }
 }

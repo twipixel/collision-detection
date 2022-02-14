@@ -1,34 +1,34 @@
 export default class Separation {
 
-    get normal() {
-        return this._normal;
-    }
+  get normal() {
+    return this._normal;
+  }
 
-    set normal(value) {
-        this._normal = value;
-    }
+  set normal(value) {
+    this._normal = value;
+  }
 
-    get distance() {
-        return this._distance;
-    }
+  get distance() {
+    return this._distance;
+  }
 
-    set distance(value) {
-        this._distance = value;
-    }
+  set distance(value) {
+    this._distance = value;
+  }
 
-    get point1() {
-        return this._point1;
-    }
+  get point1() {
+    return this._point1;
+  }
 
-    set point1(value) {
-        this._point1 = value;
-    }
+  set point1(value) {
+    this._point1 = value;
+  }
 
-    get point2() {
-        return this._point2;
-    }
+  get point2() {
+    return this._point2;
+  }
 
-    set point2(value) {
-        this._point2 = value;
-    }
+  set point2(value) {
+    this._point2 = value;
+  }
 }

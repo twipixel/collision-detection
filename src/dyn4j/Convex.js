@@ -24,19 +24,19 @@
  */
 export default class Convex {
 
-    /**
-     * 방향에서 가장 먼 벡터의 인덱스 (Feature)를 반환합니다.
-     * @param direction {Vector}
-     */
-    getFarthestFeature(direction) {
-        throw new Error('[Convex] implments getFarthestFeature');
-    }
+  /**
+   * 방향에서 가장 먼 벡터의 인덱스 (Feature)를 반환합니다.
+   * @param direction {Vector}
+   */
+  getFarthestFeature(direction) {
+    throw new Error('[Convex] implments getFarthestFeature');
+  }
 
-    /**
-     * 방향에서 가장 먼 포인트를 반환합니다.
-     * @param direction {Vector}
-     */
-    getFarthestPoint(direction) {
-        throw new Error('[Convex] implments getFarthestPoint');
-    }
+  /**
+   * 방향에서 가장 먼 포인트를 반환합니다.
+   * @param direction {Vector}
+   */
+  getFarthestPoint(direction) {
+    throw new Error('[Convex] implments getFarthestPoint');
+  }
 }

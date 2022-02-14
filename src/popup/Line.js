@@ -1,7 +1,6 @@
 import Vector from '../../src/Vector';
 import Shape from '../../src/sat/Shape';
 import Projection from '../../src/sat/Projection';
-import PastelColor from '../../src/utils/PastelColor';
 
 export default class Line extends Shape {
   constructor(line, size = 20) {
@@ -28,7 +27,7 @@ export default class Line extends Shape {
   }
 
   draw(graphics) {
-    const g =  graphics
+    const g = graphics
       , p1 = this.p1
       , p2 = this.p2
       , p3 = this.p3
@@ -49,7 +48,7 @@ export default class Line extends Shape {
   getCenter() {
     var pointSum = new PIXI.Point();
 
-    for (var i=0, point; i < this.points.length; ++i) {
+    for (var i = 0, point; i < this.points.length; ++i) {
       point = this.points[i];
       pointSum.x += point.x;
       pointSum.y += point.y;
@@ -67,8 +66,7 @@ export default class Line extends Shape {
   collidesWith(shape) {
     if (shape.radius) {
       return this.polygonCollidesWithCircle(this, shape);
-    }
-    else {
+    } else {
       return this.polygonCollidesWithPolygon(this, shape);
     }
   }
@@ -82,7 +80,7 @@ export default class Line extends Shape {
     var scalars = [],
       v = new Vector();
 
-    this.points.forEach( function (point) {
+    this.points.forEach(function (point) {
       v.x = point.x;
       v.y = point.y;
       scalars.push(v.dotProduct(axis));
@@ -102,19 +100,19 @@ export default class Line extends Shape {
       v2 = new Vector(),
       axes = [];
 
-    for (var i=0; i < this.points.length-1; i++) {
+    for (var i = 0; i < this.points.length - 1; i++) {
       v1.x = this.points[i].x;
       v1.y = this.points[i].y;
 
-      v2.x = this.points[i+1].x;
-      v2.y = this.points[i+1].y;
+      v2.x = this.points[i + 1].x;
+      v2.y = this.points[i + 1].y;
 
       // 모서리에서 수직인 노말(법선) 벡터를 만듭니다. (축 생성)
       axes.push(v1.edge(v2).perpendicular().normalize());
     }
 
-    v1.x = this.points[this.points.length-1].x;
-    v1.y = this.points[this.points.length-1].y;
+    v1.x = this.points[this.points.length - 1].x;
+    v1.y = this.points[this.points.length - 1].y;
 
     v2.x = this.points[0].x;
     v2.y = this.points[0].y;

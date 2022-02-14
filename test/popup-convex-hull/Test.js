@@ -100,7 +100,7 @@ export default class Test extends PIXI.Container {
   }
 
   drawPopup(graphics, createPoints = false) {
-    const center = { x: STAGE_WIDTH / 2, y: STAGE_HEIGHT / 2 }
+    const center = {x: STAGE_WIDTH / 2, y: STAGE_HEIGHT / 2}
       , x = graphics.x
       , y = graphics.y
       , w = POPUP_WIDTH
@@ -123,7 +123,7 @@ export default class Test extends PIXI.Container {
     const lt = new Point(graphics.x, graphics.y);
     const rt = new Point(graphics.x + w, graphics.y);
     const rb = new Point(graphics.x + w, graphics.y + h);
-    const lb = new Point(graphics.x, graphics.y + h );
+    const lb = new Point(graphics.x, graphics.y + h);
     POPUP_POINTS.push(lt.clone());
     POPUP_POINTS.push(rt.clone());
     POPUP_POINTS.push(rb.clone());
@@ -144,7 +144,7 @@ export default class Test extends PIXI.Container {
     graphics.lineStyle(1, LINE_COLOR, 0.8);
     graphics.moveTo(points[0].x, points[0].y);
     for (let i = 0; i < total; i += 1) {
-      const { x, y } = points[i];
+      const {x, y} = points[i];
       graphics.lineTo(x, y);
     }
   }
@@ -193,7 +193,7 @@ export default class Test extends PIXI.Container {
     graphics.lineStyle(thickness, color, alpha);
     graphics.moveTo(first.x, first.y);
     for (let i = 1; i < total; i += 1) {
-      const { x, y } = points[i];
+      const {x, y} = points[i];
       graphics.lineTo(x, y);
     }
     if (closePath) graphics.lineTo(first.x, first.y);
@@ -210,7 +210,7 @@ export default class Test extends PIXI.Container {
       , popupConvexHull = ConvexHull.generate(popupVertices);
 
     graphics.clear();
-    this.drawPoints(lineVertices, graphics, 1, LINE_COLOR, 0.8, );
+    this.drawPoints(lineVertices, graphics, 1, LINE_COLOR, 0.8,);
     this.drawPoints(popupConvexHull, graphics, 1, POPUP_COLOR, 0.8, true);
   }
 
@@ -234,7 +234,7 @@ export default class Test extends PIXI.Container {
     if (isCollision) {
       const movement = Vector.multiplyScalar(penetration.normal, penetration.depth);
       // 충돌 후 팝업 위치
-      const movedPopup = popupConvexHull.slice().map(({ x, y }) => {
+      const movedPopup = popupConvexHull.slice().map(({x, y}) => {
         return new Vector(x + movement.x, y + movement.y);
       });
 
@@ -263,7 +263,7 @@ export default class Test extends PIXI.Container {
     this.drawLines();
     this.intersections = this.getIntersections();
     this.drawConvexHull(this.intersections, true, 1, CONVEX_HULL_COLOR, 1);
-    this.drawConvexHull(POINTS, false,1, 0x00FFFF, 0.3);
+    this.drawConvexHull(POINTS, false, 1, 0x00FFFF, 0.3);
 
     this.drawResult1();
     const movedPopup = this.drawResult2();
@@ -281,12 +281,12 @@ export default class Test extends PIXI.Container {
   export() {
     console.log('export!');
     console.log(POINTS);
-    console.log(JSON.stringify({ points: POINTS }));
+    console.log(JSON.stringify({points: POINTS}));
   }
 
   onMouseDown(event) {
-    const { x, y } = event.data.global;
-    POINTS.push({ x, y });
+    const {x, y} = event.data.global;
+    POINTS.push({x, y});
   }
 
   onKeyUp(key) {

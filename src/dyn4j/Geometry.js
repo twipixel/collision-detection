@@ -28,37 +28,37 @@ import Vector from '../Vector';
 
 export default class Geometry {
 
-    /**
-     * Returns an array of normalized vectors representing the normals of all the
-     * edges given the vertices.
-     * <p>
-     * This method assumes counter-clockwise ordering.
-     * <p>
-     * Returns null if the given vertices array is null or empty.
-     * @param vertices {Vector[]}
-     */
-    static getCounterClockwiseEdgeNormals(vertices) {
-        if (vertices == null) {
-            return null;
-        }
-
-        const size = vertices.length;
-        if (size === 0) {
-            return null;
-        }
-
-        const normals = new Array(size);
-        for (let i = 0; i < size; i++) {
-            // get the edge points
-            const p1 = vertices[i];
-            const p2 = (i + 1 === size) ? vertices[0] : vertices[i + 1];
-            // create the edge and get its left perpedicular vector
-            const n = p1.to(p2).left();
-            // normalize it
-            n.normalize();
-            normals[i] = n;
-        }
-
-        return normals;
+  /**
+   * Returns an array of normalized vectors representing the normals of all the
+   * edges given the vertices.
+   * <p>
+   * This method assumes counter-clockwise ordering.
+   * <p>
+   * Returns null if the given vertices array is null or empty.
+   * @param vertices {Vector[]}
+   */
+  static getCounterClockwiseEdgeNormals(vertices) {
+    if (vertices == null) {
+      return null;
     }
+
+    const size = vertices.length;
+    if (size === 0) {
+      return null;
+    }
+
+    const normals = new Array(size);
+    for (let i = 0; i < size; i++) {
+      // get the edge points
+      const p1 = vertices[i];
+      const p2 = (i + 1 === size) ? vertices[0] : vertices[i + 1];
+      // create the edge and get its left perpedicular vector
+      const n = p1.to(p2).left();
+      // normalize it
+      n.normalize();
+      normals[i] = n;
+    }
+
+    return normals;
+  }
 }

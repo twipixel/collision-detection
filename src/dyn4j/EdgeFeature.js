@@ -26,35 +26,35 @@ import Feature from "./Feature";
 
 export default class EdgeFeature extends Feature {
 
-    /**
-     *
-     * @param vertex1 {PointFeature}
-     * @param vertex2 {PointFeature}
-     * @param max {PointFeature}
-     * @param edge {Vector}
-     * @param index {number}
-     */
-    constructor(vertex1, vertex2, max, edge, index = Feature.NOT_INDEXED) {
-        super(index);
-        this.vertex1 = vertex1;
-        this.vertex2 = vertex2;
-        this.edge = edge;
-        this.max = max;
-    }
+  /**
+   *
+   * @param vertex1 {PointFeature}
+   * @param vertex2 {PointFeature}
+   * @param max {PointFeature}
+   * @param edge {Vector}
+   * @param index {number}
+   */
+  constructor(vertex1, vertex2, max, edge, index = Feature.NOT_INDEXED) {
+    super(index);
+    this.vertex1 = vertex1;
+    this.vertex2 = vertex2;
+    this.edge = edge;
+    this.max = max;
+  }
 
-    getVertex1() {
-        return this.vertex1;
-    }
+  getVertex1() {
+    return this.vertex1;
+  }
 
-    getVertex2() {
-        return this.vertex2;
-    }
+  getVertex2() {
+    return this.vertex2;
+  }
 
-    getEdge() {
-        return this.edge;
-    }
+  getEdge() {
+    return this.edge;
+  }
 
-    getMaximum() {
-        return this.max;
-    }
+  getMaximum() {
+    return this.max;
+  }
 }

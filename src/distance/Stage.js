@@ -2,68 +2,68 @@ import Consts from "../distance/Consts";
 import PastelColor from '../utils/PastelColor';
 
 const STAGE = Consts.STAGE
-    , SCALE = Consts.SCALE
-    , W = STAGE.width
-    , H = STAGE.height
-    , HW = W / 2
-    , HH = H / 2
-    , LINE_COLOR = 0xFFFFFF
-    , LINE_THICKNESS = 1
-    , ALPHA = 0.5
-    , RADIUS = 2;
+  , SCALE = Consts.SCALE
+  , W = STAGE.width
+  , H = STAGE.height
+  , HW = W / 2
+  , HH = H / 2
+  , LINE_COLOR = 0xFFFFFF
+  , LINE_THICKNESS = 1
+  , ALPHA = 0.5
+  , RADIUS = 2;
 
 export default class Stage extends PIXI.Container {
-    constructor() {
-        super();
+  constructor() {
+    super();
 
-        this.initialize();
-        this.drawAxes();
-    }
+    this.initialize();
+    this.drawAxes();
+  }
 
-    initialize() {
-        this.graphics = new PIXI.Graphics();
-        this.addChild(this.graphics);
-    }
+  get g() {
+    return this.graphics;
+  }
 
-    drawLine(lineA, lineB, thickenss = LINE_THICKNESS) {
-        lineA = lineA.clone().multiplyScalar(SCALE);
-        lineB = lineB.clone().multiplyScalar(SCALE);
+  initialize() {
+    this.graphics = new PIXI.Graphics();
+    this.addChild(this.graphics);
+  }
 
-        const alpha = ALPHA
-            , g = this.graphics
-            , color = PastelColor.generate().hex;
+  drawLine(lineA, lineB, thickenss = LINE_THICKNESS) {
+    lineA = lineA.clone().multiplyScalar(SCALE);
+    lineB = lineB.clone().multiplyScalar(SCALE);
 
-        g.lineStyle(thickenss, color, alpha);
-        g.moveTo(lineA.x, lineA.y);
-        g.lineTo(lineB.x, lineB.y);
-    }
+    const alpha = ALPHA
+      , g = this.graphics
+      , color = PastelColor.generate().hex;
 
-    drawPoint(point, radius = RADIUS) {
-        point = point.clone().multiplyScalar(SCALE);
+    g.lineStyle(thickenss, color, alpha);
+    g.moveTo(lineA.x, lineA.y);
+    g.lineTo(lineB.x, lineB.y);
+  }
 
-        const alpha = ALPHA
-            , g = this.graphics
-            , color = PastelColor.generate().hex;
+  drawPoint(point, radius = RADIUS) {
+    point = point.clone().multiplyScalar(SCALE);
 
-        g.beginFill(color, alpha);
-        g.drawCircle(point.x, point.y, radius, color, alpha);
-        g.endFill();
-    }
+    const alpha = ALPHA
+      , g = this.graphics
+      , color = PastelColor.generate().hex;
 
-    drawAxes() {
-        const g = this.graphics;
-        g.lineStyle(LINE_THICKNESS, LINE_COLOR, ALPHA);
-        g.moveTo(-HW, 0);
-        g.lineTo(HW, 0);
-        g.moveTo(0, -HH);
-        g.lineTo(0, HH);
-    }
+    g.beginFill(color, alpha);
+    g.drawCircle(point.x, point.y, radius, color, alpha);
+    g.endFill();
+  }
 
-    clear() {
-        this.graphics.clear();
-    }
+  drawAxes() {
+    const g = this.graphics;
+    g.lineStyle(LINE_THICKNESS, LINE_COLOR, ALPHA);
+    g.moveTo(-HW, 0);
+    g.lineTo(HW, 0);
+    g.moveTo(0, -HH);
+    g.lineTo(0, HH);
+  }
 
-    get g() {
-        return this.graphics;
-    }
+  clear() {
+    this.graphics.clear();
+  }
 }

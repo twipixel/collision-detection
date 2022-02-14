@@ -29,83 +29,83 @@ import ExpandingSimplexEdge from './ExpandingSimplexEdge';
 
 export default class ExpandingSimplex {
 
-    /**
-     *
-     * @param simplex {Vector[]}
-     */
-    constructor(simplex) {
-        this.winding = this.getWinding(simplex);
+  /**
+   *
+   * @param simplex {Vector[]}
+   */
+  constructor(simplex) {
+    this.winding = this.getWinding(simplex);
 
-        this.queue = new PriorityQueue((a, b) => {
-            if (a.distance < b.distance) {
-                return -1;
-            }
-            if (a.distance > b.distance) {
-                return 1;
-            }
-            return 0;
-        });
+    this.queue = new PriorityQueue((a, b) => {
+      if (a.distance < b.distance) {
+        return -1;
+      }
+      if (a.distance > b.distance) {
+        return 1;
+      }
+      return 0;
+    });
 
-        const size = simplex.length;
+    const size = simplex.length;
 
-        // console.log('size', size);
-        for (let i = 0; i < size; i++) {
-            // compute j
-            let j = i + 1 == size ? 0 : i + 1;
-            // get the points that make up the current edge
-            const a = simplex[i]
-                , b = simplex[j];
-            // create the edge
-            this.queue.add(new ExpandingSimplexEdge(a, b, this.winding));
-        }
-
-        // console.log('this.queue.size', this.queue.size);
+    // console.log('size', size);
+    for (let i = 0; i < size; i++) {
+      // compute j
+      let j = i + 1 == size ? 0 : i + 1;
+      // get the points that make up the current edge
+      const a = simplex[i]
+        , b = simplex[j];
+      // create the edge
+      this.queue.add(new ExpandingSimplexEdge(a, b, this.winding));
     }
 
+    // console.log('this.queue.size', this.queue.size);
+  }
 
-    /**
-     * 심플렉스에 주어진 방향을 리턴합니다.
-     *
-     * -1 시계 방향
-     * 1 반 시계 방향
-     * @param simplex {Vector[]}
-     */
-    getWinding(simplex) {
-        const size = simplex.length;
 
-        for (let i = 0; i < size; i++) {
-            let j = i + 1 === size ? 0 : i + 1;
-            const a = simplex[i]
-                , b = simplex[j];
+  /**
+   * 심플렉스에 주어진 방향을 리턴합니다.
+   *
+   * -1 시계 방향
+   * 1 반 시계 방향
+   * @param simplex {Vector[]}
+   */
+  getWinding(simplex) {
+    const size = simplex.length;
 
-            if (a.cross(b) > 0) {
-                // 외적을 통해 외적 값이 양수면 반시계 방향
-                return 1;
-            } else if (a.cross(b) < 0) {
-                // 음수면 반시계 방향
-                return -1;
-            }
-        }
-        return 0;
+    for (let i = 0; i < size; i++) {
+      let j = i + 1 === size ? 0 : i + 1;
+      const a = simplex[i]
+        , b = simplex[j];
+
+      if (a.cross(b) > 0) {
+        // 외적을 통해 외적 값이 양수면 반시계 방향
+        return 1;
+      } else if (a.cross(b) < 0) {
+        // 음수면 반시계 방향
+        return -1;
+      }
     }
+    return 0;
+  }
 
-    /**
-     *
-     * @returns {ExpandingSimplexEdge}
-     */
-    getClosestEdge() {
-        return this.queue.peek();
-    }
+  /**
+   *
+   * @returns {ExpandingSimplexEdge}
+   */
+  getClosestEdge() {
+    return this.queue.peek();
+  }
 
-    /**
-     *
-     * @param point {Vector}
-     */
-    expand(point) {
-        const edge = this.queue.poll();
-        const edge1 = new ExpandingSimplexEdge(edge.point1, point, this.winding);
-        const edge2 = new ExpandingSimplexEdge(point, edge.point2, this.winding);
-        this.queue.add(edge1);
-        this.queue.add(edge2);
-    }
+  /**
+   *
+   * @param point {Vector}
+   */
+  expand(point) {
+    const edge = this.queue.poll();
+    const edge1 = new ExpandingSimplexEdge(edge.point1, point, this.winding);
+    const edge2 = new ExpandingSimplexEdge(point, edge.point2, this.winding);
+    this.queue.add(edge1);
+    this.queue.add(edge2);
+  }
 }

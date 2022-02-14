@@ -105,7 +105,7 @@ export default class Test extends PIXI.Container {
           mtv.axis = new Vector(1, 1);
         }
         collisions.push(line);
-        const { a, b } = line;
+        const {a, b} = line;
         this.collisionsPoints.addPoint(new Point(a.x, a.y));
         this.collisionsPoints.addPoint(new Point(b.x, b.y));
       }
@@ -142,7 +142,7 @@ export default class Test extends PIXI.Container {
 
     if (isCollision) {
       const movement = Vector.multiplyScalar(penetration.normal, penetration.depth + LINE_SIZE + SPACE);
-      const movedPopup = popupPolygon.getPoints().map(({ x, y }) => {
+      const movedPopup = popupPolygon.getPoints().map(({x, y}) => {
         return new Vector(x + movement.x, y + movement.y);
       });
       this.popup.setPoints(movedPopup);
@@ -234,7 +234,7 @@ export default class Test extends PIXI.Container {
       new PIXI.Point(center.x + POPUP_WIDTH / 2, center.y + POPUP_HEIGHT / 2),
       new PIXI.Point(center.x - POPUP_WIDTH / 2, center.y + POPUP_HEIGHT / 2)
     ];
-    this.initPopupPoints = popupPoints.map(({ x, y }) => new Vector(x, y));
+    this.initPopupPoints = popupPoints.map(({x, y}) => new Vector(x, y));
     this.popup = new Popup(popupPoints);
     this.drawPoints(popupPoints, this.popupGraphics, 10, 0xFFFFFF, 0.1, true);
   }
@@ -246,7 +246,7 @@ export default class Test extends PIXI.Container {
     graphics.lineStyle(thickness, color, alpha);
     graphics.moveTo(first.x, first.y);
     for (let i = 0; i < total; i += 1) {
-      const { x, y } = points[i];
+      const {x, y} = points[i];
       graphics.lineTo(x, y);
     }
     if (closedPath) graphics.lineTo(first.x, first.y);
@@ -300,8 +300,8 @@ export default class Test extends PIXI.Container {
     const points = new Points([
       new Point(10, 10),
       new Point(20, 10),
-      new Point( 30, 10),
-      new Point( 40, 10),
+      new Point(30, 10),
+      new Point(40, 10),
       new Point(0, 0),
       new Point(0, 10),
       new Point(0, 20)

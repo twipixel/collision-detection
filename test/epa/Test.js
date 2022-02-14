@@ -9,18 +9,16 @@ import Gjk from '../../src/dyn4j/Gjk';
 import Epa from '../../src/dyn4j/Epa';
 import Polygon from '../../src/dyn4j/Polygon';
 import KeyCode from "../../src/consts/KeyCode";
-import PastelColor from '../../src/utils/PastelColor';
 import Penetration from '../../src/dyn4j/Penetration';
-import Painter from '../../src/utils/Painter';
 
 
 const TOTAL = 30
-    , INTERVAL = 600000
-    , SCALE = Consts.SCALE
-    , STAGE = Consts.STAGE
-    , TOP_LEFT = {x: 2, y: 2}
-    , TOP_RIGHT = {x: 17, y: 17}
-    , RAD_TO_DEG = 180 / Math.PI;
+  , INTERVAL = 600000
+  , SCALE = Consts.SCALE
+  , STAGE = Consts.STAGE
+  , TOP_LEFT = {x: 2, y: 2}
+  , TOP_RIGHT = {x: 17, y: 17}
+  , RAD_TO_DEG = 180 / Math.PI;
 
 const triangles = createPolygons(3, TOTAL);
 const rectangles = createPolygons(4, TOTAL);
@@ -50,148 +48,148 @@ const errorCase2 = [
 
 
 export default class Test extends PIXI.Container {
-    constructor(renderer) {
-        super();
+  constructor(renderer) {
+    super();
 
-        this.interactive = true;
-        this.renderer = renderer;
-        this.canvas = this.renderer.view;
-        this.context = this.canvas.getContext('2d');
+    this.interactive = true;
+    this.renderer = renderer;
+    this.canvas = this.renderer.view;
+    this.context = this.canvas.getContext('2d');
 
-        this.initialize();
-        this.addEvent();
+    this.initialize();
+    this.addEvent();
+  }
+
+  initialize() {
+    this.shapes = [];
+    this.graphics = new PIXI.Graphics();
+    this.addChild(this.graphics);
+    this.display = this.displayCollision.bind(this);
+    this.next();
+  }
+
+  addEvent() {
+    this.keyUpListener = this.onKeyUp.bind(this);
+    window.addEventListener('keyup', this.keyUpListener);
+
+    this.mouseDownListener = this.onMouseDown.bind(this);
+    this.on('mousedown', this.mouseDownListener);
+  }
+
+  displayCollision() {
+    this.clear();
+    this.checkCollision();
+  }
+
+  clear() {
+    this.shapes.forEach((shape) => {
+      this.removeChild(shape);
+      shape.destroy();
+    });
+
+    this.shapes.length = 0;
+    this.shapes = [];
+
+    if (!this.minkowski) {
+      return;
+    }
+    this.removeChild(this.minkowski);
+    this.minkowski.destroy();
+
+    this.graphics.clear();
+  }
+
+  checkCollision() {
+    const index1 = Math.floor(Math.random() * triangles.length)
+      , index2 = Math.floor(Math.random() * rectangles.length)
+      , vertices1 = new Vertices(triangles[index1])
+      , vertices2 = new Vertices(rectangles[index2])
+      , penetrationColor = 0xFF3300
+      , penetrationAlpha = 0.7;
+
+    /*const index1 = Math.floor(Math.random() * errorCase1.length)
+        , index2 = Math.floor(Math.random() * errorCase2.length)
+        , vertices1 = new Vertices(errorCase1[index1])
+        , vertices2 = new Vertices(errorCase2[index2]);*/
+
+    vertices1.multiply(SCALE);
+    vertices2.multiply(SCALE);
+
+    const shape1 = new Shape(vertices1.vertices)
+      , shape2 = new Shape(vertices2.vertices)
+      , shape3 = new Shape(vertices2.clone(), penetrationColor, penetrationAlpha);
+
+    this.minkowski = new MinkowskiDifference(vertices1.vertices, vertices2.vertices);
+    this.minkowski.x = (STAGE.width / 3) * 2;
+    this.minkowski.y = (STAGE.height / 3) * 2;
+
+    this.addChild(shape1);
+    this.addChild(shape2);
+    this.addChild(shape3);
+    this.addChild(this.minkowski);
+
+    this.shapes.push(shape1);
+    this.shapes.push(shape2);
+    this.shapes.push(shape3);
+
+    vertices1.divide(SCALE);
+    vertices2.divide(SCALE);
+
+    const polygon1 = new Polygon(vertices1.vertices)
+      , polygon2 = new Polygon(vertices2.vertices);
+
+    const gjk = new Gjk(new Epa())
+      , penetration = new Penetration()
+      , history = new History();
+
+    const isCollision = gjk.detect(polygon1, polygon2, penetration, history)
+      , arrow = Vector.multiplyScalar(penetration.normal, penetration.depth).multiplyScalar(SCALE);
+
+    this.graphics.x = this.minkowski.x;
+    this.graphics.y = this.minkowski.y;
+    this.graphics.lineStyle(2, penetrationColor, penetrationAlpha);
+    this.graphics.moveTo(0, 0);
+    this.graphics.lineTo(arrow.x, arrow.y);
+
+    shape3.x = arrow.x;
+    shape3.y = arrow.y;
+    if (!isCollision) {
+      shape3.visible = false;
     }
 
-    initialize() {
-        this.shapes = [];
-        this.graphics = new PIXI.Graphics();
-        this.addChild(this.graphics);
-        this.display = this.displayCollision.bind(this);
+    console.log('polygon1', polygon1);
+    console.log('polygon2', polygon2);
+    console.log('isCollision', isCollision);
+    console.log('penetration', penetration);
+  }
+
+  next() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+
+    this.display();
+    this.intervalId = setInterval(this.display, INTERVAL);
+  }
+
+  update() {
+  }
+
+  resize() {
+    this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  onMouseDown() {
+    this.next();
+  }
+
+  onKeyUp(e) {
+    switch (e.keyCode) {
+      case KeyCode.SPACE:
         this.next();
+        break;
     }
-
-    addEvent() {
-        this.keyUpListener = this.onKeyUp.bind(this);
-        window.addEventListener('keyup', this.keyUpListener);
-
-        this.mouseDownListener = this.onMouseDown.bind(this);
-        this.on('mousedown', this.mouseDownListener);
-    }
-
-    displayCollision() {
-        this.clear();
-        this.checkCollision();
-    }
-
-    clear() {
-        this.shapes.forEach((shape) => {
-            this.removeChild(shape);
-            shape.destroy();
-        });
-
-        this.shapes.length = 0;
-        this.shapes = [];
-
-        if (!this.minkowski) {
-            return;
-        }
-        this.removeChild(this.minkowski);
-        this.minkowski.destroy();
-
-        this.graphics.clear();
-    }
-
-    checkCollision() {
-        const index1 = Math.floor(Math.random() * triangles.length)
-            , index2 = Math.floor(Math.random() * rectangles.length)
-            , vertices1 = new Vertices(triangles[index1])
-            , vertices2 = new Vertices(rectangles[index2])
-            , penetrationColor = 0xFF3300
-            , penetrationAlpha = 0.7;
-
-        /*const index1 = Math.floor(Math.random() * errorCase1.length)
-            , index2 = Math.floor(Math.random() * errorCase2.length)
-            , vertices1 = new Vertices(errorCase1[index1])
-            , vertices2 = new Vertices(errorCase2[index2]);*/
-
-        vertices1.multiply(SCALE);
-        vertices2.multiply(SCALE);
-
-        const shape1 = new Shape(vertices1.vertices)
-            , shape2 = new Shape(vertices2.vertices)
-            , shape3 = new Shape(vertices2.clone(), penetrationColor, penetrationAlpha);
-
-        this.minkowski = new MinkowskiDifference(vertices1.vertices, vertices2.vertices);
-        this.minkowski.x = (STAGE.width / 3) * 2;
-        this.minkowski.y = (STAGE.height / 3) * 2;
-
-        this.addChild(shape1);
-        this.addChild(shape2);
-        this.addChild(shape3);
-        this.addChild(this.minkowski);
-
-        this.shapes.push(shape1);
-        this.shapes.push(shape2);
-        this.shapes.push(shape3);
-
-        vertices1.divide(SCALE);
-        vertices2.divide(SCALE);
-
-        const polygon1 = new Polygon(vertices1.vertices)
-            , polygon2 = new Polygon(vertices2.vertices);
-
-        const gjk = new Gjk(new Epa())
-            , penetration = new Penetration()
-            , history = new History();
-        
-        const isCollision = gjk.detect(polygon1, polygon2, penetration, history)
-            , arrow = Vector.multiplyScalar(penetration.normal, penetration.depth).multiplyScalar(SCALE);
-
-        this.graphics.x = this.minkowski.x;
-        this.graphics.y = this.minkowski.y;
-        this.graphics.lineStyle(2, penetrationColor, penetrationAlpha);
-        this.graphics.moveTo(0, 0);
-        this.graphics.lineTo(arrow.x, arrow.y);
-
-        shape3.x = arrow.x;
-        shape3.y = arrow.y;
-        if (!isCollision) {
-            shape3.visible = false;
-        }
-
-        console.log('polygon1', polygon1);
-        console.log('polygon2', polygon2);
-        console.log('isCollision', isCollision);
-        console.log('penetration', penetration);
-    }
-
-    next() {
-        if (this.intervalId) {
-            clearInterval(this.intervalId);
-        }
-
-        this.display();
-        this.intervalId = setInterval(this.display, INTERVAL);
-    }
-
-    update() {
-    }
-
-    resize() {
-        this.hitArea = new PIXI.Rectangle(0, 0, this.canvas.width, this.canvas.height);
-    }
-
-    onMouseDown() {
-        this.next();
-    }
-
-    onKeyUp(e) {
-        switch (e.keyCode) {
-            case KeyCode.SPACE:
-                this.next();
-                break;
-        }
-    }
+  }
 }
 
 
@@ -202,10 +200,10 @@ export default class Test extends PIXI.Container {
  * @returns {number}
  */
 function getAngle(a, b) {
-    a = new Vector(a.x, a.y).norm();
-    b = new Vector(b.x, b.y).norm();
-    const radian = Math.acos(Vector.dotProduct(a, b));
-    return radian * RAD_TO_DEG;
+  a = new Vector(a.x, a.y).norm();
+  b = new Vector(b.x, b.y).norm();
+  const radian = Math.acos(Vector.dotProduct(a, b));
+  return radian * RAD_TO_DEG;
 }
 
 
@@ -215,24 +213,24 @@ function getAngle(a, b) {
  * @param total
  */
 function createPolygons(polygon, total) {
-    let vertices;
-    const polygons = [];
+  let vertices;
+  const polygons = [];
 
-    for (let i = 0; i < total; i++) {
-        vertices = [];
+  for (let i = 0; i < total; i++) {
+    vertices = [];
 
-        for (let j = 0; j < polygon; j++) {
-            const vertex = Vector.randomize(TOP_LEFT, TOP_RIGHT);
-            vertices.push(vertex);
+    for (let j = 0; j < polygon; j++) {
+      const vertex = Vector.randomize(TOP_LEFT, TOP_RIGHT);
+      vertices.push(vertex);
 
-            if (j === polygon - 1) {
-                const convexHull = ConvexHull.generate(vertices);
-                vertices = convexHull;
-            }
-        }
-
-        polygons.push(vertices);
+      if (j === polygon - 1) {
+        const convexHull = ConvexHull.generate(vertices);
+        vertices = convexHull;
+      }
     }
 
-    return polygons;
+    polygons.push(vertices);
+  }
+
+  return polygons;
 }

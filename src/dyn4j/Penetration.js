@@ -27,42 +27,42 @@ import Vector from '../Vector';
 
 
 export default class Penetration {
-    /**
-     *
-     * @param normal {Vector} convex1 에서 convex2 로 침투한 normal
-     * @param depth {number} 침투 깊이
-     */
-    constructor(normal = new Vector(), depth = 0) {
-        this.normal = normal;
-        this.depth = depth;
-    }
+  /**
+   *
+   * @param normal {Vector} convex1 에서 convex2 로 침투한 normal
+   * @param depth {number} 침투 깊이
+   */
+  constructor(normal = new Vector(), depth = 0) {
+    this.normal = normal;
+    this.depth = depth;
+  }
 
-    clear() {
-        this.normal = null;
-        this.depth = 0;
-    }
+  clear() {
+    this.normal = null;
+    this.depth = 0;
+  }
 
-    getNormal() {
-        return this.normal;
-    }
+  getNormal() {
+    return this.normal;
+  }
 
-    getDepth() {
-        return this.depth;
-    }
+  getDepth() {
+    return this.depth;
+  }
 
-    /**
-     * 침투 방향을 설정합니다. 반드시 normalized 해야 합니다.
-     * @param normal {Vector}
-     */
-    setNormal(normal) {
-        this.normal = normal;
-    }
+  /**
+   * 침투 방향을 설정합니다. 반드시 normalized 해야 합니다.
+   * @param normal {Vector}
+   */
+  setNormal(normal) {
+    this.normal = normal;
+  }
 
-    /**
-     * 침투 깊이를 설정합니다.
-     * @param depth {number}
-     */
-    setDepth(depth) {
-        this.depth = depth;
-    }
+  /**
+   * 침투 깊이를 설정합니다.
+   * @param depth {number}
+   */
+  setDepth(depth) {
+    this.depth = depth;
+  }
 }

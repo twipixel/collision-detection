@@ -28,33 +28,33 @@ import Vector from '../Vector';
 
 export default class MinkowskiSum {
 
-    /**
-     * @param convex1 충돌 체크할 도형 1
-     * @param convex2 충돌 체크할 도형 2
-     */
-    constructor(convex1, convex2) {
-        this.convex1 = convex1;
-        this.convex2 = convex2;
-    }
+  /**
+   * @param convex1 충돌 체크할 도형 1
+   * @param convex2 충돌 체크할 도형 2
+   */
+  constructor(convex1, convex2) {
+    this.convex1 = convex1;
+    this.convex2 = convex2;
+  }
 
-    /**
-     * supportPoint 를 구합니다. (심플렉스 만들기)
-     * @param direction {Vector}
-     */
-    getSupportPoint(direction) {
-        // get the farthest point in the given direction in convex1
-        const point1 = this.convex1.getFarthestPoint(direction);
-        // get the farthest point in the opposite direction in convex2
-        const point2 = this.convex2.getFarthestPoint(Vector.negate(direction));
-        // return the Minkowski sum point
-        return point1.subtract(point2);
-    }
+  /**
+   * supportPoint 를 구합니다. (심플렉스 만들기)
+   * @param direction {Vector}
+   */
+  getSupportPoint(direction) {
+    // get the farthest point in the given direction in convex1
+    const point1 = this.convex1.getFarthestPoint(direction);
+    // get the farthest point in the opposite direction in convex2
+    const point2 = this.convex2.getFarthestPoint(Vector.negate(direction));
+    // return the Minkowski sum point
+    return point1.subtract(point2);
+  }
 
-    getConvex1() {
-        return this.convex1;
-    }
+  getConvex1() {
+    return this.convex1;
+  }
 
-    getConvex2() {
-        return this.convex2;
-    }
+  getConvex2() {
+    return this.convex2;
+  }
 }

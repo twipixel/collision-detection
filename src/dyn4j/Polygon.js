@@ -29,101 +29,101 @@ import Geometry from './Geometry';
 
 export default class Polygon extends Convex {
 
-    /**
-     * 폴리곤
-     * @param center {Vector}
-     * @param vertices {Vector[]}
-     * @param normals {Vector[]}
-     */
-    constructor(vertices = [], normals = []) {
-        super();
-        this.vertices = vertices;
-        this.normals = (vertices.length !== 0) ?
-            Geometry.getCounterClockwiseEdgeNormals(vertices) : normals;
-        this.center = this.getCenter();
+  /**
+   * 폴리곤
+   * @param center {Vector}
+   * @param vertices {Vector[]}
+   * @param normals {Vector[]}
+   */
+  constructor(vertices = [], normals = []) {
+    super();
+    this.vertices = vertices;
+    this.normals = (vertices.length !== 0) ?
+      Geometry.getCounterClockwiseEdgeNormals(vertices) : normals;
+    this.center = this.getCenter();
+  }
+
+  getPoints() {
+    return this.vertices.slice();
+  }
+
+  getCenter() {
+    const avg = new Vector()
+      , vertices = this.vertices
+      , count = vertices.length;
+
+    for (let i = 0; i < count; i++) {
+      avg.x += vertices[i].x;
+      avg.y += vertices[i].y;
     }
 
-    getPoints() {
-        return this.vertices.slice();
+    avg.x /= count;
+    avg.y /= count;
+    return avg;
+  }
+
+  getFarthestPoint(direction) {
+    const point = new Vector();
+    // set the farthest point to the first one
+    point.set(this.vertices[0]);
+    // prime the projection amount
+    let max = direction.dot(this.vertices[0]);
+    const size = this.vertices.length;
+    for (let i = 1; i < size; i++) {
+      const vertex = this.vertices[i]
+        , projection = direction.dot(vertex);
+
+      if (projection > max) {
+        point.set(vertex);
+        max = projection;
+      }
     }
 
-    getCenter() {
-        const avg = new Vector()
-            , vertices = this.vertices
-            , count = vertices.length;
+    return point;
+  }
 
-        for (let i = 0; i < count; i++) {
-            avg.x += vertices[i].x;
-            avg.y += vertices[i].y;
-        }
+  getFarthestFeature(direction) {
+    const maximum = new Vector();
+    let max = -Number.MAX_VALUE;
+    let index = 0;
 
-        avg.x /= count;
-        avg.y /= count;
-        return avg;
+    const count = this.vertices.length;
+    for (let i = 0; i < count; i++) {
+      // get the current vertex
+      const vertex = this.vertices[i];
+      // get the scalar projection of v onto axis
+      const projection = direction.dot(vertex);
+      // keep the maximum projection point
+      if (projection > max) {
+        // set the max point
+        maximum.set(v);
+        // set the new maximum
+        max = projection;
+        // save the index
+        index = i;
+      }
     }
 
-    getFarthestPoint(direction) {
-        const point = new Vector();
-        // set the farthest point to the first one
-        point.set(this.vertices[0]);
-        // prime the projection amount
-        let max = direction.dot(this.vertices[0]);
-        const size = this.vertices.length;
-        for (let i = 1; i < size; i++) {
-            const vertex = this.vertices[i]
-                , projection = direction.dot(vertex);
+    // once we have the point of maximum
+    // see which edge is most perpendicular
+    const l = index + 1 == count ? 0 : index + 1;
+    const r = index - 1 < 0 ? count - 1 : index - 1;
 
-            if (projection > max) {
-                point.set(vertex);
-                max = projection;
-            }
-        }
-
-        return point;
+    const leftN = this.normals[index == 0 ? count - 1 : index - 1];
+    const rightN = this.normals[index];
+    // create the maximum point for the feature (transform the maximum into world space)
+    const vm = new PointFeature(maximum, index);
+    // is the left or right edge more perpendicular?
+    if (leftN.dot(direction) < rightN.dot(direction)) {
+      const left = this.vertices[l];
+      const vl = new PointFeature(left, l);
+      // make sure the edge is the right winding
+      return new EdgeFeature(vm, vl, vm, maximum.to(left), index + 1);
     }
 
-    getFarthestFeature(direction) {
-        const maximum = new Vector();
-        let max = -Number.MAX_VALUE;
-        let index = 0;
-
-        const count = this.vertices.length;
-        for (let i = 0; i < count; i++) {
-            // get the current vertex
-            const vertex = this.vertices[i];
-            // get the scalar projection of v onto axis
-            const projection = direction.dot(vertex);
-            // keep the maximum projection point
-            if (projection > max) {
-                // set the max point
-                maximum.set(v);
-                // set the new maximum
-                max = projection;
-                // save the index
-                index = i;
-            }
-        }
-
-        // once we have the point of maximum
-        // see which edge is most perpendicular
-        const l = index + 1 == count ? 0 : index + 1;
-        const r = index - 1 < 0 ? count - 1 : index - 1;
-
-        const leftN = this.normals[index == 0 ? count - 1 : index - 1];
-        const rightN = this.normals[index];
-        // create the maximum point for the feature (transform the maximum into world space)
-        const vm = new PointFeature(maximum, index);
-        // is the left or right edge more perpendicular?
-        if (leftN.dot(direction) < rightN.dot(direction)) {
-            const left = this.vertices[l];
-            const vl = new PointFeature(left, l);
-            // make sure the edge is the right winding
-            return new EdgeFeature(vm, vl, vm, maximum.to(left), index + 1);
-        }
-
-        const right = this.vertices[r];
-        const vr = new PointFeature(right, r);
-        // make sure the edge is the right winding
-        return new EdgeFeature(vr, vm, vm, right.to(maximum), index);
-    }
+    const right = this.vertices[r];
+    const vr = new PointFeature(right, r);
+    // make sure the edge is the right winding
+    return new EdgeFeature(vr, vm, vm, right.to(maximum), index);
+  }
 }

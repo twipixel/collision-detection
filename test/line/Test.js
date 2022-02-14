@@ -30,10 +30,10 @@ export default class Test extends PIXI.Container {
       , y1 = half + parseInt(Math.random() * (h - space), 10)
       , x2 = half + parseInt(Math.random() * (w - space), 10) + defaultX
       , y2 = half + parseInt(Math.random() * (h - space), 10) + defaultY
-      , a = { x: x1, y: y1 }
-      , b = { x: x2, y: y2 };
+      , a = {x: x1, y: y1}
+      , b = {x: x2, y: y2};
 
-    this.line = { x1: a.x, y1: a.y, x2: b.x, y2: b.y, a: a, b: b};
+    this.line = {x1: a.x, y1: a.y, x2: b.x, y2: b.y, a: a, b: b};
 
     this.drawLine();
   }
