@@ -36,13 +36,12 @@ class Main {
     stage = new PIXI.Container();
     container = new PIXI.Container();
     stage.addChild(container);
+    this.resizeWindow();
 
     test = new Test(renderer);
-
     container.addChild(test);
 
     this.updateLoop();
-    this.resizeWindow();
   }
 
   addEvent() {
@@ -51,6 +50,7 @@ class Main {
   }
 
   onResize() {
+    this.resizeWindow();
   }
 
   updateLoop(ms) {
@@ -64,22 +64,12 @@ class Main {
   }
 
   resizeWindow() {
-    const width = window.innerWidth * window.devicePixelRatio;
-    const height = window.innerHeight * window.devicePixelRatio;
-
-    /**
-     * 캔버스 사이즈와 디스플레이 사이즈 설정
-     * 레티나 그래픽 지원 코드
-     */
+    const width = window.innerWidth;
+    const height = window.innerHeight;
     canvas.width = width;
     canvas.height = height;
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
-
-    /**
-     * PIXI renderer 리사이즈
-     * PIXI 에게 viewport 사이즈 변경 알림
-     */
     renderer.resize(width, height);
 
     if (test) {
