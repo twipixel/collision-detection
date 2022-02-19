@@ -124,6 +124,8 @@ export default class Test extends PIXI.Container {
       this.removeChild(selectedGraphics[key]);
       selectedGraphics[key] = null;
     });
+
+    this.clearAnimateGraphics();
   }
 
   reset() {
